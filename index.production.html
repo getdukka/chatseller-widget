@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChatSeller Widget - Test Page</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .product {
+      display: flex;
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+    @media (max-width: 768px) {
+      .product {
+        flex-direction: column;
+        gap: 20px;
+      }
+      .product-image {
+        width: 100% !important;
+        height: 200px !important;
+      }
+    }
+    .product-image {
+      width: 300px;
+      height: 300px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .product-info h1 {
+      margin: 0 0 20px 0;
+      font-size: 28px;
+      color: #333;
+    }
+    .price {
+      font-size: 24px;
+      font-weight: bold;
+      color: #e91e63;
+      margin-bottom: 20px;
+    }
+    .description {
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+    .btn {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      transition: background 0.3s;
+    }
+    .btn:hover {
+      background: #0056b3;
+    }
+    .test-controls {
+      margin-top: 40px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border: 1px solid #dee2e6;
+    }
+    .test-controls h3 {
+      margin-top: 0;
+      color: #495057;
+    }
+    .test-controls button {
+      margin: 5px;
+      padding: 8px 16px;
+      border: 1px solid #ddd;
+      background: white;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .test-controls button:hover {
+      background: #f0f0f0;
+      border-color: #007bff;
+    }
+    .status {
+      margin-top: 20px;
+      padding: 15px;
+      background: #e7f3ff;
+      border-radius: 6px;
+      border-left: 4px solid #2196F3;
+    }
+    .status.success {
+      background: #e8f5e8;
+      border-left-color: #4CAF50;
+    }
+    .status.error {
+      background: #ffebee;
+      border-left-color: #f44336;
+    }
+    .hero {
+      text-align: center; 
+      margin-bottom: 40px;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      color: white;
+    }
+    .hero h1 {
+      margin-bottom: 10px;
+      font-size: 2.5rem;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Hero Section -->
+    <div class="hero">
+      <h1>🤖 ChatSeller Widget</h1>
+      <p>Agent IA Commercial pour e-commerce</p>
+      <p style="font-size: 1rem; margin-top: 20px;">
+        ✨ Transformez vos visiteurs en clients avec l'IA conversationnelle
+      </p>
+    </div>
+
+    <!-- Fake Product Page -->
+    <div class="product">
+      <div class="product-image">
+        📦 Image Produit
+      </div>
+      <div class="product-info">
+        <h1>Le Jeu Pour les Couples</h1>
+        <div class="price">14 000 FCFA</div>
+        <div class="description">
+          <p>Découvrez ce jeu révolutionnaire conçu spécialement pour renforcer les liens entre couples. Avec plus de 200 questions et défis, ce jeu vous permettra de mieux vous connaître et de passer des moments inoubliables ensemble.</p>
+          <p><strong>Contenu :</strong></p>
+          <ul>
+            <li>✅ 200+ cartes questions</li>
+            <li>📖 Guide d'utilisation</li>
+            <li>💡 Livret de conseils</li>
+            <li>📦 Boîte de rangement premium</li>
+          </ul>
+        </div>
+        <button class="btn">Ajouter au panier</button>
+        <button class="btn" style="background: #6c757d;">Acheter maintenant</button>
+      </div>
+    </div>
+
+    <!-- Widget Status -->
+    <div id="widget-status" class="status">
+      <strong>Status Widget:</strong> <span id="status-text">Chargement...</span>
+    </div>
+
+    <!-- Test Controls -->
+    <div class="test-controls">
+      <h3>🧪 Contrôles de Test du Widget</h3>
+      <p>Utilisez ces boutons pour tester différentes configurations du widget ChatSeller :</p>
+      
+      <div>
+        <button onclick="initWidget('modern')">🎨 Thème Modern</button>
+        <button onclick="initWidget('minimal')">⚡ Thème Minimal</button>
+        <button onclick="showWidget()">👁️ Afficher</button>
+        <button onclick="hideWidget()">🙈 Masquer</button>
+        <button onclick="destroyWidget()">💥 Détruire</button>
+      </div>
+      
+      <div style="margin-top: 10px;">
+        <button onclick="changeLanguage('fr')">🇫🇷 Français</button>
+        <button onclick="changeLanguage('en')">🇺🇸 English</button>
+        <button onclick="changeLanguage('wo')">🇸🇳 Wolof</button>
+      </div>
+      
+      <div style="margin-top: 10px;">
+        <button onclick="changePosition('bottom-right')">↘️ Bas Droite</button>
+        <button onclick="changePosition('bottom-left')">↙️ Bas Gauche</button>
+        <button onclick="changePosition('top-right')">↗️ Haut Droite</button>
+        <button onclick="changePosition('top-left')">↖️ Haut Gauche</button>
+      </div>
+      
+      <div style="margin-top: 15px;">
+        <button onclick="testIntegration()" style="background: #28a745; color: white; font-weight: bold;">🚀 Test Intégration Complète</button>
+      </div>
+    </div>
+
+    <!-- Integration Instructions -->
+    <div style="margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6;">
+      <h3>📋 Instructions d'Intégration E-commerce</h3>
+      <p>Pour intégrer ChatSeller sur votre site e-commerce :</p>
+      
+      <h4>🔗 Script CDN (Recommandé)</h4>
+      <pre style="background: #2d3748; color: #a0aec0; padding: 15px; border-radius: 6px; overflow-x: auto; font-size: 14px;"><code>&lt;!-- Intégration ChatSeller --&gt;
+&lt;script src="https://chatseller-widget.vercel.app/dist/chatseller.umd.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  ChatSeller.init({
+    shopId: 'your-shop-id',
+    apiUrl: 'https://chatseller-api-production.up.railway.app',
+    productName: 'Nom de votre produit',
+    productPrice: 15000,
+    theme: 'modern',
+    primaryColor: '#ec4899',
+    language: 'fr'
+  });
+&lt;/script&gt;</code></pre>
+
+      <h4>📊 URLs importantes</h4>
+      <ul>
+        <li><strong>Dashboard :</strong> <a href="https://chatseller-dashboard.vercel.app" target="_blank">chatseller-dashboard.vercel.app</a></li>
+        <li><strong>API :</strong> <a href="https://chatseller-api-production.up.railway.app" target="_blank">chatseller-api-production.up.railway.app</a></li>
+        <li><strong>Widget :</strong> <a href="https://chatseller-widget.vercel.app" target="_blank">chatseller-widget.vercel.app</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ChatSeller Widget Script - Production version -->
+  <script src="./chatseller.umd.js"></script>
+  
+  <script>
+    // Status elements
+    const statusDiv = document.getElementById('widget-status');
+    const statusText = document.getElementById('status-text');
+
+    function updateStatus(message, type = 'info') {
+      statusText.textContent = message;
+      statusDiv.className = `status ${type}`;
+    }
+
+    // Wait for widget to load
+    window.addEventListener('DOMContentLoaded', function() {
+      setTimeout(() => {
+        if (window.ChatSeller) {
+          updateStatus('✅ Widget chargé avec succès!', 'success');
+          initWidget('modern');
+        } else {
+          updateStatus('❌ Erreur: Widget non chargé', 'error');
+          console.error('ChatSeller widget failed to load');
+        }
+      }, 1500);
+    });
+
+    function initWidget(theme = 'modern') {
+      try {
+        if (window.ChatSeller) {
+          window.ChatSeller.destroy(); // Clean up existing instance
+          
+          window.ChatSeller.init({
+            shopId: 'test-shop-id',
+            apiUrl: 'https://chatseller-api-production.up.railway.app',
+            productId: 'jeu-couples-001',
+            productName: 'Le Jeu Pour les Couples',
+            productPrice: 14000,
+            productUrl: window.location.href,
+            theme: theme,
+            primaryColor: '#e91e63',
+            position: 'bottom-right',
+            buttonText: 'Parler au vendeur',
+            language: 'fr'
+          });
+          
+          updateStatus(`✅ Widget initialisé (thème: ${theme})`, 'success');
+        } else {
+          updateStatus('❌ Erreur: ChatSeller non disponible', 'error');
+        }
+      } catch (error) {
+        updateStatus(`❌ Erreur d'initialisation: ${error.message}`, 'error');
+        console.error('Widget initialization error:', error);
+      }
+    }
+
+    function showWidget() {
+      if (window.ChatSeller) {
+        window.ChatSeller.show();
+        updateStatus('👁️ Widget affiché', 'success');
+      }
+    }
+
+    function hideWidget() {
+      if (window.ChatSeller) {
+        window.ChatSeller.hide();
+        updateStatus('🙈 Widget masqué', 'success');
+      }
+    }
+
+    function destroyWidget() {
+      if (window.ChatSeller) {
+        window.ChatSeller.destroy();
+        updateStatus('💥 Widget détruit', 'success');
+      }
+    }
+
+    function changeLanguage(lang) {
+      if (window.ChatSeller) {
+        window.ChatSeller.updateConfig({ language: lang });
+        updateStatus(`🌍 Langue changée: ${lang}`, 'success');
+      }
+    }
+
+    function changePosition(position) {
+      if (window.ChatSeller) {
+        window.ChatSeller.updateConfig({ position: position });
+        updateStatus(`📍 Position changée: ${position}`, 'success');
+      }
+    }
+
+    function testIntegration() {
+      updateStatus('⏳ Test d\'intégration en cours...', 'info');
+      
+      setTimeout(() => {
+        if (window.ChatSeller) {
+          // Test toutes les fonctions
+          window.ChatSeller.track('test_event', { test: true, timestamp: new Date().toISOString() });
+          updateStatus('🎉 Test d\'intégration réussi!', 'success');
+        } else {
+          updateStatus('💥 Test d\'intégration échoué', 'error');
+        }
+      }, 1000);
+    }
+
+    // Console helpers for debugging
+    window.debugWidget = {
+      config: () => window.ChatSeller?.config,
+      track: (event, data) => window.ChatSeller?.track(event, data),
+      init: initWidget,
+      show: showWidget,
+      hide: hideWidget,
+      destroy: destroyWidget,
+      status: () => updateStatus('Debug mode active', 'info')
+    };
+
+    console.log('🚀 ChatSeller Widget Test Page loaded!');
+    console.log('💡 Use window.debugWidget for testing commands');
+    console.log('📊 API Status: Railway deployed and ready');
+    console.log('🎨 Dashboard: https://chatseller-dashboard.vercel.app');
+  </script>
+</body>
+</html>
