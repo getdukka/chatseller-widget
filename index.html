@@ -24,6 +24,16 @@
       gap: 30px;
       margin-bottom: 40px;
     }
+    @media (max-width: 768px) {
+      .product {
+        flex-direction: column;
+        gap: 20px;
+      }
+      .product-image {
+        width: 100% !important;
+        height: 200px !important;
+      }
+    }
     .product-image {
       width: 300px;
       height: 300px;
@@ -59,6 +69,7 @@
       cursor: pointer;
       font-size: 16px;
       margin-right: 10px;
+      margin-bottom: 10px;
     }
     .btn:hover {
       background: #0056b3;
@@ -83,14 +94,35 @@
     .test-controls button:hover {
       background: #f0f0f0;
     }
+    .status {
+      margin-top: 20px;
+      padding: 15px;
+      background: #e7f3ff;
+      border-radius: 6px;
+      border-left: 4px solid #2196F3;
+    }
+    .status.success {
+      background: #e8f5e8;
+      border-left-color: #4CAF50;
+    }
+    .status.error {
+      background: #ffebee;
+      border-left-color: #f44336;
+    }
   </style>
 </head>
 <body>
   <div class="container">
+    <!-- Header -->
+    <div style="text-align: center; margin-bottom: 40px;">
+      <h1 style="color: #ec4899; margin-bottom: 10px;">🤖 ChatSeller Widget Demo</h1>
+      <p style="color: #666; font-size: 18px;">Agent IA Commercial pour e-commerce</p>
+    </div>
+
     <!-- Fake Product Page -->
     <div class="product">
       <div class="product-image">
-        <span>Image Produit</span>
+        <span>📦 Image Produit</span>
       </div>
       <div class="product-info">
         <h1>Le Jeu Pour les Couples</h1>
@@ -108,6 +140,11 @@
         <button class="btn">Ajouter au panier</button>
         <button class="btn" style="background: #6c757d;">Acheter maintenant</button>
       </div>
+    </div>
+
+    <!-- Widget Status -->
+    <div id="widget-status" class="status">
+      <strong>Status Widget:</strong> <span id="status-text">Chargement...</span>
     </div>
 
     <!-- Test Controls -->
@@ -135,71 +172,131 @@
         <button onclick="changePosition('top-right')">Haut Droite</button>
         <button onclick="changePosition('top-left')">Haut Gauche</button>
       </div>
+      
+      <div style="margin-top: 15px;">
+        <button onclick="testIntegration()" style="background: #28a745; color: white; font-weight: bold;">🚀 Test Intégration Complète</button>
+      </div>
+    </div>
+
+    <!-- Integration Instructions -->
+    <div style="margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+      <h3>📋 Instructions d'Intégration</h3>
+      <p>Pour intégrer ChatSeller sur votre site :</p>
+      <pre style="background: #2d3748; color: #a0aec0; padding: 15px; border-radius: 6px; overflow-x: auto;"><code>&lt;script src="https://chatseller-widget.vercel.app/dist/chatseller.umd.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  ChatSeller.init({
+    shopId: 'your-shop-id',
+    apiUrl: 'https://chatseller-api-production.up.railway.app',
+    productName: 'Nom de votre produit',
+    productPrice: 15000,
+    theme: 'modern',
+    primaryColor: '#ec4899',
+    language: 'fr'
+  });
+&lt;/script&gt;</code></pre>
     </div>
   </div>
 
   <!-- ChatSeller Widget Script -->
-  <script type="module" src="/src/embed.ts"></script>
+  <script src="./dist/chatseller.umd.js"></script>
   
   <script>
+    // Status elements
+    const statusDiv = document.getElementById('widget-status');
+    const statusText = document.getElementById('status-text');
+
+    function updateStatus(message, type = 'info') {
+      statusText.textContent = message;
+      statusDiv.className = `status ${type}`;
+    }
+
     // Wait for widget to load
     window.addEventListener('DOMContentLoaded', function() {
-      // Initialize with default config
       setTimeout(() => {
-        initWidget('modern');
+        if (window.ChatSeller) {
+          updateStatus('Widget chargé avec succès!', 'success');
+          initWidget('modern');
+        } else {
+          updateStatus('Erreur: Widget non chargé', 'error');
+        }
       }, 1000);
     });
 
     function initWidget(theme = 'modern') {
-      if (window.ChatSeller) {
-        window.ChatSeller.destroy(); // Clean up existing instance
-        
-        window.ChatSeller.init({
-          shopId: 'test-shop-id',
-          apiUrl: 'http://localhost:3001',
-          productId: 'jeu-couples-001',
-          productName: 'Le Jeu Pour les Couples',
-          productPrice: 14000,
-          productUrl: window.location.href,
-          theme: theme,
-          primaryColor: '#e91e63',
-          position: 'bottom-right',
-          buttonText: 'Parler au vendeur',
-          language: 'fr'
-        });
-      } else {
-        console.error('ChatSeller not loaded yet');
+      try {
+        if (window.ChatSeller) {
+          window.ChatSeller.destroy(); // Clean up existing instance
+          
+          window.ChatSeller.init({
+            shopId: 'test-shop-id',
+            apiUrl: 'https://chatseller-api-production.up.railway.app',
+            productId: 'jeu-couples-001',
+            productName: 'Le Jeu Pour les Couples',
+            productPrice: 14000,
+            productUrl: window.location.href,
+            theme: theme,
+            primaryColor: '#e91e63',
+            position: 'bottom-right',
+            buttonText: 'Parler au vendeur',
+            language: 'fr'
+          });
+          
+          updateStatus(`Widget initialisé (thème: ${theme})`, 'success');
+        } else {
+          updateStatus('Erreur: ChatSeller non disponible', 'error');
+        }
+      } catch (error) {
+        updateStatus(`Erreur d'initialisation: ${error.message}`, 'error');
       }
     }
 
     function showWidget() {
       if (window.ChatSeller) {
         window.ChatSeller.show();
+        updateStatus('Widget affiché', 'success');
       }
     }
 
     function hideWidget() {
       if (window.ChatSeller) {
         window.ChatSeller.hide();
+        updateStatus('Widget masqué', 'success');
       }
     }
 
     function destroyWidget() {
       if (window.ChatSeller) {
         window.ChatSeller.destroy();
+        updateStatus('Widget détruit', 'success');
       }
     }
 
     function changeLanguage(lang) {
       if (window.ChatSeller) {
         window.ChatSeller.updateConfig({ language: lang });
+        updateStatus(`Langue changée: ${lang}`, 'success');
       }
     }
 
     function changePosition(position) {
       if (window.ChatSeller) {
         window.ChatSeller.updateConfig({ position: position });
+        updateStatus(`Position changée: ${position}`, 'success');
       }
+    }
+
+    function testIntegration() {
+      updateStatus('Test d\'intégration en cours...', 'info');
+      
+      setTimeout(() => {
+        if (window.ChatSeller) {
+          // Test toutes les fonctions
+          window.ChatSeller.track('test_event', { test: true });
+          updateStatus('✅ Test d\'intégration réussi!', 'success');
+        } else {
+          updateStatus('❌ Test d\'intégration échoué', 'error');
+        }
+      }, 1000);
     }
 
     // Console helpers for debugging
