@@ -11,6 +11,7 @@
     "build": "vue-tsc && vite build",
     "build:lib": "vue-tsc && vite build --mode library",
     "build:complete": "npm run build:lib && cp index.html dist/ && cp -r dist dist/dist",
+    "build:vercel": "npm run build:lib && cp index.html dist/ && sed -i '' 's|\\.\\./src/embed\\.ts|./chatseller.umd.js|g' dist/index.html",
     "preview": "vite preview",
     "type-check": "vue-tsc --noEmit",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
