@@ -1,8 +1,18 @@
 {
-  "buildCommand": "npm run build:lib",
+  "buildCommand": "npm run build && npm run build:lib",
   "outputDirectory": "dist",
   "installCommand": "npm install",
   "framework": null,
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
   "headers": [
     {
       "source": "/dist/(.*)",
@@ -20,12 +30,6 @@
           "value": "X-Requested-With, Content-Type, Authorization"
         }
       ]
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
     }
   ]
 }
