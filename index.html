@@ -3,18 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Test ChatSeller Widget - Boutique E-commerce</title>
+  <title>Test Intégration ChatSeller Widget</title>
   
   <!-- Meta tags pour simulation e-commerce -->
-  <meta property="og:title" content="Le Jeu Pour les Couples - Boutique Test">
-  <meta property="og:description" content="Jeu révolutionnaire pour renforcer les liens entre couples">
-  <meta property="og:price:amount" content="14000">
-  <meta property="og:price:currency" content="XOF">
-  <meta name="chatseller-shop-id" content="12345678-1234-1234-1234-123456789abc">
-  
-  <!-- Préchargement DNS pour performance -->
-  <link rel="dns-prefetch" href="//widget.chatseller.app">
-  <link rel="dns-prefetch" href="//chatseller-api-production.up.railway.app">
+  <meta property="og:title" content="iPhone 15 Pro - Boutique Test">
+  <meta property="og:description" content="Le dernier iPhone avec puce A17 Pro">
+  <meta property="og:price:amount" content="1200">
+  <meta property="og:price:currency" content="EUR">
   
   <style>
     * {
@@ -27,8 +22,7 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       line-height: 1.6;
       color: #333;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
+      background: #f8f9fa;
     }
 
     .header {
@@ -52,9 +46,7 @@
     .logo {
       font-size: 1.8rem;
       font-weight: bold;
-      background: linear-gradient(45deg, #667eea, #764ba2);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: #007AFF;
     }
 
     .nav {
@@ -67,14 +59,6 @@
       text-decoration: none;
       color: #666;
       font-weight: 500;
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-      transition: all 0.3s;
-    }
-
-    .nav a:hover {
-      background: #f8f9fa;
-      color: #667eea;
     }
 
     .container {
@@ -84,13 +68,12 @@
     }
 
     .test-banner {
-      background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+      background: linear-gradient(135deg, #007AFF, #5856D6);
       color: white;
-      padding: 1rem 2rem;
+      padding: 1.5rem 2rem;
       border-radius: 12px;
       margin-bottom: 2rem;
       text-align: center;
-      box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
     }
 
     .test-banner h2 {
@@ -98,29 +81,12 @@
       margin-bottom: 0.5rem;
     }
 
-    .test-banner p {
-      opacity: 0.9;
-      font-size: 1rem;
-    }
-
     .product-section {
       background: white;
       border-radius: 16px;
       padding: 3rem;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
       margin-bottom: 2rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .product-section::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, #667eea, #764ba2);
     }
 
     .product-grid {
@@ -131,13 +97,11 @@
     }
 
     .product-image {
-      position: relative;
       width: 100%;
       height: 400px;
       border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -147,17 +111,11 @@
       text-align: center;
     }
 
-    .product-image::after {
-      content: '📦 Image Produit\A(Simulation E-commerce)';
-      white-space: pre-line;
-    }
-
     .product-info h1 {
       font-size: 2.5rem;
       font-weight: bold;
       color: #1a1a1a;
       margin-bottom: 1rem;
-      line-height: 1.2;
     }
 
     .product-rating {
@@ -177,17 +135,10 @@
       font-size: 1.2rem;
     }
 
-    .rating-text {
-      color: #666;
-      font-size: 0.9rem;
-    }
-
     .price {
       font-size: 2.2rem;
       font-weight: bold;
-      background: linear-gradient(45deg, #667eea, #764ba2);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: #007AFF;
       margin-bottom: 1.5rem;
     }
 
@@ -206,7 +157,6 @@
       font-size: 1.2rem;
       font-weight: 600;
       margin-bottom: 1rem;
-      color: #1a1a1a;
     }
 
     .features ul {
@@ -223,8 +173,9 @@
     }
 
     .features li:before {
-      content: "✅";
-      font-size: 1rem;
+      content: "✓";
+      color: #34D399;
+      font-weight: bold;
     }
 
     .product-actions {
@@ -256,7 +207,6 @@
       font-size: 1.2rem;
       font-weight: bold;
       transition: background 0.3s;
-      color: #667eea;
     }
 
     .quantity-btn:hover {
@@ -281,97 +231,55 @@
       cursor: pointer;
       transition: all 0.3s;
       text-align: center;
-      text-decoration: none;
-      display: inline-block;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-      transition: left 0.5s;
-    }
-
-    .btn:hover::before {
-      left: 100%;
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: #1a1a1a;
       color: white;
-      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
     }
 
     .btn-primary:hover {
+      background: #333;
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
     }
 
     .btn-secondary {
-      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+      background: #007AFF;
       color: white;
-      box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
     }
 
     .btn-secondary:hover {
+      background: #0051D5;
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
     }
 
-    .widget-status {
+    /* ✅ STYLE POUR WIDGET CONTAINER */
+    .widget-container {
+      margin: 1rem 0;
+      position: relative;
+      z-index: 1000;
+    }
+
+    /* ✅ WIDGET DEBUG AREA */
+    .widget-debug {
       background: white;
       border-radius: 12px;
       padding: 2rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     }
 
-    .status-indicator {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 1rem;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-      font-weight: 500;
-    }
-
-    .status-loading {
-      background: #fef3c7;
-      border: 1px solid #f59e0b;
-      color: #92400e;
-    }
-
-    .status-success {
-      background: #d1fae5;
-      border: 1px solid #10b981;
-      color: #065f46;
-    }
-
-    .status-error {
-      background: #fee2e2;
-      border: 1px solid #ef4444;
-      color: #991b1b;
-    }
-
-    .widget-controls {
+    .debug-controls {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 1rem;
-      margin-top: 1rem;
+      margin-bottom: 2rem;
     }
 
-    .control-btn {
+    .debug-btn {
       padding: 0.75rem 1rem;
-      border: 2px solid #667eea;
+      border: 2px solid #007AFF;
       background: white;
-      color: #667eea;
+      color: #007AFF;
       border-radius: 8px;
       cursor: pointer;
       font-size: 0.9rem;
@@ -379,8 +287,8 @@
       transition: all 0.3s;
     }
 
-    .control-btn:hover {
-      background: #667eea;
+    .debug-btn:hover {
+      background: #007AFF;
       color: white;
     }
 
@@ -397,84 +305,26 @@
     }
 
     @media (max-width: 768px) {
-      .container {
-        padding: 1rem;
-      }
-
-      .product-section {
-        padding: 1.5rem;
-      }
-
       .product-grid {
         grid-template-columns: 1fr;
         gap: 2rem;
       }
-
+      
       .product-info h1 {
         font-size: 2rem;
       }
-
-      .price {
-        font-size: 1.8rem;
-      }
-
-      .nav {
-        display: none;
-      }
-
-      .widget-controls {
+      
+      .debug-controls {
         grid-template-columns: 1fr;
-      }
-    }
-
-    .floating-info {
-      position: fixed;
-      top: 50%;
-      left: 20px;
-      transform: translateY(-50%);
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      padding: 1rem;
-      border-radius: 12px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-      z-index: 1000;
-      max-width: 250px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .floating-info h4 {
-      color: #667eea;
-      margin-bottom: 0.5rem;
-      font-size: 0.9rem;
-    }
-
-    .floating-info p {
-      font-size: 0.8rem;
-      color: #666;
-      margin-bottom: 0.25rem;
-    }
-
-    @media (max-width: 1024px) {
-      .floating-info {
-        display: none;
       }
     }
   </style>
 </head>
 <body>
-  <!-- Info flottante pour développeurs -->
-  <div class="floating-info">
-    <h4>🧪 Mode Test</h4>
-    <p><strong>Shop ID:</strong> Test UUID</p>
-    <p><strong>API:</strong> Production</p>
-    <p><strong>Détection:</strong> Auto</p>
-    <p><strong>Console:</strong> F12 pour debug</p>
-  </div>
-
   <!-- Header -->
   <header class="header">
     <div class="header-content">
-      <div class="logo">🛍️ Boutique Test</div>
+      <div class="logo">📱 TechStore</div>
       <nav>
         <ul class="nav">
           <li><a href="#accueil">Accueil</a></li>
@@ -490,39 +340,21 @@
   <div class="container">
     <!-- Bannière de test -->
     <div class="test-banner">
-      <h2>🧪 PAGE DE TEST CHATSELLER WIDGET</h2>
+      <h2>🧪 TEST D'INTÉGRATION CHATSELLER WIDGET</h2>
       <p>Cette page simule une boutique e-commerce pour tester le widget ChatSeller</p>
-    </div>
-
-    <!-- Statut du widget -->
-    <div class="widget-status">
-      <h3>📊 Statut du Widget ChatSeller</h3>
-      <div id="widget-status-indicator" class="status-indicator status-loading">
-        <span>🔄</span>
-        <span>Chargement du widget en cours...</span>
-      </div>
-      
-      <div class="widget-controls">
-        <button class="control-btn" onclick="testWidgetConnection()">🔌 Tester Connexion</button>
-        <button class="control-btn" onclick="showWidgetDebug()">🐛 Debug Info</button>
-        <button class="control-btn" onclick="simulateProductView()">👁️ Simuler Vue Produit</button>
-        <button class="control-btn" onclick="openWidgetManually()">💬 Ouvrir Widget</button>
-      </div>
-      
-      <div id="debug-output" class="debug-info" style="display: none;"></div>
     </div>
 
     <!-- Section produit simulé -->
     <div class="product-section">
       <div class="product-grid">
         <!-- Image produit -->
-        <div class="product-image" id="product-image">
-          <!-- Image sera chargée ici -->
+        <div class="product-image">
+          📱<br>iPhone 15 Pro<br>(Image Produit)
         </div>
 
         <!-- Informations produit -->
         <div class="product-info">
-          <h1 id="product-title">Le Jeu Pour les Couples</h1>
+          <h1>iPhone 15 Pro</h1>
           
           <div class="product-rating">
             <div class="stars">
@@ -532,23 +364,24 @@
               <span class="star">★</span>
               <span class="star">★</span>
             </div>
-            <span class="rating-text">(127 avis clients)</span>
+            <span style="color: #666; font-size: 0.9rem;">(1,234 avis)</span>
           </div>
 
-          <div class="price" id="product-price">14 000 FCFA</div>
+          <div class="price">1 199 €</div>
 
           <div class="description">
-            <p>Découvrez ce jeu révolutionnaire conçu spécialement pour renforcer les liens entre couples. Avec plus de 200 questions et défis, ce jeu vous permettra de mieux vous connaître et de passer des moments inoubliables ensemble.</p>
+            <p>iPhone 15 Pro avec puce A17 Pro révolutionnaire, caméra 48 Mpx, écran Super Retina XDR et boîtier en titane. Une performance exceptionnelle dans un design premium.</p>
           </div>
 
           <div class="features">
-            <h3>Contenu du pack :</h3>
+            <h3>Caractéristiques principales :</h3>
             <ul>
-              <li>200+ cartes questions personnalisées</li>
-              <li>Guide d'utilisation détaillé</li>
-              <li>Livret de conseils relationnels</li>
-              <li>Boîte de rangement premium</li>
-              <li>Garantie satisfaction 30 jours</li>
+              <li>Puce A17 Pro avec GPU 6 cœurs</li>
+              <li>Écran Super Retina XDR 6,1"</li>
+              <li>Caméra principale 48 Mpx</li>
+              <li>Boîtier en titane</li>
+              <li>USB-C avec Thunderbolt</li>
+              <li>Bouton Action personnalisable</li>
             </ul>
           </div>
 
@@ -557,236 +390,335 @@
               <label><strong>Quantité :</strong></label>
               <div class="quantity-controls">
                 <button class="quantity-btn" onclick="changeQuantity(-1)">−</button>
-                <input type="number" id="quantity" class="quantity-input" value="1" min="1" max="10">
+                <input type="number" id="quantity" class="quantity-input" value="1" min="1" max="5">
                 <button class="quantity-btn" onclick="changeQuantity(1)">+</button>
               </div>
             </div>
 
-            <button class="btn btn-primary" onclick="addToCart()">
+            <!-- ✅ CONTAINER DÉDIÉ POUR LE WIDGET -->
+            <div id="chatseller-widget-container" class="widget-container">
+              <!-- Le widget ChatSeller sera inséré automatiquement ici -->
+              <div id="chatseller-widget" style="width: 100%;"></div>
+            </div>
+
+            <!-- Boutons CTA principaux -->
+            <button id="add-to-cart-btn" class="btn btn-primary" onclick="addToCart()">
               🛒 Ajouter au panier
             </button>
 
-            <button class="btn btn-secondary" onclick="buyNow()">
+            <button id="buy-now-btn" class="btn btn-secondary" onclick="buyNow()">
               ⚡ Acheter maintenant
             </button>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Debug du widget -->
+    <div class="widget-debug">
+      <h3>🔧 Outils de Debug Widget</h3>
+      
+      <div class="debug-controls">
+        <button class="debug-btn" onclick="testWidgetLoad()">🔌 Tester Chargement</button>
+        <button class="debug-btn" onclick="showWidgetDebug()">🐛 Debug Info</button>
+        <button class="debug-btn" onclick="simulateProductView()">👁️ Simuler Vue</button>
+        <button class="debug-btn" onclick="openWidgetChat()">💬 Ouvrir Chat</button>
+        <button class="debug-btn" onclick="testWidgetAPI()">🌐 Test API</button>
+        <button class="debug-btn" onclick="reloadWidget()">🔄 Recharger</button>
+      </div>
+      
+      <div id="debug-output" class="debug-info" style="display: none;">
+        Informations de debug s'afficheront ici...
+      </div>
+    </div>
   </div>
 
-  <!-- ✅ WIDGET CHATSELLER - Configuration de test -->
+  <!-- ✅ WIDGET CHATSELLER - CONFIGURATION SIMPLIFIÉE -->
   <script>
     // Configuration globale pour le widget
     window.ChatSellerConfig = {
       shopId: "12345678-1234-1234-1234-123456789abc", // UUID de test
-      apiUrl: "http://localhost:3001", // URL de votre API locale
+      apiUrl: "https://chatseller-api-production.up.railway.app", // ✅ URL API Production
       theme: "modern",
-      primaryColor: "#667eea",
-      position: "bottom-right",
-      buttonText: "💬 Parler au vendeur",
+      primaryColor: "#007AFF",
+      position: "above-cta", // above-cta, below-cta, beside-cta  
+      buttonText: "💬 Parler à un conseiller",
       language: "fr",
-      autoDetectProduct: true
+      autoDetectProduct: true,
+      // ✅ Configuration pour forcer le positionnement
+      forceContainer: "chatseller-widget", // ID du container dédié
+      debug: true // Activer le mode debug
     };
+
+    console.log('🔧 Configuration widget:', window.ChatSellerConfig);
   </script>
 
-  <!-- Chargement du widget -->
-  <script async src="/src/embed.ts" type="module"></script>
+  <!-- ✅ CHARGEMENT MODULE TYPESCRIPT EN DÉVELOPPEMENT -->
+  <script type="module">
+    try {
+      console.log('🚀 Tentative de chargement du widget...');
+      
+      // ✅ Import du module TypeScript en développement
+      const { default: chatSeller } = await import('/src/embed.ts');
+      
+      console.log('✅ Module widget chargé:', chatSeller);
+      
+      // ✅ Initialiser immédiatement
+      if (chatSeller && typeof chatSeller.init === 'function') {
+        await chatSeller.init(window.ChatSellerConfig);
+        console.log('✅ Widget initialisé avec succès');
+      } else {
+        console.error('❌ Module widget invalide');
+      }
+      
+    } catch (error) {
+      console.error('❌ Erreur lors du chargement du widget:', error);
+      
+      // ✅ Fallback : Créer un bouton de test simple
+      setTimeout(() => {
+        createFallbackWidget();
+      }, 1000);
+    }
+
+    // ✅ Fonction fallback pour créer un widget de test
+    function createFallbackWidget() {
+      const container = document.getElementById('chatseller-widget');
+      if (container && !container.hasChildNodes()) {
+        container.innerHTML = `
+          <button 
+            onclick="alert('Widget de test - Conversation simulée!')" 
+            style="
+              width: 100%;
+              padding: 12px 20px;
+              background: #007AFF;
+              color: white;
+              border: none;
+              border-radius: 12px;
+              font-size: 14px;
+              font-weight: 600;
+              cursor: pointer;
+              margin: 8px 0;
+              transition: all 0.2s;
+            "
+            onmouseover="this.style.background='#0051D5'"
+            onmouseout="this.style.background='#007AFF'"
+          >
+            💬 Parler à un conseiller (TEST)
+          </button>
+        `;
+        console.log('✅ Widget fallback créé');
+      }
+    }
+  </script>
 
   <!-- Scripts de la page de test -->
   <script>
     let currentQuantity = 1;
-    let widgetLoadAttempts = 0;
-    const maxAttempts = 10;
 
     // Fonctions de la boutique simulée
     function changeQuantity(delta) {
       const input = document.getElementById('quantity');
       const newValue = parseInt(input.value) + delta;
-      if (newValue >= 1 && newValue <= 10) {
+      if (newValue >= 1 && newValue <= 5) {
         input.value = newValue;
         currentQuantity = newValue;
       }
     }
 
     function addToCart() {
-      showSuccessMessage(`${currentQuantity} x "Le Jeu Pour les Couples" ajouté au panier !`);
+      showMessage(`${currentQuantity} x iPhone 15 Pro ajouté au panier !`, 'success');
       
-      // Track avec le widget si disponible
+      // Notifier le widget
       if (window.ChatSeller) {
         window.ChatSeller.track('add_to_cart', {
-          productName: 'Le Jeu Pour les Couples',
+          productName: 'iPhone 15 Pro',
           quantity: currentQuantity,
-          price: 14000
+          price: 1199
         });
       }
     }
 
     function buyNow() {
-      showSuccessMessage(`Redirection vers le checkout pour ${currentQuantity} exemplaire(s)`);
+      showMessage(`Redirection vers le checkout pour ${currentQuantity} iPhone(s)`, 'info');
       
-      // Track avec le widget si disponible
+      // Notifier le widget
       if (window.ChatSeller) {
         window.ChatSeller.track('buy_now_clicked', {
-          productName: 'Le Jeu Pour les Couples',
+          productName: 'iPhone 15 Pro',
           quantity: currentQuantity,
-          price: 14000
+          price: 1199
         });
       }
     }
 
-    function showSuccessMessage(message) {
-      const existingMsg = document.querySelector('.success-message');
-      if (existingMsg) existingMsg.remove();
+    function showMessage(message, type = 'info') {
+      // Remove existing message
+      const existing = document.querySelector('.toast-message');
+      if (existing) existing.remove();
 
-      const msgDiv = document.createElement('div');
-      msgDiv.className = 'success-message';
-      msgDiv.style.cssText = `
+      // Create new message
+      const toast = document.createElement('div');
+      toast.className = 'toast-message';
+      toast.style.cssText = `
         position: fixed;
         top: 20px;
         right: 20px;
-        background: linear-gradient(135deg, #10b981, #059669);
-        color: white;
         padding: 1rem 1.5rem;
         border-radius: 12px;
-        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
-        z-index: 10000;
+        color: white;
         font-weight: 500;
-        animation: slideInRight 0.5s ease-out;
+        z-index: 10000;
+        animation: slideIn 0.3s ease-out;
+        background: ${type === 'success' ? '#10B981' : type === 'error' ? '#EF4444' : '#007AFF'};
       `;
-      msgDiv.textContent = message;
+      toast.textContent = message;
 
-      document.body.appendChild(msgDiv);
+      document.body.appendChild(toast);
 
+      // Auto remove
       setTimeout(() => {
-        msgDiv.style.animation = 'slideOutRight 0.5s ease-in forwards';
-        setTimeout(() => msgDiv.remove(), 500);
+        toast.style.animation = 'slideOut 0.3s ease-in';
+        setTimeout(() => toast.remove(), 300);
       }, 3000);
     }
 
-    // Fonctions de test du widget
-    function checkWidgetStatus() {
-      widgetLoadAttempts++;
-      const statusIndicator = document.getElementById('widget-status-indicator');
+    // ✅ FONCTIONS DE DEBUG AMÉLIORÉES
+    function testWidgetLoad() {
+      const debugOutput = document.getElementById('debug-output');
+      debugOutput.style.display = 'block';
+      
+      const container = document.getElementById('chatseller-widget');
+      const hasWidget = container && container.hasChildNodes();
       
       if (window.ChatSeller) {
-        statusIndicator.className = 'status-indicator status-success';
-        statusIndicator.innerHTML = '<span>✅</span><span>Widget ChatSeller chargé et opérationnel</span>';
-        
-        // Log des informations de debug
-        console.log('✅ ChatSeller widget loaded:', window.ChatSeller.getDebugInfo());
-        
-        // Track le chargement de page
-        window.ChatSeller.track('test_page_loaded', {
-          timestamp: new Date().toISOString(),
-          userAgent: navigator.userAgent
-        });
-        
-      } else if (widgetLoadAttempts < maxAttempts) {
-        setTimeout(checkWidgetStatus, 1000);
+        debugOutput.textContent = `✅ Widget chargé avec succès !
+Version: ${window.ChatSeller.version || 'N/A'}
+Config: ${JSON.stringify(window.ChatSeller.currentConfig || window.ChatSellerConfig, null, 2)}
+État: ${window.ChatSeller.isReady ? 'Prêt' : 'En cours de chargement'}
+Container: ${hasWidget ? 'Widget présent' : 'Pas de widget visible'}`;
       } else {
-        statusIndicator.className = 'status-indicator status-error';
-        statusIndicator.innerHTML = '<span>❌</span><span>Échec du chargement du widget après ' + maxAttempts + ' tentatives</span>';
-      }
-    }
+        debugOutput.textContent = `❌ Module principal non chargé
+Container: ${hasWidget ? 'Widget fallback présent' : 'Aucun widget'}
+Config: ${JSON.stringify(window.ChatSellerConfig, null, 2)}
 
-    async function testWidgetConnection() {
-      if (!window.ChatSeller) {
-        alert('❌ Widget non chargé. Attendez le chargement ou vérifiez la console.');
-        return;
+Vérifications:
+1. Serveur de développement actif ? (npm run dev)
+2. Console pour erreurs ? (F12)
+3. Fichier embed.ts accessible ? (/src/embed.ts)`;
       }
-
-      const result = await window.ChatSeller.testConnection();
-      
-      const message = result.success 
-        ? `✅ Connexion réussie (${result.latency}ms)`
-        : `❌ Connexion échouée: ${result.error}`;
-      
-      alert(message);
-      console.log('🔌 Connection test result:', result);
     }
 
     function showWidgetDebug() {
-      if (!window.ChatSeller) {
-        alert('❌ Widget non chargé');
-        return;
-      }
-
       const debugOutput = document.getElementById('debug-output');
-      const debugInfo = window.ChatSeller.getDebugInfo();
-      
-      debugOutput.textContent = JSON.stringify(debugInfo, null, 2);
       debugOutput.style.display = debugOutput.style.display === 'none' ? 'block' : 'none';
       
-      console.log('🐛 Debug info:', debugInfo);
+      if (window.ChatSeller && debugOutput.style.display === 'block') {
+        const debugInfo = window.ChatSeller.getDebugInfo ? window.ChatSeller.getDebugInfo() : {};
+        debugOutput.textContent = JSON.stringify(debugInfo, null, 2);
+      }
     }
 
     function simulateProductView() {
-      if (!window.ChatSeller) {
-        alert('❌ Widget non chargé');
-        return;
-      }
-
-      window.ChatSeller.track('product_viewed', {
-        productId: 'jeu-couples-001',
-        productName: 'Le Jeu Pour les Couples',
-        productPrice: 14000,
-        category: 'Jeux et Divertissement',
-        timestamp: new Date().toISOString()
-      });
-
-      showSuccessMessage('📊 Événement "Vue Produit" envoyé');
-      console.log('👁️ Product view event tracked');
-    }
-
-    function openWidgetManually() {
-      if (!window.ChatSeller) {
-        alert('❌ Widget non chargé');
-        return;
-      }
-
-      // Simuler un clic sur le bouton du widget
-      const widgetButton = document.querySelector('.cs-chat-trigger-button');
-      if (widgetButton) {
-        widgetButton.click();
-        console.log('💬 Widget opened manually');
+      if (window.ChatSeller) {
+        window.ChatSeller.track('product_viewed', {
+          productId: 'iphone-15-pro',
+          productName: 'iPhone 15 Pro',
+          productPrice: 1199,
+          category: 'Smartphones'
+        });
+        showMessage('📊 Événement "Vue Produit" envoyé', 'info');
       } else {
-        alert('❌ Bouton du widget non trouvé');
+        showMessage('❌ Widget non disponible', 'error');
       }
     }
 
-    // Initialisation de la page
+    function openWidgetChat() {
+      // ✅ Recherche améliorée du bouton widget
+      const selectors = [
+        '.cs-chat-trigger-button',
+        '[data-chatseller-trigger]',
+        '#chatseller-widget button',
+        '.chatseller-button'
+      ];
+      
+      let button = null;
+      for (const selector of selectors) {
+        button = document.querySelector(selector);
+        if (button) break;
+      }
+      
+      if (button) {
+        button.click();
+        showMessage('✅ Chat ouvert', 'success');
+      } else {
+        // ✅ Forcer l'ouverture via API si disponible
+        if (window.ChatSeller && window.ChatSeller.show) {
+          window.ChatSeller.show();
+          showMessage('✅ Chat ouvert via API', 'success');
+        } else {
+          showMessage('❌ Bouton widget non trouvé', 'error');
+          console.log('🔍 Boutons disponibles:', document.querySelectorAll('button'));
+        }
+      }
+    }
+
+    async function testWidgetAPI() {
+      try {
+        const response = await fetch('https://chatseller-api-production.up.railway.app/health');
+        if (response.ok) {
+          const data = await response.json();
+          showMessage('✅ API ChatSeller accessible', 'success');
+          console.log('API Health:', data);
+        } else {
+          showMessage('⚠️ API répond avec erreur', 'error');
+        }
+      } catch (error) {
+        showMessage('❌ API inaccessible', 'error');
+        console.error('API Error:', error);
+      }
+    }
+
+    function reloadWidget() {
+      if (window.ChatSeller && window.ChatSeller.destroy) {
+        window.ChatSeller.destroy();
+      }
+      location.reload();
+    }
+
+    // ✅ INITIALISATION AUTOMATIQUE
     document.addEventListener('DOMContentLoaded', function() {
       console.log('🚀 Page de test ChatSeller chargée');
       console.log('🆔 Shop ID de test:', window.ChatSellerConfig?.shopId);
       
-      // Commencer à vérifier le statut du widget
-      setTimeout(checkWidgetStatus, 1000);
-      
-      // Ajouter des styles d'animation
+      // Ajouter styles d'animation
       const style = document.createElement('style');
       style.textContent = `
-        @keyframes slideInRight {
+        @keyframes slideIn {
           from { transform: translateX(100%); opacity: 0; }
           to { transform: translateX(0); opacity: 1; }
         }
-        @keyframes slideOutRight {
+        @keyframes slideOut {
           from { transform: translateX(0); opacity: 1; }
           to { transform: translateX(100%); opacity: 0; }
         }
       `;
       document.head.appendChild(style);
+      
+      // ✅ Debug automatique après chargement
+      setTimeout(() => {
+        testWidgetLoad();
+      }, 2000);
     });
 
-    // Debug global pour la console
-    window.debugChatSeller = {
-      info: () => window.ChatSeller?.getDebugInfo(),
-      test: () => window.ChatSeller?.testConnection(),
-      track: (event, data) => window.ChatSeller?.track(event, data),
-      config: () => window.ChatSeller?.currentConfig
+    // ✅ Exposer les fonctions pour debug global
+    window.testChatSeller = {
+      load: testWidgetLoad,
+      debug: showWidgetDebug,
+      api: testWidgetAPI,
+      track: simulateProductView,
+      open: openWidgetChat,
+      reload: reloadWidget
     };
-
-    console.log('💡 Commandes debug disponibles: window.debugChatSeller');
   </script>
 </body>
 </html>
