@@ -2,9 +2,8 @@
   "name": "chatseller-widget",
   "version": "1.0.0",
   "description": "Widget embeddable d'agent IA commercial pour e-commerce",
-  "main": "dist/chatseller.min.js",
-  "module": "dist/chatseller.esm.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/chatseller-widget.js",
+  "types": "dist/embed.d.ts",
   "files": [
     "dist/"
   ],
@@ -15,11 +14,14 @@
     "build:watch": "vite build --watch",
     "type-check": "vue-tsc --noEmit",
     "preview": "vite preview --host 0.0.0.0 --port 3000",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
+    "lint": "eslint . --ext .vue,.js,.jsx,.ts,.tsx --fix --ignore-path .gitignore",
     "format": "prettier --write src/",
     "test": "echo \"Tests à implémenter\" && exit 0",
     "analyze": "npm run build && npx vite-bundle-analyzer dist",
-    "serve": "npx http-server dist -p 8080 -c-1"
+    "serve": "npx http-server dist -p 8080 -c-1",
+    "clean": "rm -rf dist node_modules/.vite",
+    "test:widget": "npm run build && npm run serve",
+    "deploy:prepare": "npm run clean && npm install && npm run build:prod"
   },
   "dependencies": {
     "vue": "^3.4.0",
@@ -34,9 +36,11 @@
     "@vue/eslint-config-prettier": "^8.0.0",
     "@vue/eslint-config-typescript": "^12.0.0",
     "@vue/tsconfig": "^0.5.1",
+    "autoprefixer": "^10.4.16",
     "eslint": "^8.56.0",
     "eslint-plugin-vue": "^9.19.2",
     "http-server": "^14.1.1",
+    "postcss": "^8.4.32",
     "prettier": "^3.1.1",
     "typescript": "~5.3.0",
     "vite": "^5.0.10",

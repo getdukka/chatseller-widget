@@ -360,12 +360,6 @@ interface Message {
   timestamp: Date
 }
 
-interface OrderWorkflow {
-  currentStep: string
-  collectedData: any
-  isComplete: boolean
-}
-
 interface Translations {
   [lang: string]: {
     [key: string]: string
@@ -534,7 +528,7 @@ const detectBrandColors = () => {
 
   try {
     // Détecter les couleurs principales du site
-    const bodyStyles = window.getComputedStyle(document.body)
+    // const bodyStyles = window.getComputedStyle(document.body) // TODO: Utiliser pour détection de couleurs
     const primaryButtons = document.querySelectorAll('button[class*="primary"], .btn-primary, [class*="cta"]')
     
     if (primaryButtons.length > 0) {
