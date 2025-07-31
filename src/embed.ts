@@ -1,4 +1,4 @@
-// src/embed.ts - WIDGET 100% AUTONOME SANS DÉPENDANCES
+// src/embed.ts - WIDGET 100% AUTONOME AVEC CONNEXION AGENT IA - CORRIGÉ
 export interface ChatSellerConfig {
   shopId: string
   apiUrl?: string
@@ -24,6 +24,31 @@ interface Message {
   timestamp: Date
 }
 
+interface AgentConfig {
+  id: string
+  name: string
+  title: string
+  avatar?: string
+  welcomeMessage: string
+  fallbackMessage: string
+  systemPrompt: string
+  personality: string
+  tone: string
+  knowledgeBase: any[]
+  isActive: boolean
+}
+
+interface ShopConfig {
+  id: string
+  shopId: string
+  primaryColor: string
+  buttonText: string
+  position: string
+  theme: string
+  language: string
+  agent?: AgentConfig
+}
+
 class ChatSeller {
   private config: ChatSellerConfig
   private widgetElement: HTMLElement | null = null
@@ -31,6 +56,9 @@ class ChatSeller {
   private isOpen = false
   private messages: Message[] = []
   private modalElement: HTMLElement | null = null
+  private shopConfig: ShopConfig | null = null
+  private agentConfig: AgentConfig | null = null
+  private conversationId: string | null = null
 
   constructor() {
     this.config = {
@@ -62,12 +90,219 @@ class ChatSeller {
 
     try {
       await this.waitForDOM()
+      
+      // ✅ ÉTAPE 1: Charger la configuration shop + agent depuis l'API
+      await this.loadShopConfiguration()
+      
+      // ✅ ÉTAPE 2: Détecter automatiquement le produit si activé
+      if (this.config.autoDetectProduct) {
+        this.detectProductInfo()
+      }
+      
+      // ✅ ÉTAPE 3: Créer le widget avec la config complète
       this.createWidget()
+      
       this.isInitialized = true
       console.log('✅ ChatSeller widget initialisé avec succès')
+      
+      // ✅ ÉTAPE 4: Track l'initialisation
+      this.track('widget_initialized', {
+        shopId: this.config.shopId,
+        agentConfigured: !!this.agentConfig,
+        productDetected: !!(this.config.productName || this.config.productId)
+      })
+      
     } catch (error) {
       console.error('❌ Échec initialisation ChatSeller:', error)
       this.createFallbackWidget()
+    }
+  }
+
+  // ✅ NOUVEAU: Charger la configuration depuis l'API
+  private async loadShopConfiguration(): Promise<void> {
+    try {
+      console.log('🔄 Chargement configuration shop:', this.config.shopId)
+      
+      const response = await fetch(`${this.config.apiUrl}/public/shops/${this.config.shopId}/config`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status}`)
+      }
+
+      const data = await response.json()
+      
+      if (data.success) {
+        this.shopConfig = data.data.shop
+        this.agentConfig = data.data.agent
+        
+        // ✅ FUSIONNER la config API avec la config locale
+        this.mergeApiConfiguration()
+        
+        console.log('✅ Configuration chargée:', {
+          shop: this.shopConfig?.id,
+          agent: this.agentConfig?.name,
+          primaryColor: this.config.primaryColor
+        })
+      } else {
+        throw new Error(data.error || 'Erreur configuration API')
+      }
+      
+    } catch (error) {
+      console.warn('⚠️ Impossible de charger la configuration:', error)
+      // Continuer avec la config par défaut
+    }
+  }
+
+  // ✅ CORRECTED: Fusionner configuration API + locale avec null checks
+  private mergeApiConfiguration(): void {
+    if (this.shopConfig) {
+      // ✅ Utilisation d'opérateurs de coalescence avec fallbacks sûrs
+      this.config = {
+        ...this.config,
+        primaryColor: this.shopConfig.primaryColor || this.config.primaryColor || '#007AFF',
+        buttonText: this.shopConfig.buttonText || this.config.buttonText || 'Parler à un conseiller',
+        position: (this.shopConfig.position as ChatSellerConfig['position']) || this.config.position || 'above-cta',
+        theme: (this.shopConfig.theme as ChatSellerConfig['theme']) || this.config.theme || 'modern',
+        language: (this.shopConfig.language as ChatSellerConfig['language']) || this.config.language || 'fr'
+      }
+    }
+
+    if (this.agentConfig) {
+      // Injecter la config agent
+      this.config.agentConfig = {
+        id: this.agentConfig.id,
+        name: this.agentConfig.name,
+        title: this.agentConfig.title,
+        avatar: this.agentConfig.avatar,
+        welcomeMessage: this.agentConfig.welcomeMessage,
+        fallbackMessage: this.agentConfig.fallbackMessage,
+        systemPrompt: this.agentConfig.systemPrompt,
+        personality: this.agentConfig.personality,
+        tone: this.agentConfig.tone,
+        knowledgeBase: this.agentConfig.knowledgeBase || []
+      }
+    }
+  }
+
+  // ✅ NOUVEAU: Détection automatique produit
+  private detectProductInfo(): void {
+    try {
+      // Méta tags OpenGraph
+      const ogTitle = document.querySelector('meta[property="og:title"]')?.getAttribute('content')
+      const ogPrice = document.querySelector('meta[property="og:price:amount"]')?.getAttribute('content')
+      // const ogCurrency = document.querySelector('meta[property="og:price:currency"]')?.getAttribute('content')
+      
+      // Schema.org Product
+      const productSchema = document.querySelector('script[type="application/ld+json"]')
+      let schemaData = null
+      if (productSchema) {
+        try {
+          schemaData = JSON.parse(productSchema.textContent || '')
+        } catch (e) {}
+      }
+
+      // Shopify spécifique
+      const shopifyProduct = (window as any).ShopifyAnalytics?.meta?.product
+      
+      // WooCommerce spécifique - peut être utilisé dans une future version  
+      // const wooPrice = document.querySelector('.price .amount')?.textContent
+
+      // Détection générique par sélecteurs
+      const titleSelectors = ['h1.product-title', '.product-name', 'h1', '[data-product-title]']
+      const priceSelectors = ['.price', '.product-price', '[data-price]', '.cost']
+
+      let detectedName = this.config.productName
+      let detectedPrice = this.config.productPrice
+
+      // Priorité: Shopify > OG > Schema > Generic
+      if (shopifyProduct) {
+        detectedName = shopifyProduct.title
+        detectedPrice = shopifyProduct.price ? shopifyProduct.price / 100 : undefined
+      } else if (ogTitle) {
+        detectedName = ogTitle
+        detectedPrice = ogPrice ? parseFloat(ogPrice) : undefined
+      } else if (schemaData?.name) {
+        detectedName = schemaData.name
+        detectedPrice = schemaData.offers?.price ? parseFloat(schemaData.offers.price) : undefined
+      } else {
+        // Fallback générique
+        for (const selector of titleSelectors) {
+          const element = document.querySelector(selector)
+          if (element?.textContent?.trim()) {
+            detectedName = element.textContent.trim()
+            break
+          }
+        }
+        
+        for (const selector of priceSelectors) {
+          const element = document.querySelector(selector)
+          if (element?.textContent?.trim()) {
+            const priceText = element.textContent.trim()
+            const priceMatch = priceText.match(/[\d,]+(?:\.\d{2})?/)
+            if (priceMatch) {
+              detectedPrice = parseFloat(priceMatch[0].replace(',', ''))
+              break
+            }
+          }
+        }
+      }
+
+      // Mise à jour config avec fallbacks sûrs
+      if (detectedName && !this.config.productName) {
+        this.config.productName = detectedName
+      }
+      if (detectedPrice && !this.config.productPrice) {
+        this.config.productPrice = detectedPrice
+      }
+      
+      // Détection URL et ID
+      if (!this.config.productUrl) {
+        this.config.productUrl = window.location.href
+      }
+      if (!this.config.productId) {
+        this.config.productId = this.extractProductIdFromUrl()
+      }
+
+      if (detectedName || detectedPrice) {
+        console.log('✅ Produit détecté:', {
+          name: detectedName,
+          price: detectedPrice,
+          id: this.config.productId
+        })
+      }
+
+    } catch (error) {
+      console.warn('⚠️ Erreur détection produit:', error)
+    }
+  }
+
+  // ✅ CORRECTED: Extraction ID produit avec fallback sûr
+  private extractProductIdFromUrl(): string {
+    try {
+      const url = window.location.href
+      // Shopify: /products/product-handle
+      const shopifyMatch = url.match(/\/products\/([^/?#]+)/)
+      if (shopifyMatch?.[1]) return shopifyMatch[1]
+      
+      // WooCommerce: /?product_id=123 ou /product/product-name/
+      const wooMatch = url.match(/product_id=(\d+)/) || url.match(/\/product\/([^/?#]+)/)
+      if (wooMatch?.[1]) return wooMatch[1]
+      
+      // Generic: dernière partie du path
+      try {
+        const pathParts = new URL(url).pathname.split('/').filter(Boolean)
+        return pathParts[pathParts.length - 1] || 'unknown'
+      } catch {
+        return 'unknown'
+      }
+    } catch (error) {
+      console.warn('⚠️ Erreur extraction product ID:', error)
+      return 'unknown'
     }
   }
 
@@ -90,31 +325,77 @@ class ChatSeller {
     }
     
     if (!container) {
-      // Créer un container et l'insérer au bon endroit
+      // Créer un container et l'insérer au bon endroit selon la position configurée
       container = document.createElement('div')
       container.id = 'chatseller-widget'
       
-      // Chercher un endroit approprié pour l'insérer
-      const productActions = document.querySelector('.product-actions')
-      const addToCartBtn = document.querySelector('#add-to-cart-btn')
-      
-      if (productActions) {
-        if (this.config.position === 'above-cta' && addToCartBtn) {
-          productActions.insertBefore(container, addToCartBtn)
-        } else {
-          productActions.appendChild(container)
-        }
-      } else {
-        document.body.appendChild(container)
-      }
+      this.insertWidgetAtPosition(container)
     }
 
     this.widgetElement = container
     this.renderWidget()
   }
 
+  // ✅ NOUVEAU: Insertion intelligente selon position configurée
+  private insertWidgetAtPosition(container: HTMLElement): void {
+    const position = this.config.position || 'above-cta'
+    
+    // Sélecteurs pour détecter les boutons CTA
+    const ctaSelectors = [
+      '#add-to-cart-btn', '.add-to-cart', '[data-add-to-cart]',
+      '#buy-now-btn', '.buy-now', '.purchase-btn',
+      '.product-actions', '.product-form__buttons',
+      '.single_add_to_cart_button', '.button.add_to_cart_button',
+      '.btn-addtocart', '.product-form__cart'
+    ]
+    
+    let targetElement = null
+    let insertMethod: 'before' | 'after' | 'append' = 'before'
+    
+    // Trouver l'élément CTA
+    for (const selector of ctaSelectors) {
+      targetElement = document.querySelector(selector)
+      if (targetElement) break
+    }
+    
+    // Déterminer la méthode d'insertion selon la position
+    switch (position) {
+      case 'above-cta':
+        insertMethod = 'before'
+        break
+      case 'below-cta':
+        insertMethod = 'after'
+        break
+      case 'beside-cta':
+        insertMethod = 'after'
+        container.style.display = 'inline-block'
+        container.style.marginLeft = '1rem'
+        break
+      default:
+        insertMethod = 'before'
+    }
+    
+    // Insérer le widget
+    if (targetElement) {
+      if (insertMethod === 'before') {
+        targetElement.parentNode?.insertBefore(container, targetElement)
+      } else if (insertMethod === 'after') {
+        targetElement.parentNode?.insertBefore(container, targetElement.nextSibling)
+      } else {
+        targetElement.appendChild(container)
+      }
+    } else {
+      // Fallback: ajouter à la fin du body
+      document.body.appendChild(container)
+    }
+  }
+
   private renderWidget() {
     if (!this.widgetElement) return
+
+    // ✅ UTILISER LA CONFIG AGENT POUR PERSONNALISER LE BOUTON avec fallbacks sûrs
+    const buttonText = this.config.buttonText || 'Parler à un conseiller'
+    const primaryColor = this.config.primaryColor || '#007AFF'
 
     // ✅ HTML COMPLET AVEC STYLES INLINE
     this.widgetElement.innerHTML = `
@@ -123,16 +404,16 @@ class ChatSeller {
           id="chatseller-trigger-btn"
           style="
             width: 100%;
-            padding: 12px 20px;
-            background: ${this.config.primaryColor};
+            padding: 16px 24px;
+            background: linear-gradient(135deg, ${primaryColor} 0%, ${this.adjustColor(primaryColor, -15)} 100%);
             color: white;
             border: none;
             border-radius: 12px;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             display: flex;
             align-items: center;
@@ -141,14 +422,15 @@ class ChatSeller {
             outline: none;
             text-decoration: none;
             box-sizing: border-box;
+            transform: translateY(0);
           "
-          onmouseover="this.style.opacity='0.9'; this.style.transform='translateY(-1px)'"
-          onmouseout="this.style.opacity='1'; this.style.transform='translateY(0px)'"
+          onmouseover="this.style.opacity='0.95'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 35px rgba(0, 0, 0, 0.25)'"
+          onmouseout="this.style.opacity='1'; this.style.transform='translateY(0px)'; this.style.boxShadow='0 8px 25px rgba(0, 0, 0, 0.15)'"
         >
-          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink: 0;">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink: 0;">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
           </svg>
-          ${this.config.buttonText}
+          ${buttonText}
         </button>
       </div>
     `
@@ -162,15 +444,43 @@ class ChatSeller {
     console.log('✅ Widget rendu avec succès')
   }
 
+  // ✅ CORRECTED: Ajustement couleur avec validation
+  private adjustColor(color: string, percent: number): string {
+    try {
+      // Convertir hex vers RGB puis ajuster luminosité
+      const hex = color.replace('#', '')
+      if (hex.length !== 6) return color // Fallback si format invalide
+      
+      const r = parseInt(hex.substr(0, 2), 16)
+      const g = parseInt(hex.substr(2, 2), 16)
+      const b = parseInt(hex.substr(4, 2), 16)
+      
+      const adjust = (channel: number) => {
+        const adjusted = channel + (channel * percent / 100)
+        return Math.max(0, Math.min(255, Math.round(adjusted)))
+      }
+      
+      const newR = adjust(r)
+      const newG = adjust(g)
+      const newB = adjust(b)
+      
+      return `rgb(${newR}, ${newG}, ${newB})`
+    } catch (error) {
+      console.warn('⚠️ Erreur ajustement couleur:', error)
+      return color // Fallback: retourner couleur originale
+    }
+  }
+
   private openChat() {
     if (this.isOpen) return
 
     this.isOpen = true
     this.createChatModal()
     
-    // Ajouter le message de bienvenue
+    // Ajouter le message de bienvenue personnalisé
     if (this.messages.length === 0) {
-      this.addMessage('assistant', 'Bonjour ! Comment puis-je vous aider avec ce produit ?')
+      const welcomeMsg = this.config.agentConfig?.welcomeMessage || 'Bonjour ! Comment puis-je vous aider avec ce produit ?'
+      this.addMessage('assistant', welcomeMsg)
     }
 
     console.log('💬 Chat ouvert')
@@ -182,7 +492,11 @@ class ChatSeller {
       this.modalElement.remove()
     }
 
-    // ✅ CRÉER LE MODAL COMPLET AVEC STYLES INLINE
+    const agentName = this.config.agentConfig?.name || 'Assistant'
+    const agentTitle = this.config.agentConfig?.title || 'Conseiller Commercial'
+    const primaryColor = this.config.primaryColor || '#007AFF'
+
+    // ✅ CRÉER LE MODAL COMPLET ÉLARGI À 450PX AVEC STYLES MODERNES
     this.modalElement = document.createElement('div')
     this.modalElement.innerHTML = `
       <div id="chatseller-modal-overlay" style="
@@ -191,8 +505,9 @@ class ChatSeller {
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(4px);
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
         z-index: 2147483647;
         display: flex;
         align-items: center;
@@ -200,74 +515,107 @@ class ChatSeller {
         padding: 16px;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         box-sizing: border-box;
+        animation: fadeIn 0.3s ease-out;
       ">
         <div id="chatseller-chat-container" style="
-          width: 384px;
-          height: 600px;
+          width: 450px;
+          height: 650px;
           max-height: 90vh;
           background: white;
           border-radius: 16px;
           box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
-          border: 1px solid #e5e7eb;
+          border: 1px solid rgba(255, 255, 255, 0.2);
           display: flex;
           flex-direction: column;
           overflow: hidden;
           position: relative;
           box-sizing: border-box;
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         ">
-          <!-- Header -->
+          <!-- Header Moderne -->
           <div style="
-            padding: 16px;
-            background: ${this.config.primaryColor};
+            padding: 20px;
+            background: linear-gradient(135deg, ${primaryColor} 0%, ${this.adjustColor(primaryColor, -20)} 100%);
             color: white;
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-shrink: 0;
             box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
           ">
-            <div style="display: flex; align-items: center; gap: 12px;">
-              <div style="
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                background: rgba(255, 255, 255, 0.2);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-weight: 600;
-                font-size: 16px;
-              ">
-                AI
+            <div style="
+              position: absolute;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+              pointer-events: none;
+            "></div>
+            <div style="display: flex; align-items: center; gap: 12px; position: relative;">
+              <div style="position: relative;">
+                <div style="
+                  width: 48px;
+                  height: 48px;
+                  border-radius: 50%;
+                  background: rgba(255, 255, 255, 0.2);
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-weight: 600;
+                  font-size: 18px;
+                  border: 3px solid rgba(255, 255, 255, 0.3);
+                  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                ">
+                  ${agentName.charAt(0).toUpperCase()}
+                </div>
+                <div style="
+                  position: absolute;
+                  bottom: -2px;
+                  right: -2px;
+                  width: 16px;
+                  height: 16px;
+                  background: #34D399;
+                  border-radius: 50%;
+                  border: 2px solid white;
+                  animation: pulse 2s infinite;
+                "></div>
               </div>
               <div>
                 <h3 style="
-                  font-size: 16px;
+                  font-size: 18px;
                   font-weight: 600;
                   margin: 0;
                   color: white;
-                ">Assistant</h3>
+                  letter-spacing: -0.025em;
+                ">${agentName}</h3>
                 <p style="
-                  font-size: 12px;
-                  margin: 0;
-                  color: rgba(255, 255, 255, 0.8);
+                  font-size: 13px;
+                  margin: 4px 0 0 0;
+                  color: rgba(255, 255, 255, 0.9);
                   display: flex;
                   align-items: center;
                   gap: 6px;
                 ">
                   <span style="
-                    width: 8px;
-                    height: 8px;
+                    font-size: 11px;
                     background: #34D399;
-                    border-radius: 50%;
-                  "></span>
-                  En ligne
+                    color: #065f46;
+                    padding: 2px 8px;
+                    border-radius: 10px;
+                    font-weight: 500;
+                  ">En ligne</span>
+                  ${agentTitle}
                 </p>
               </div>
             </div>
             <button id="chatseller-close-btn" style="
-              width: 32px;
-              height: 32px;
+              width: 40px;
+              height: 40px;
               border-radius: 50%;
               background: rgba(255, 255, 255, 0.1);
               color: rgba(255, 255, 255, 0.8);
@@ -277,52 +625,59 @@ class ChatSeller {
               align-items: center;
               justify-content: center;
               transition: all 0.2s;
-            " onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'">
-              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              position: relative;
+            " onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'; this.style.color='white'; this.style.transform='rotate(90deg)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.color='rgba(255, 255, 255, 0.8)'; this.style.transform='rotate(0deg)'">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="transition: transform 0.2s;">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
             </button>
           </div>
 
-          <!-- Messages Container -->
+          <!-- Messages Container Moderne -->
           <div id="chatseller-messages" style="
             flex: 1;
-            padding: 16px;
-            background: #f9fafb;
+            padding: 24px;
+            background: linear-gradient(to bottom, #f8fafc 0%, #ffffff 100%);
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 24px;
             box-sizing: border-box;
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e0 #f7fafc;
           ">
             <!-- Les messages seront ajoutés ici dynamiquement -->
           </div>
 
-          <!-- Input Container -->
+          <!-- Input Container Moderne -->
           <div style="
-            padding: 16px;
+            padding: 20px;
             border-top: 1px solid #e2e8f0;
-            background: white;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
             flex-shrink: 0;
             box-sizing: border-box;
           ">
-            <div style="display: flex; align-items: flex-end; gap: 8px;">
+            <div style="display: flex; align-items: flex-end; gap: 12px;">
               <input id="chatseller-input" type="text" placeholder="Tapez votre message..." style="
                 flex: 1;
-                padding: 12px 16px;
-                border: 1px solid #d1d5db;
+                padding: 16px 20px;
+                border: 2px solid rgba(226, 232, 240, 0.8);
                 border-radius: 12px;
                 font-size: 14px;
-                background: white;
+                background: rgba(255, 255, 255, 0.8);
                 color: #374151;
                 outline: none;
                 font-family: inherit;
                 box-sizing: border-box;
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
               " />
               <button id="chatseller-send-btn" style="
-                width: 48px;
-                height: 48px;
-                background: ${this.config.primaryColor};
+                width: 56px;
+                height: 56px;
+                background: linear-gradient(135deg, ${primaryColor} 0%, ${this.adjustColor(primaryColor, -15)} 100%);
                 color: white;
                 border: none;
                 border-radius: 12px;
@@ -331,9 +686,11 @@ class ChatSeller {
                 justify-content: center;
                 cursor: pointer;
                 flex-shrink: 0;
-                transition: all 0.2s;
-              " onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                transform: translateY(0);
+              " onmouseover="this.style.opacity='0.95'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(0, 0, 0, 0.25)'" onmouseout="this.style.opacity='1'; this.style.transform='translateY(0px)'; this.style.boxShadow='0 4px 12px rgba(0, 0, 0, 0.15)'">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                 </svg>
               </button>
@@ -341,14 +698,57 @@ class ChatSeller {
             <p style="
               font-size: 12px;
               color: #9ca3af;
-              margin: 8px 0 0 0;
+              margin: 12px 0 0 0;
               text-align: center;
+              background: #f9fafb;
+              padding: 8px 16px;
+              border-radius: 8px;
+              display: inline-block;
+              width: 100%;
+              box-sizing: border-box;
             ">
-              Propulsé par <strong>ChatSeller</strong> • Assistant IA
+              Propulsé par <strong style="color: ${primaryColor}; font-weight: 600;">ChatSeller</strong> • Assistant IA
             </p>
           </div>
         </div>
       </div>
+      
+      <style>
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slideIn {
+          from { 
+            opacity: 0; 
+            transform: scale(0.95) translateY(20px); 
+          }
+          to { 
+            opacity: 1; 
+            transform: scale(1) translateY(0); 
+          }
+        }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
+        #chatseller-messages::-webkit-scrollbar {
+          width: 6px;
+        }
+        #chatseller-messages::-webkit-scrollbar-track {
+          background: #f7fafc;
+          border-radius: 3px;
+        }
+        #chatseller-messages::-webkit-scrollbar-thumb {
+          background: linear-gradient(to bottom, #cbd5e0, #9ca3af);
+          border-radius: 3px;
+        }
+        #chatseller-input:focus {
+          background: rgba(255, 255, 255, 0.95);
+          border-color: ${primaryColor};
+          box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+        }
+      </style>
     `
 
     document.body.appendChild(this.modalElement)
@@ -434,6 +834,9 @@ class ChatSeller {
     const messagesContainer = this.modalElement?.querySelector('#chatseller-messages')
     if (!messagesContainer) return
 
+    const agentName = this.config.agentConfig?.name || 'Assistant'
+    const primaryColor = this.config.primaryColor || '#007AFF'
+
     messagesContainer.innerHTML = this.messages.map(message => {
       const isUser = message.role === 'user'
       const time = message.timestamp.toLocaleTimeString('fr', { 
@@ -448,45 +851,75 @@ class ChatSeller {
           gap: 12px;
           ${isUser ? 'flex-direction: row-reverse;' : ''}
         ">
-          <div style="
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            ${isUser 
-              ? 'background: #9ca3af; color: white;' 
-              : `background: ${this.config.primaryColor}; color: white;`
-            }
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 600;
-            flex-shrink: 0;
-          ">
-            ${isUser ? 'V' : 'AI'}
+          <div style="position: relative;">
+            <div style="
+              width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              ${isUser 
+                ? 'background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%); color: white;' 
+                : `background: linear-gradient(135deg, ${primaryColor} 0%, ${this.adjustColor(primaryColor, -15)} 100%); color: white;`
+              }
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 14px;
+              font-weight: 600;
+              flex-shrink: 0;
+              border: 2px solid ${isUser ? '#f3f4f6' : 'rgba(255, 255, 255, 0.2)'};
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            ">
+              ${isUser ? 'V' : agentName.charAt(0).toUpperCase()}
+            </div>
+            ${!isUser ? `
+              <div style="
+                position: absolute;
+                bottom: 0;
+                right: 0;
+                width: 12px;
+                height: 12px;
+                background: #34D399;
+                border-radius: 50%;
+                border: 2px solid white;
+              "></div>
+            ` : ''}
           </div>
           <div style="
-            max-width: 280px;
+            max-width: 320px;
             ${isUser ? 'text-align: right;' : ''}
           ">
             <div style="
               font-size: 11px;
               color: #6b7280;
-              margin-bottom: 4px;
+              margin-bottom: 6px;
               ${isUser ? 'text-align: right;' : ''}
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              ${isUser ? 'justify-content: flex-end;' : ''}
             ">
-              ${isUser ? 'Vous' : 'Assistant'} • ${time}
+              <span style="
+                background: #f3f4f6;
+                padding: 2px 8px;
+                border-radius: 10px;
+                font-weight: 500;
+              ">${isUser ? 'Vous' : agentName}</span>
+              <span>${time}</span>
             </div>
             <div style="
-              padding: 12px;
-              border-radius: 12px;
+              padding: 16px;
+              border-radius: 16px;
               ${isUser 
-                ? `background: ${this.config.primaryColor}; color: white; border-top-right-radius: 6px;`
-                : 'background: #f3f4f6; color: #374151; border-top-left-radius: 6px;'
+                ? `background: linear-gradient(135deg, ${primaryColor} 0%, ${this.adjustColor(primaryColor, -15)} 100%); color: white; border-top-right-radius: 6px;`
+                : 'background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); color: #374151; border-top-left-radius: 6px; border: 1px solid #e2e8f0;'
               }
               font-size: 14px;
-              line-height: 1.5;
+              line-height: 1.6;
               word-wrap: break-word;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+              backdrop-filter: blur(10px);
+              -webkit-backdrop-filter: blur(10px);
+              position: relative;
             ">
               ${message.content}
             </div>
@@ -509,20 +942,79 @@ class ChatSeller {
     // Ajouter le message utilisateur
     this.addMessage('user', messageContent)
 
-    // Simuler la réponse de l'IA (pour les tests)
-    setTimeout(() => {
-      let response = "Merci pour votre message ! Comment puis-je vous aider davantage ?"
+    try {
+      // ✅ ENVOYER MESSAGE À L'API AVEC BASE DE CONNAISSANCE
+      const response = await this.sendMessageToAPI(messageContent)
       
-      if (messageContent.toLowerCase().includes('prix')) {
-        response = "Le prix de ce produit est très compétitif ! Voulez-vous que je vous aide à finaliser votre commande ?"
-      } else if (messageContent.toLowerCase().includes('acheter') || messageContent.toLowerCase().includes('commander')) {
-        response = "Parfait ! Je vais vous aider à passer commande. Pour commencer, puis-je avoir votre nom et prénom ?"
-      } else if (messageContent.toLowerCase().includes('bonjour') || messageContent.toLowerCase().includes('salut')) {
-        response = `Bonjour ! Je vois que vous vous intéressez à ce produit. Comment puis-je vous aider ? Avez-vous des questions spécifiques ?`
+      if (response.success) {
+        this.conversationId = response.data.conversationId
+        this.addMessage('assistant', response.data.message)
+        
+        // Track analytics
+        this.track('message_received', {
+          conversationId: this.conversationId,
+          agentName: this.config.agentConfig?.name,
+          responseTime: response.data.responseTime
+        })
+      } else {
+        throw new Error(response.error)
       }
       
-      this.addMessage('assistant', response)
-    }, 1000)
+    } catch (error) {
+      console.error('❌ Erreur envoi message:', error)
+      
+      // Message de fallback personnalisé
+      const fallbackMsg = this.config.agentConfig?.fallbackMessage || 
+        'Désolé, je rencontre une difficulté technique. Un conseiller vous recontactera bientôt.'
+      
+      this.addMessage('assistant', fallbackMsg)
+    }
+  }
+
+  // ✅ NOUVEAU: Envoi message à l'API avec base de connaissance
+  private async sendMessageToAPI(message: string): Promise<any> {
+    try {
+      const payload = {
+        message,
+        conversationId: this.conversationId,
+        shopId: this.config.shopId,
+        agentId: this.config.agentConfig?.id,
+        productContext: {
+          id: this.config.productId,
+          name: this.config.productName,
+          price: this.config.productPrice,
+          url: this.config.productUrl
+        },
+        systemPrompt: this.config.agentConfig?.systemPrompt,
+        knowledgeBase: this.config.agentConfig?.knowledgeBase || []
+      }
+
+      console.log('📤 Envoi message à l\'API:', payload)
+
+      const response = await fetch(`${this.config.apiUrl}/public/chat/message`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      })
+
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status}`)
+      }
+
+      const data = await response.json()
+      console.log('📥 Réponse API:', data)
+      
+      return data
+
+    } catch (error) {
+      console.error('❌ Erreur API:', error)
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Erreur inconnue'
+      }
+    }
   }
 
   private createFallbackWidget() {
@@ -533,27 +1025,31 @@ class ChatSeller {
       this.widgetElement = container
     }
 
+    const primaryColor = this.config.primaryColor || '#007AFF'
+    const buttonText = this.config.buttonText || 'Parler à un conseiller'
+
     this.widgetElement.innerHTML = `
       <div style="margin: 8px 0;">
         <button onclick="alert('Widget ChatSeller en développement - Version de test')" style="
           width: 100%;
-          padding: 12px 20px;
-          background: ${this.config.primaryColor};
+          padding: 16px 24px;
+          background: ${primaryColor};
           color: white;
           border: none;
           border-radius: 12px;
-          font-size: 14px;
+          font-size: 15px;
           font-weight: 600;
           cursor: pointer;
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         ">
-          💬 ${this.config.buttonText} (Test)
+          💬 ${buttonText} (Test)
         </button>
       </div>
     `
   }
 
-  // ✅ MÉTHODES PUBLIQUES
+  // ✅ MÉTHODES PUBLIQUES ÉTENDUES
   show() {
     if (this.widgetElement) {
       this.widgetElement.style.display = 'block'
@@ -581,6 +1077,102 @@ class ChatSeller {
 
   track(event: string, data?: any) {
     console.log('📊 Track event:', event, data)
+    
+    // ✅ ENVOYER ANALYTICS À L'API
+    if (this.config.shopId) {
+      fetch(`${this.config.apiUrl}/public/analytics/track`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          shopId: this.config.shopId,
+          event,
+          data,
+          timestamp: new Date().toISOString(),
+          url: window.location.href,
+          userAgent: navigator.userAgent
+        })
+      }).catch(err => console.warn('Analytics error:', err))
+    }
+  }
+
+  // ✅ NOUVELLES MÉTHODES POUR COMMANDES
+  async analyzeOrderIntent(message: string, conversationId: string | null, productInfo: any) {
+    try {
+      const response = await fetch(`${this.config.apiUrl}/public/orders/analyze-intent`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message,
+          conversationId,
+          productInfo,
+          shopId: this.config.shopId
+        })
+      })
+      
+      return await response.json()
+    } catch (error) {
+      console.error('❌ Erreur analyze order intent:', error)
+      return { success: false, error }
+    }
+  }
+
+  async startOrder(conversationId: string | null, productInfo: any, initialMessage: string) {
+    try {
+      const response = await fetch(`${this.config.apiUrl}/public/orders/start`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          conversationId,
+          productInfo,
+          initialMessage,
+          shopId: this.config.shopId
+        })
+      })
+      
+      return await response.json()
+    } catch (error) {
+      console.error('❌ Erreur start order:', error)
+      return { success: false, error }
+    }
+  }
+
+  async processOrderStep(conversationId: string, step: string, data: any) {
+    try {
+      const response = await fetch(`${this.config.apiUrl}/public/orders/process-step`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          conversationId,
+          step,
+          data,
+          shopId: this.config.shopId
+        })
+      })
+      
+      return await response.json()
+    } catch (error) {
+      console.error('❌ Erreur process order step:', error)
+      return { success: false, error }
+    }
+  }
+
+  async completeOrder(conversationId: string, orderData: any) {
+    try {
+      const response = await fetch(`${this.config.apiUrl}/public/orders/complete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          conversationId,
+          orderData,
+          shopId: this.config.shopId
+        })
+      })
+      
+      return await response.json()
+    } catch (error) {
+      console.error('❌ Erreur complete order:', error)
+      return { success: false, error }
+    }
   }
 
   getDebugInfo() {
@@ -589,6 +1181,13 @@ class ChatSeller {
       isOpen: this.isOpen,
       messagesCount: this.messages.length,
       config: { ...this.config },
+      shopConfig: this.shopConfig,
+      agentConfig: this.agentConfig ? {
+        id: this.agentConfig.id,
+        name: this.agentConfig.name,
+        hasKnowledgeBase: (this.agentConfig.knowledgeBase || []).length > 0
+      } : null,
+      conversationId: this.conversationId,
       timestamp: new Date().toISOString()
     }
   }
@@ -603,6 +1202,10 @@ class ChatSeller {
 
   get version(): string {
     return '1.0.0'
+  }
+
+  get isConfigLoaded(): boolean {
+    return !!this.shopConfig && !!this.agentConfig
   }
 }
 

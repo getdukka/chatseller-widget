@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🧪 Test ChatSeller Widget MVP - Build Production</title>
+  
+  <!-- Simulation e-commerce -->
+  <meta property="og:title" content="iPhone 15 Pro - Test ChatSeller">
+  <meta property="og:price:amount" content="1199">
+  
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 2rem;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      background: linear-gradient(135deg, #007AFF, #5856D6);
+      color: white;
+      border-radius: 12px;
+    }
+    
+    .product {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .product-image {
+      width: 100%;
+      height: 300px;
+      background: linear-gradient(135deg, #007AFF, #5856D6);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+    
+    .product-info h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #1a1a1a;
+    }
+    
+    .price {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #007AFF;
+      margin-bottom: 1rem;
+    }
+    
+    .description {
+      color: #666;
+      margin-bottom: 2rem;
+      line-height: 1.8;
+    }
+    
+    .cta-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .btn {
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .btn-primary {
+      background: #1a1a1a;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #333;
+      transform: translateY(-2px);
+    }
+    
+    .status {
+      background: #f8f9fa;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 2rem;
+      font-family: monospace;
+      font-size: 0.9rem;
+    }
+    
+    .success { color: #28a745; }
+    .error { color: #dc3545; }
+    .warning { color: #ffc107; }
+    .info { color: #17a2b8; }
+    
+    @media (max-width: 768px) {
+      .product { grid-template-columns: 1fr; }
+      .container { padding: 1rem; margin: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🧪 Test ChatSeller Widget MVP</h1>
+      <p>Build Production - Interface 450px Moderne</p>
+    </div>
+
+    <div class="product">
+      <div class="product-image">
+        📱<br>iPhone 15 Pro<br>(Demo)
+      </div>
+      
+      <div class="product-info">
+        <h1>iPhone 15 Pro</h1>
+        <div class="price">1 199 €</div>
+        <div class="description">
+          iPhone 15 Pro avec puce A17 Pro révolutionnaire, système de caméra Pro avancé et boîtier en titane.
+        </div>
+        
+        <div class="cta-buttons">
+          <!-- ✅ WIDGET CHATSELLER S'INSÉRERA ICI -->
+          <div id="chatseller-widget"></div>
+          
+          <button id="add-to-cart-btn" class="btn btn-primary">
+            🛒 Ajouter au panier
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="status">
+      <div id="status-log">
+        <div class="info">📊 Initialisation du test...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ CONFIGURATION WIDGET -->
+  <script>
+    // Configuration globale
+    window.ChatSellerConfig = {
+      shopId: "12345678-1234-1234-1234-123456789abc",
+      apiUrl: "https://chatseller-api-production.up.railway.app",
+      theme: "modern",
+      primaryColor: "#007AFF",
+      position: "above-cta",
+      buttonText: "💬 Parler à un conseiller IA",
+      language: "fr",
+      autoDetectProduct: true,
+      debug: true
+    };
+
+    // Logging fonction
+    function logStatus(message, type = 'info') {
+      const log = document.getElementById('status-log');
+      const timestamp = new Date().toLocaleTimeString();
+      const className = type;
+      log.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+      console.log(`[${timestamp}] ${message}`);
+    }
+
+    logStatus('Configuration widget définie', 'success');
+  </script>
+
+  <!-- ✅ CHARGEMENT WIDGET BUILD PRODUCTION -->
+  <script>
+    // Charger le widget build depuis dist/
+    (function() {
+      logStatus('Chargement du widget build...', 'info');
+      
+      const script = document.createElement('script');
+      script.src = '/dist/chatseller-widget.js';
+      script.onload = function() {
+        logStatus('✅ Widget build chargé avec succès !', 'success');
+        
+        // Le widget s'initialise automatiquement via window.ChatSellerConfig
+        setTimeout(() => {
+          if (window.ChatSeller) {
+            logStatus('✅ ChatSeller instance disponible', 'success');
+            logStatus(`Version: ${window.ChatSeller.version || 'N/A'}`, 'info');
+            logStatus(`État: ${window.ChatSeller.isReady ? 'Prêt' : 'En cours'}`, 'info');
+            
+            // Test debug info
+            setTimeout(() => {
+              try {
+                const debugInfo = window.ChatSeller.getDebugInfo();
+                logStatus(`Produit détecté: ${debugInfo.config?.productName || 'Aucun'}`, 'info');
+                logStatus(`Agent configuré: ${debugInfo.agentConfig ? 'Oui' : 'Non'}`, debugInfo.agentConfig ? 'success' : 'warning');
+              } catch (e) {
+                logStatus(`Erreur debug: ${e.message}`, 'error');
+              }
+            }, 2000);
+          } else {
+            logStatus('❌ ChatSeller instance non trouvée', 'error');
+          }
+        }, 1000);
+      };
+      
+      script.onerror = function() {
+        logStatus('❌ Erreur chargement widget build', 'error');
+        logStatus('Vérifiez que le serveur preview est actif sur port 3001', 'warning');
+      };
+      
+      document.head.appendChild(script);
+    })();
+  </script>
+
+  <!-- Simulation boutique -->
+  <script>
+    document.getElementById('add-to-cart-btn').addEventListener('click', () => {
+      logStatus('🛒 Ajout au panier simulé', 'success');
+      if (window.ChatSeller) {
+        window.ChatSeller.track('add_to_cart', {
+          productName: 'iPhone 15 Pro',
+          price: 1199
+        });
+      }
+    });
+  </script>
+</body>
+</html>
