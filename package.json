@@ -25,6 +25,7 @@
     "build": "npm run clean && npm run type-check && vite build",
     "build:prod": "npm run clean && npm run type-check && vite build --mode production",
     "build:staging": "npm run clean && npm run type-check && vite build --mode staging",
+    "build:vercel": "npm run clean && npm run type-check && vite build --mode production",
     "build:watch": "vite build --watch",
     "build:analyze": "npm run build && npx vite-bundle-analyzer dist",
     "type-check": "vue-tsc --noEmit --skipLibCheck",
@@ -151,7 +152,7 @@
     "Edge >= 79"
   ],
   "engines": {
-    "node": ">=16.0.0",
+    "node": ">=18.0.0",
     "npm": ">=8.0.0"
   },
   "volta": {
@@ -209,19 +210,19 @@
     "VITE_CDN_URL": "https://cdn.chatseller.app"
   },
   "cdn": {
-    "production": "https://cdn.chatseller.app/widget/v1/",
-    "staging": "https://staging-cdn.chatseller.app/widget/v1/",
+    "production": "https://widget.chatseller.app/",
+    "staging": "https://staging-widget.chatseller.app/",
     "development": "http://localhost:3000/"
   },
   "deployment": {
     "environments": {
       "production": {
-        "url": "https://cdn.chatseller.app",
+        "url": "https://widget.chatseller.app",
         "branch": "main",
         "auto-deploy": true
       },
       "staging": {
-        "url": "https://staging-cdn.chatseller.app",
+        "url": "https://staging-widget.chatseller.app",
         "branch": "develop",
         "auto-deploy": true
       }

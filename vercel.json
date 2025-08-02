@@ -1,13 +1,59 @@
 {
   "version": 2,
-  "public": true,
+  "name": "chatseller-widget",
   "buildCommand": "npm run build:vercel",
   "outputDirectory": "dist",
-  "installCommand": "npm install",
+  "installCommand": "npm ci",
+  "devCommand": "npm run dev",
   "framework": null,
+  "env": {
+    "NODE_ENV": "production",
+    "VITE_API_URL": "https://chatseller-api-production.up.railway.app",
+    "VITE_WIDGET_VERSION": "1.0.0",
+    "VITE_CDN_URL": "https://widget.chatseller.app"
+  },
+  "build": {
+    "env": {
+      "NODE_ENV": "production"
+    }
+  },
+  "functions": {},
+  "routes": [
+    {
+      "src": "/widget.js",
+      "dest": "/chatseller-widget.js",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable",
+        "Content-Type": "application/javascript"
+      }
+    },
+    {
+      "src": "/widget.css",
+      "dest": "/chatseller-widget.css",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable",
+        "Content-Type": "text/css"
+      }
+    },
+    {
+      "src": "/.*\\.(js|css|woff2?|ttf|eot|ico|png|jpe?g|gif|svg)$",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization"
+      }
+    }
+  ],
   "headers": [
     {
-      "source": "/chatseller-widget.js",
+      "source": "/(.*)",
       "headers": [
         {
           "key": "Access-Control-Allow-Origin",
@@ -20,31 +66,6 @@
         {
           "key": "Access-Control-Allow-Headers",
           "value": "Content-Type, Authorization"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        },
-        {
-          "key": "Content-Type",
-          "value": "application/javascript"
-        }
-      ]
-    },
-    {
-      "source": "/chatseller-widget.css",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        },
-        {
-          "key": "Content-Type",
-          "value": "text/css"
         }
       ]
     }
@@ -55,18 +76,10 @@
       "destination": "/chatseller-widget.js"
     },
     {
-      "source": "/widget.css",
+      "source": "/widget.css", 
       "destination": "/chatseller-widget.css"
     }
   ],
-  "routes": [
-    {
-      "src": "/test-integration.html",
-      "dest": "/test-integration.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
-  ]
+  "cleanUrls": false,
+  "trailingSlash": false
 }
