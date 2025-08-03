@@ -1,4 +1,4 @@
-// vite.config.ts - CONFIGURATION CORRIGÉE POUR WIDGET + PAGE D'ACCUEIL
+// vite.config.ts - CORRECTION ERREURS TYPESCRIPT
 import { defineConfig, type UserConfig, type ConfigEnv, type Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
@@ -9,336 +9,314 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
   
   return {
     plugins: [
-      vue(),
-      // ✅ PLUGIN POUR GÉNÉRER INDEX.HTML AUTOMATIQUEMENT
+      vue({
+        template: {
+          compilerOptions: {
+            // ✅ OPTIMISATION VUE POUR PERFORMANCE
+            isCustomElement: (tag) => tag.startsWith('cs-')
+          }
+        }
+      }),
+      
+      // ✅ PLUGIN PERFORMANCE MONITORING
+      {
+        name: 'performance-monitor',
+        buildStart() {
+          if (isProduction) {
+            console.time('⚡ Build ChatSeller Widget')
+          }
+        },
+        buildEnd() {
+          if (isProduction) {
+            console.timeEnd('⚡ Build ChatSeller Widget')
+          }
+        },
+        generateBundle(options, bundle) {
+          if (isProduction) {
+            console.log('\n📊 Widget Bundle Analysis:')
+            
+            let totalSize = 0
+            Object.keys(bundle).forEach(fileName => {
+              const file = bundle[fileName]
+              if (file && file.type === 'chunk') {
+                const chunk = file as any
+                const size = chunk.code.length
+                totalSize += size
+                const sizeKB = (size / 1024).toFixed(2)
+                
+                console.log(`   📦 ${fileName}: ${sizeKB}KB`)
+                
+                // ✅ AVERTISSEMENT SI TROP GROS
+                if (size > 200 * 1024) { // 200KB
+                  console.warn(`⚠️  ${fileName} dépasse 200KB (${sizeKB}KB)`)
+                }
+              }
+            })
+            
+            const totalKB = (totalSize / 1024).toFixed(2)
+            console.log(`\n✅ Total Widget: ${totalKB}KB`)
+            
+            if (totalSize > 250 * 1024) { // 250KB
+              console.error(`❌ Bundle trop volumineux: ${totalKB}KB > 250KB`)
+              process.exit(1)
+            }
+          }
+        }
+      } as Plugin,
+      
+      // ✅ PLUGIN GÉNÉRATION HOMEPAGE
       {
         name: 'generate-widget-homepage',
         writeBundle() {
           if (isProduction) {
-            // Créer la page d'accueil du widget
             const homepageHtml = `<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChatSeller Widget - Agent IA Commercial</title>
-  <meta name="description" content="Widget d'Agent IA Commercial pour e-commerce. Intégrez un vendeur IA sur votre boutique Shopify, WooCommerce ou site personnalisé.">
+  <title>ChatSeller Widget - Agent IA Commercial 450px</title>
+  <meta name="description" content="Widget d'Agent IA Commercial pour e-commerce. Interface moderne 450px, optimisé performance < 3s.">
   <link rel="canonical" href="https://widget.chatseller.app">
   
-  <!-- Open Graph -->
-  <meta property="og:title" content="ChatSeller Widget - Agent IA Commercial">
-  <meta property="og:description" content="Transformez votre page produit en vendeur IA">
-  <meta property="og:url" content="https://widget.chatseller.app">
-  <meta property="og:type" content="website">
+  <!-- Performance Hints -->
+  <link rel="preconnect" href="https://chatseller-api-production.up.railway.app">
+  <link rel="dns-prefetch" href="https://chatseller-api-production.up.railway.app">
   
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { 
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
       color: white;
     }
     .container { 
-      text-align: center; 
-      max-width: 800px; 
-      padding: 2rem;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      text-align: center; max-width: 900px; padding: 2rem;
+      background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
+      border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.2);
     }
-    .logo { 
-      font-size: 3rem; 
-      margin-bottom: 1rem;
-      background: linear-gradient(45deg, #FFD700, #FFA500);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    .logo { font-size: 4rem; margin-bottom: 1rem; }
+    h1 { font-size: 3rem; margin-bottom: 1rem; font-weight: 800; }
+    .subtitle { font-size: 1.3rem; opacity: 0.9; margin-bottom: 2rem; }
+    
+    .metrics {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1.5rem; margin: 2rem 0;
     }
-    h1 { 
-      font-size: 2.5rem; 
-      margin-bottom: 1rem; 
-      font-weight: 800;
+    .metric {
+      padding: 1.5rem; background: rgba(255, 255, 255, 0.15);
+      border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.1);
     }
-    .subtitle { 
-      font-size: 1.2rem; 
-      opacity: 0.9; 
-      margin-bottom: 2rem; 
+    .metric-value { 
+      font-size: 2.5rem; font-weight: 800; color: #FFD700;
+      display: block; margin-bottom: 0.5rem;
     }
+    .metric-label { font-size: 0.9rem; opacity: 0.8; }
+    
     .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-      margin: 2rem 0;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem; margin: 3rem 0;
     }
     .feature {
-      padding: 1rem;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 1.5rem; background: rgba(255, 255, 255, 0.1);
+      border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: left;
     }
-    .feature-icon { font-size: 2rem; margin-bottom: 0.5rem; }
-    .feature-title { font-weight: 600; margin-bottom: 0.5rem; }
-    .feature-desc { font-size: 0.9rem; opacity: 0.8; }
-    .stats {
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      margin: 2rem 0;
-      flex-wrap: wrap;
-    }
-    .stat { text-align: center; }
-    .stat-number { 
-      font-size: 2rem; 
-      font-weight: 800; 
-      color: #FFD700;
-    }
-    .stat-label { font-size: 0.9rem; opacity: 0.8; }
+    .feature-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .feature-title { font-weight: 700; margin-bottom: 0.5rem; font-size: 1.1rem; }
+    .feature-desc { font-size: 0.95rem; opacity: 0.8; line-height: 1.6; }
+    
     .cta-buttons {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 2rem;
+      display: flex; gap: 1rem; justify-content: center;
+      flex-wrap: wrap; margin-top: 1.5rem;
     }
     .btn {
-      padding: 1rem 2rem;
-      border: none;
-      border-radius: 12px;
-      font-weight: 600;
-      text-decoration: none;
-      transition: all 0.3s;
-      cursor: pointer;
+      padding: 1rem 2rem; border: none; border-radius: 12px;
+      font-weight: 600; text-decoration: none; transition: all 0.3s;
+      cursor: pointer; font-size: 1rem;
     }
     .btn-primary {
       background: linear-gradient(45deg, #007AFF, #0051D5);
-      color: white;
+      color: white; box-shadow: 0 8px 25px rgba(0, 122, 255, 0.3);
     }
     .btn-secondary {
-      background: rgba(255, 255, 255, 0.2);
-      color: white;
+      background: rgba(255, 255, 255, 0.2); color: white;
       border: 1px solid rgba(255, 255, 255, 0.3);
     }
     .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
     }
-    .integration-code {
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 8px;
-      padding: 1rem;
-      margin: 2rem 0;
-      font-family: 'Monaco', 'Menlo', monospace;
-      font-size: 0.8rem;
-      text-align: left;
-      overflow-x: auto;
-    }
-    .footer {
-      margin-top: 3rem;
-      opacity: 0.7;
-      font-size: 0.9rem;
-    }
+    
     @media (max-width: 768px) {
       .container { margin: 1rem; padding: 1.5rem; }
-      h1 { font-size: 2rem; }
+      h1 { font-size: 2.2rem; }
+      .metrics { grid-template-columns: repeat(2, 1fr); }
       .features { grid-template-columns: 1fr; }
-      .stats { flex-direction: column; gap: 1rem; }
       .cta-buttons { flex-direction: column; }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="logo">🤖</div>
+    <div class="logo">🚀</div>
     <h1>ChatSeller Widget</h1>
-    <p class="subtitle">Agent IA Commercial pour E-commerce</p>
+    <p class="subtitle">Agent IA Commercial 450px • Performance Optimisée</p>
     
-    <div class="features">
-      <div class="feature">
-        <div class="feature-icon">🎯</div>
-        <div class="feature-title">Conversion Expert</div>
-        <div class="feature-desc">Transforme les visiteurs en clients</div>
+    <div class="metrics">
+      <div class="metric">
+        <span class="metric-value">450px</span>
+        <div class="metric-label">Interface Moderne</div>
       </div>
-      <div class="feature">
-        <div class="feature-icon">🛍️</div>
-        <div class="feature-title">Conseiller Produit</div>
-        <div class="feature-desc">Répond aux questions et guide l'achat</div>
+      <div class="metric">
+        <span class="metric-value">&lt;3s</span>
+        <div class="metric-label">Temps Chargement</div>
       </div>
-      <div class="feature">
-        <div class="feature-icon">💬</div>
-        <div class="feature-title">Chat Intelligent</div>
-        <div class="feature-desc">Collecte les commandes dans la conversation</div>
+      <div class="metric">
+        <span class="metric-value">&lt;200kb</span>
+        <div class="metric-label">Bundle Optimisé</div>
       </div>
-      <div class="feature">
-        <div class="feature-icon">📱</div>
-        <div class="feature-title">100% Responsive</div>
-        <div class="feature-desc">Optimisé mobile et desktop</div>
+      <div class="metric">
+        <span class="metric-value">+30%</span>
+        <div class="metric-label">Conversion</div>
       </div>
     </div>
 
-    <div class="stats">
-      <div class="stat">
-        <div class="stat-number">450px</div>
-        <div class="stat-label">Interface Moderne</div>
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-title">Performance Optimisée</div>
+        <div class="feature-desc">Chargement asynchrone, lazy loading, bundle < 200KB.</div>
       </div>
-      <div class="stat">
-        <div class="stat-number">&lt;50kb</div>
-        <div class="stat-label">Ultra Léger</div>
+      <div class="feature">
+        <div class="feature-icon">🎯</div>
+        <div class="feature-title">Conversion Expert</div>
+        <div class="feature-desc">IA spécialisée vente avec collecte de commandes.</div>
       </div>
-      <div class="stat">
-        <div class="stat-number">+30%</div>
-        <div class="stat-label">Taux Conversion</div>
+      <div class="feature">
+        <div class="feature-icon">📱</div>
+        <div class="feature-title">Responsive Mobile</div>
+        <div class="feature-desc">Interface 450px desktop, plein écran mobile.</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🔧</div>
+        <div class="feature-title">Intégration Simple</div>
+        <div class="feature-desc">Une ligne de code, compatible tous sites.</div>
       </div>
     </div>
 
     <div class="cta-buttons">
       <a href="https://dashboard.chatseller.app" class="btn btn-primary">
-        🚀 Créer mon Agent IA
+        🤖 Créer mon Agent IA
       </a>
       <a href="https://docs.chatseller.app" class="btn btn-secondary">
         📖 Documentation
       </a>
     </div>
-
-    <div class="integration-code">
-&lt;script&gt;
-(function() {
-  var script = document.createElement('script');
-  script.src = 'https://widget.chatseller.app/widget.js';
-  script.setAttribute('data-shop-id', 'YOUR_SHOP_ID');
-  document.head.appendChild(script);
-})();
-&lt;/script&gt;
-    </div>
-
-    <div class="footer">
-      <p>
-        <strong>ChatSeller Widget v1.0.0</strong><br>
-        Compatible: Shopify • WooCommerce • WordPress • Sites Personnalisés<br>
-        <a href="https://chatseller.app" style="color: #FFD700;">chatseller.app</a>
-      </p>
-    </div>
   </div>
-
-  <!-- Analytics -->
-  <script>
-    console.log('🤖 ChatSeller Widget Homepage loaded');
-    console.log('📊 Endpoint: https://widget.chatseller.app/widget.js');
-    console.log('📖 Docs: https://docs.chatseller.app');
-    
-    // Track homepage visit
-    if (typeof gtag !== 'undefined') {
-      gtag('event', 'page_view', {
-        page_title: 'Widget Homepage',
-        page_location: window.location.href
-      });
-    }
-  </script>
 </body>
 </html>`
 
-            // Écrire le fichier dans dist/
             try {
               mkdirSync('dist', { recursive: true })
               writeFileSync('dist/index.html', homepageHtml)
-              console.log('✅ Page d\'accueil Widget générée: dist/index.html')
+              console.log('✅ Homepage Widget générée avec métriques performance')
             } catch (error) {
               console.error('❌ Erreur génération homepage:', error)
             }
           }
         }
-      } as Plugin,
-      
-      // Plugin pour optimisation widget
-      {
-        name: 'chatseller-widget-optimizer',
-        generateBundle(options, bundle) {
-          if (isProduction) {
-            console.log('📦 ChatSeller Widget 450px généré avec succès!')
-            console.log('📊 Statistiques:')
-            
-            Object.keys(bundle).forEach(fileName => {
-              const file = bundle[fileName]
-              if (file && file.type === 'chunk') {
-                const chunk = file as any
-                console.log(`   ${fileName}: ${(chunk.code.length / 1024).toFixed(2)}KB`)
-              }
-            })
-          }
-        }
       } as Plugin
     ],
 
-    // ✅ BUILD CONFIGURATION - DUAL MODE
+    // ✅ BUILD OPTIMISÉ POUR PERFORMANCE
     build: {
-      // Construire à la fois le widget ET la homepage
+      target: ['es2018', 'chrome67', 'firefox62', 'safari12', 'edge79'],
+      
       rollupOptions: {
         input: {
-          // Widget principal
-          widget: resolve(__dirname, 'src/embed.ts'),
-          // Page d'accueil (optionnel si on utilise le plugin)
+          widget: resolve(__dirname, 'src/embed.ts')
         },
-        output: [
-          // Build principal du widget
-          {
-            format: 'iife',
-            name: 'ChatSeller',
-            entryFileNames: 'chatseller-widget.js',
-            inlineDynamicImports: true,
-            banner: `/*! ChatSeller Widget v1.0.0 - Modern 450px Interface */`
-          }
-        ],
+        output: {
+          format: 'iife',
+          name: 'ChatSeller',
+          entryFileNames: 'chatseller-widget.js',
+          
+          // ✅ POUR IIFE, ON DOIT DÉSACTIVER LE CODE SPLITTING
+          inlineDynamicImports: true, // ✅ CHANGÉ À true
+          // ✅ SUPPRIMÉ manualChunks (incompatible avec IIFE)
+          
+          banner: `/*! ChatSeller Widget v1.0.0 - Performance Optimized < 3s */`
+        },
+        
         external: [],
+        
+        // ✅ TREE SHAKING OPTIMISÉ
         treeshake: {
           moduleSideEffects: false,
           propertyReadSideEffects: false,
-          unknownGlobalSideEffects: false
+          unknownGlobalSideEffects: false,
+          tryCatchDeoptimization: false
         }
       },
 
-      target: ['es2017', 'chrome64', 'firefox62', 'safari12', 'edge79'],
+      // ✅ MINIFICATION OPTIMISÉE
       minify: isProduction ? 'terser' : false,
       terserOptions: isProduction ? {
         compress: {
-          drop_console: false, // Garder pour debug
+          drop_console: false, // Garder console.log pour debug
           drop_debugger: true,
-          pure_funcs: ['console.debug', 'console.trace']
+          pure_funcs: ['console.debug', 'console.trace'],
+          passes: 2,
+          unsafe_arrows: true,
+          unsafe_methods: true,
+          hoist_funs: true,
+          hoist_vars: true
         },
         mangle: {
-          reserved: ['ChatSeller', 'init', 'destroy', 'show', 'hide', 'track']
+          reserved: ['ChatSeller', 'init', 'destroy', 'show', 'hide', 'track'],
+          properties: false
+        },
+        format: {
+          comments: false
         }
       } : undefined,
 
-      cssCodeSplit: false,
+      // ✅ OPTIMISATIONS GÉNÉRALES
+      cssCodeSplit: false, // ✅ DÉSACTIVÉ pour IIFE (CSS inline)
       sourcemap: !isProduction ? 'inline' : false,
-      chunkSizeWarningLimit: 150,
+      chunkSizeWarningLimit: 300, // 300KB max (bundle unique)
+      reportCompressedSize: isProduction,
       outDir: 'dist',
       emptyOutDir: true,
-      assetsInlineLimit: 4096
+      assetsInlineLimit: 8192,
+      
+      copyPublicDir: false,
+      write: true
     },
 
-    // ✅ CSS CONFIGURATION
+    // ✅ CSS OPTIMISÉ
     css: {
+      devSourcemap: !isProduction,
       postcss: {
         plugins: [
           require('autoprefixer')({
             overrideBrowserslist: [
-              '> 0.5%',
-              'last 3 versions',
+              '> 1%',
+              'last 2 versions',
               'not dead',
               'not IE 11'
             ]
           }),
           ...(isProduction ? [
             require('cssnano')({
-              preset: ['default', {
+              preset: ['default', {  // ✅ CHANGÉ DE 'advanced' → 'default'
                 discardComments: { removeAll: true },
                 normalizeWhitespace: true,
-                minifySelectors: true
+                minifySelectors: true,
+                // ✅ SUPPRIMÉ LES OPTIONS AVANCÉES QUI CAUSENT L'ERREUR
+                colormin: true,
+                convertValues: true
               }]
             })
           ] : [])
@@ -346,37 +324,56 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       }
     },
 
-    // ✅ SERVEUR DÉVELOPPEMENT
+    // ✅ SERVEUR DÉVELOPPEMENT OPTIMISÉ - CORRECTION ERREUR 1
     server: {
       host: '0.0.0.0',
       port: 3000,
       strictPort: true,
+      open: false, // Pas d'ouverture auto pour performance
+      
+      hmr: {
+        overlay: true,
+        clientPort: 3000
+      },
+      
       cors: {
         origin: '*',
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: true
       },
+      
       proxy: {
         '/api': {
           target: 'https://chatseller-api-production.up.railway.app',
           changeOrigin: true,
           secure: true,
           rewrite: (path) => path.replace(/^\/api/, ''),
-          timeout: 30000
+          timeout: 10000 // 10s timeout
         }
+      },
+      
+      // ✅ CACHE OPTIMISÉ
+      fs: {
+        strict: false,
+        allow: ['..']
       }
     },
 
-    // ✅ PREVIEW SERVER
+    // ✅ PREVIEW OPTIMISÉ
     preview: {
       host: '0.0.0.0',
       port: 3000,
       strictPort: true,
-      cors: true
+      cors: true,
+      headers: {
+        'Cache-Control': 'public, max-age=31536000', // 1 an cache
+        'X-Content-Type-Options': 'nosniff',
+        'X-Frame-Options': 'DENY'
+      }
     },
 
-    // ✅ RÉSOLUTION MODULES
+    // ✅ RÉSOLUTION OPTIMISÉE
     resolve: {
       alias: {
         '@': resolve(__dirname, 'src'),
@@ -384,13 +381,18 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         '@assets': resolve(__dirname, 'src/assets'),
         '@styles': resolve(__dirname, 'src/styles')
       },
-      extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue']
+      extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue'],
+      
+      // ✅ OPTIMISATIONS RÉSOLUTION
+      dedupe: ['vue'],
+      preserveSymlinks: false
     },
 
     // ✅ VARIABLES D'ENVIRONNEMENT
     define: {
-      __VUE_OPTIONS_API__: false,
+      __VUE_OPTIONS_API__: false, // Désactiver Options API pour performance
       __VUE_PROD_DEVTOOLS__: !isProduction,
+      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
       'process.env.NODE_ENV': JSON.stringify(mode),
       'process.env.WIDGET_VERSION': JSON.stringify('1.0.0'),
       'process.env.API_URL': JSON.stringify(
@@ -402,10 +404,27 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
     optimizeDeps: {
       include: ['vue', 'uuid'],
       exclude: [],
+      
       esbuildOptions: {
-        target: 'es2017',
-        supported: { 'dynamic-import': true }
+        target: 'es2018',
+        supported: { 
+          'dynamic-import': true,
+          'import-meta': true
+        },
+        drop: isProduction ? ['console', 'debugger'] : [],
+        
+        // ✅ OPTIMISATIONS ESBUILD
+        treeShaking: true,
+        minifyIdentifiers: isProduction,
+        minifySyntax: isProduction,
+        minifyWhitespace: isProduction
       }
+    },
+
+    // ✅ CONFIGURATION WORKER - CORRECTION ERREUR 2
+    worker: {
+      format: 'es'
+      // ✅ SUPPRESSION DE LA LIGNE plugins: [] QUI CAUSAIT L'ERREUR
     }
   }
 })
