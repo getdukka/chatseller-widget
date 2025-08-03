@@ -25,9 +25,10 @@
     "build": "npm run clean && npm run type-check && vite build",
     "build:prod": "npm run clean && npm run type-check && vite build --mode production",
     "build:staging": "npm run clean && npm run type-check && vite build --mode staging",
-    "build:vercel": "npm run clean && npm run type-check && vite build --mode production",
+    "build:vercel": "npm run clean && npm run type-check && vite build --mode production && npm run post-build:vercel",
     "build:watch": "vite build --watch",
     "build:analyze": "npm run build && npx vite-bundle-analyzer dist",
+    "post-build:vercel": "node scripts/post-build-vercel.js",
     "type-check": "vue-tsc --noEmit --skipLibCheck",
     "preview": "vite preview --host 0.0.0.0 --port 3000",
     "lint": "eslint . --ext .vue,.js,.jsx,.ts,.tsx --fix --ignore-path .gitignore",
@@ -39,6 +40,7 @@
     "test:coverage": "vitest run --coverage",
     "test:widget": "node --loader ts-node/esm tests/widget-tests.ts",
     "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "test:performance": "lighthouse http://localhost:3000 --output json --output-path ./reports/lighthouse.json",
     "clean": "rm -rf dist node_modules/.vite .turbo",
     "clean:cache": "rm -rf node_modules/.cache .vite",
@@ -51,6 +53,7 @@
     "deploy": "./scripts/deploy-widget.sh",
     "deploy:staging": "./scripts/deploy-widget.sh --staging",
     "deploy:test": "./scripts/deploy-widget.sh --test",
+    "deploy:vercel": "vercel --prod",
     "release": "npm run validate && npm run build:prod && npm version patch && npm run deploy",
     "release:minor": "npm run validate && npm run build:prod && npm version minor && npm run deploy",
     "release:major": "npm run validate && npm run build:prod && npm version major && npm run deploy",
@@ -75,6 +78,7 @@
     "@vue/tsconfig": "^0.5.1",
     "@vitest/coverage-v8": "^1.1.3",
     "@vitest/ui": "^1.1.3",
+    "@playwright/test": "^1.40.0",
     "autoprefixer": "^10.4.16",
     "bundlesize": "^0.18.1",
     "conventional-changelog-cli": "^4.1.0",
@@ -85,6 +89,7 @@
     "http-server": "^14.1.1",
     "husky": "^8.0.3",
     "jsdom": "^23.2.0",
+    "lighthouse": "^11.4.0",
     "lint-staged": "^15.2.0",
     "playwright": "^1.40.1",
     "postcss": "^8.4.32",
@@ -219,12 +224,14 @@
       "production": {
         "url": "https://widget.chatseller.app",
         "branch": "main",
-        "auto-deploy": true
+        "auto-deploy": true,
+        "provider": "vercel"
       },
       "staging": {
         "url": "https://staging-widget.chatseller.app",
         "branch": "develop",
-        "auto-deploy": true
+        "auto-deploy": true,
+        "provider": "vercel"
       }
     }
   },
