@@ -108,32 +108,8 @@
             :class="getMessagesContainerClasses()"
           >
             
-            <!-- Message de bienvenue avec design moderne -->
-            <div v-if="messages.length === 0 && !isLoading" class="cs-message cs-assistant-message">
-              <div class="cs-flex cs-items-start cs-space-x-3">
-                <div class="cs-relative">
-                  <img
-                    :src="agentAvatar"
-                    :alt="agentName"
-                    class="cs-w-10 cs-h-10 cs-rounded-full cs-flex-shrink-0 cs-border-2 cs-border-gray-100"
-                    @error="handleAvatarError"
-                  >
-                  <div class="cs-absolute cs-bottom-0 cs-right-0 cs-w-3 cs-h-3 cs-bg-green-400 cs-rounded-full cs-border cs-border-white"></div>
-                </div>
-                <div class="cs-message-content cs-max-w-sm">
-                  <div class="cs-flex cs-items-center cs-space-x-2 cs-mb-2">
-                    <span class="cs-font-semibold cs-text-sm cs-text-gray-900">{{ agentName }}</span>
-                    <span class="cs-text-xs cs-text-gray-500 cs-bg-gray-100 cs-px-2 cs-py-0.5 cs-rounded-full">{{ formatTime(new Date()) }}</span>
-                  </div>
-                  <div 
-                    class="cs-message-bubble cs-modern-bubble cs-bg-gradient-to-br cs-from-gray-50 cs-to-gray-100 cs-text-gray-800 cs-p-4 cs-rounded-2xl cs-rounded-tl-md cs-shadow-sm cs-border cs-border-gray-200"
-                  >
-                    <p class="cs-text-sm cs-leading-relaxed" v-html="formatMessage(welcomeMessage)"></p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
+            <!-- ✅ PAS DE MESSAGE D'ACCUEIL STATIQUE - Géré par l'API -->
+            
             <!-- Messages de conversation modernes -->
             <div
               v-for="message in messages"
@@ -163,7 +139,8 @@
                   <div 
                     class="cs-message-bubble cs-modern-bubble cs-bg-gradient-to-br cs-from-gray-50 cs-to-gray-100 cs-text-gray-800 cs-p-4 cs-rounded-2xl cs-rounded-tl-md cs-shadow-sm cs-border cs-border-gray-200"
                   >
-                    <p class="cs-text-sm cs-leading-relaxed" v-html="formatMessage(message.content)"></p>
+                    <!-- ✅ FORMATAGE AMÉLIORÉ DES MESSAGES -->
+                    <div class="cs-text-sm cs-leading-relaxed cs-message-formatted" v-html="formatMessage(message.content)"></div>
                   </div>
                 </div>
               </div>
@@ -241,12 +218,54 @@
               </div>
             </div>
 
+            <!-- ✅ AFFICHAGE COLLECTE DE COMMANDE AMÉLIORÉ -->
+            <div v-if="orderCollectionState" class="cs-message cs-assistant-message">
+              <div class="cs-flex cs-items-start cs-space-x-3">
+                <div class="cs-relative">
+                  <img
+                    :src="agentAvatar"
+                    :alt="agentName"
+                    class="cs-w-10 cs-h-10 cs-rounded-full cs-flex-shrink-0 cs-border-2 cs-border-gray-100"
+                    @error="handleAvatarError"
+                  >
+                  <div class="cs-absolute cs-bottom-0 cs-right-0 cs-w-3 cs-h-3 cs-bg-blue-400 cs-rounded-full cs-border cs-border-white cs-animate-pulse"></div>
+                </div>
+                <div class="cs-message-content cs-max-w-sm">
+                  <div class="cs-bg-blue-50 cs-border cs-border-blue-200 cs-rounded-2xl cs-p-4 cs-shadow-sm">
+                    <div class="cs-flex cs-items-center cs-mb-3">
+                      <svg class="cs-w-5 cs-h-5 cs-text-blue-600 cs-mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                      </svg>
+                      <span class="cs-text-sm cs-font-semibold cs-text-blue-800">Collecte de commande</span>
+                    </div>
+                    <div class="cs-text-sm cs-text-blue-700">
+                      <p><strong>Étape:</strong> {{ getOrderStepLabel(orderCollectionState.step) }}</p>
+                      <div v-if="orderCollectionState.data" class="cs-mt-2 cs-space-y-1">
+                        <p v-if="orderCollectionState.data.productName">
+                          <strong>Produit:</strong> {{ orderCollectionState.data.productName }}
+                        </p>
+                        <p v-if="orderCollectionState.data.quantity">
+                          <strong>Quantité:</strong> {{ orderCollectionState.data.quantity }}
+                        </p>
+                        <p v-if="orderCollectionState.data.customerPhone">
+                          <strong>Téléphone:</strong> {{ orderCollectionState.data.customerPhone }}
+                        </p>
+                        <p v-if="orderCollectionState.data.customerFirstName">
+                          <strong>Nom:</strong> {{ orderCollectionState.data.customerFirstName }} {{ orderCollectionState.data.customerLastName || '' }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div ref="messagesEndRef" />
           </div>
 
-          <!-- ✅ ACTIONS RAPIDES MODERNES -->
+          <!-- ✅ ACTIONS RAPIDES MODERNES (seulement si pas de collecte en cours) -->
           <div
-            v-if="showQuickActions"
+            v-if="showQuickActions && !orderCollectionState"
             class="cs-quick-actions cs-modern-actions"
           >
             <div class="cs-mb-3">
@@ -298,52 +317,6 @@
             </div>
           </div>
 
-          <!-- ✅ FORMULAIRE DE COMMANDE CONVERSATIONNEL MODERNE -->
-          <div
-            v-if="isInOrderFlow && currentOrderStep"
-            class="cs-order-form cs-modern-order"
-          >
-            <div class="cs-mb-4">
-              <div class="cs-flex cs-items-center cs-space-x-3 cs-mb-2">
-                <div 
-                  class="cs-w-4 cs-h-4 cs-rounded-full cs-animate-pulse"
-                  :style="{ backgroundColor: config.primaryColor || '#007AFF' }"
-                ></div>
-                <span class="cs-text-sm cs-font-semibold cs-text-gray-900">{{ t('order_in_progress') }}</span>
-                <div class="cs-flex-1 cs-h-px cs-bg-gray-200"></div>
-              </div>
-              <p class="cs-text-xs cs-text-gray-600 cs-bg-blue-50 cs-px-3 cs-py-1 cs-rounded-lg cs-inline-block">{{ getOrderStepDescription(currentOrderStep) }}</p>
-            </div>
-            
-            <!-- Résumé de commande moderne -->
-            <div v-if="currentOrderStep === 'confirmation' && orderSummary" class="cs-mb-4">
-              <div class="cs-bg-white cs-p-4 cs-rounded-xl cs-border-2 cs-border-gray-100 cs-shadow-sm">
-                <div class="cs-text-sm cs-leading-relaxed" v-html="formatMessage(orderSummary)"></div>
-              </div>
-              <div class="cs-flex cs-space-x-3 cs-mt-4">
-                <button
-                  @click="confirmOrder"
-                  :disabled="isProcessingOrder"
-                  class="cs-flex-1 cs-bg-green-600 cs-text-white cs-p-4 cs-rounded-xl cs-text-sm cs-font-semibold cs-transition-all hover:cs-bg-green-700 disabled:cs-opacity-50 cs-flex cs-items-center cs-justify-center cs-shadow-sm hover:cs-shadow-md cs-transform hover:cs--translate-y-0.5"
-                >
-                  <svg v-if="!isProcessingOrder" class="cs-w-5 cs-h-5 cs-mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                  </svg>
-                  <svg v-else class="cs-w-5 cs-h-5 cs-mr-2 cs-animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                  </svg>
-                  {{ isProcessingOrder ? t('processing') : t('confirm_order') }}
-                </button>
-                <button
-                  @click="cancelOrder"
-                  class="cs-px-6 cs-py-4 cs-border-2 cs-border-gray-300 cs-rounded-xl cs-text-sm cs-text-gray-700 cs-transition-all hover:cs-bg-gray-50 cs-font-medium cs-shadow-sm"
-                >
-                  {{ t('cancel') }}
-                </button>
-              </div>
-            </div>
-          </div>
-
           <!-- ✅ INPUT MESSAGE MODERNE -->
           <div class="cs-message-input cs-modern-input">
             <div class="cs-flex cs-items-end cs-space-x-3">
@@ -356,12 +329,12 @@
                   :style="{ 
                     '--tw-ring-color': config.primaryColor || '#007AFF'
                   }"
-                  :disabled="isTyping || isLoading || isProcessingOrder"
+                  :disabled="isTyping || isLoading"
                 >
               </div>
               <button
                 @click="sendMessage"
-                :disabled="!currentMessage.trim() || isTyping || isLoading || isProcessingOrder"
+                :disabled="!currentMessage.trim() || isTyping || isLoading"
                 class="cs-p-4 cs-text-white cs-rounded-xl cs-transition-all disabled:cs-opacity-50 cs-flex cs-items-center cs-justify-center cs-min-w-14 cs-shadow-sm hover:cs-shadow-md cs-transform hover:cs--translate-y-0.5"
                 :style="{ 
                   background: `linear-gradient(135deg, ${config.primaryColor || '#007AFF'} 0%, ${adjustColor(config.primaryColor || '#007AFF', -15)} 100%)`
@@ -397,6 +370,22 @@ interface Message {
   timestamp: Date
 }
 
+interface OrderCollectionState {
+  step: 'quantity' | 'phone' | 'name' | 'address' | 'payment' | 'confirmation'
+  data: {
+    productId?: string
+    productName?: string
+    productPrice?: number
+    quantity?: number
+    customerPhone?: string
+    customerFirstName?: string
+    customerLastName?: string
+    customerEmail?: string
+    customerAddress?: string
+    paymentMethod?: string
+  }
+}
+
 interface Translations {
   [lang: string]: {
     [key: string]: string
@@ -422,11 +411,7 @@ const lastFailedMessage = ref<string | null>(null)
 const hasUnreadMessages = ref(false)
 
 // ✅ NOUVEAU STATE : Gestion des commandes
-const isInOrderFlow = ref(false)
-const currentOrderStep = ref<string | null>(null)
-const orderData = ref<any>({})
-const orderSummary = ref<string | null>(null)
-const isProcessingOrder = ref(false)
+const orderCollectionState = ref<OrderCollectionState | null>(null)
 
 // ✅ ADAPTIVE STYLES (pour theme brand_adaptive)
 const adaptiveStyles = ref<any>({})
@@ -445,10 +430,6 @@ const translations: Translations = {
     typeMessage: "Tapez votre message...",
     defaultWelcome: "Bonjour ! Je suis votre assistant d'achat. Comment puis-je vous aider ?",
     retry: "Réessayer",
-    order_in_progress: "Commande en cours",
-    processing: "Traitement...",
-    confirm_order: "Confirmer la commande",
-    cancel: "Annuler",
     powered_by: "Propulsé par",
     ai_assistant: "Assistant IA"
   },
@@ -464,10 +445,6 @@ const translations: Translations = {
     typeMessage: "Type your message...",
     defaultWelcome: "Hello! I'm your shopping assistant. How can I help you?",
     retry: "Retry",
-    order_in_progress: "Order in progress",
-    processing: "Processing...",
-    confirm_order: "Confirm order",
-    cancel: "Cancel",
     powered_by: "Powered by",
     ai_assistant: "AI Assistant"
   },
@@ -483,10 +460,6 @@ const translations: Translations = {
     typeMessage: "Bind sa mbind...",
     defaultWelcome: "Salaam! Maa ngi njëkk bu ñëpp. Na nga maa jëf?",
     retry: "Jël",
-    order_in_progress: "Jënd bi daw",
-    processing: "Daw...",
-    confirm_order: "Defar jënd",
-    cancel: "Dillu",
     powered_by: "Defar na",
     ai_assistant: "Njëkk IA"
   }
@@ -526,17 +499,6 @@ const agentAvatar = computed(() => {
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(agentName.value)}&background=${(props.config.primaryColor || '#007AFF').replace('#', '')}&color=fff&size=128`
 })
 
-const welcomeMessage = computed(() => {
-  const baseMessage = props.config.agentConfig?.welcomeMessage || t('defaultWelcome')
-  
-  // Personnaliser avec le produit si disponible
-  if (productInfo.value?.name) {
-    return `${baseMessage} Je vois que vous regardez "${productInfo.value.name}". Comment puis-je vous aider ?`
-  }
-  
-  return baseMessage
-})
-
 const productInfo = computed(() => {
   if (props.config.productName || props.config.productPrice) {
     return {
@@ -550,12 +512,12 @@ const productInfo = computed(() => {
 })
 
 const showQuickActions = computed(() => {
-  return messages.value.length === 0 && !isTyping.value && !isLoading.value && !isInOrderFlow.value
+  return messages.value.length === 0 && !isTyping.value && !isLoading.value && !orderCollectionState.value
 })
 
 const inputPlaceholder = computed(() => {
-  if (isInOrderFlow.value && currentOrderStep.value) {
-    return getOrderStepPlaceholder(currentOrderStep.value)
+  if (orderCollectionState.value) {
+    return getOrderStepPlaceholder(orderCollectionState.value.step)
   }
   return t('typeMessage')
 })
@@ -566,12 +528,36 @@ const quickActions = computed(() => ({
   wantToKnowMore: t('wantToKnowMore')
 }))
 
+// ✅ HELPER METHODS POUR COMMANDES
+const getOrderStepLabel = (step: string): string => {
+  const labels = {
+    quantity: 'Quantité souhaitée',
+    phone: 'Numéro de téléphone',
+    name: 'Nom et prénom',
+    address: 'Adresse de livraison',
+    payment: 'Mode de paiement',
+    confirmation: 'Confirmation commande'
+  }
+  return labels[step as keyof typeof labels] || step
+}
+
+const getOrderStepPlaceholder = (step: string): string => {
+  const placeholders = {
+    quantity: 'Ex: 2 exemplaires',
+    phone: 'Votre numéro de téléphone...',
+    name: 'Votre nom et prénom...',
+    address: 'Votre adresse de livraison...',
+    payment: 'Mode de paiement préféré...',
+    confirmation: 'Confirmez votre commande...'
+  }
+  return placeholders[step as keyof typeof placeholders] || 'Tapez votre réponse...'
+}
+
 // ✅ MÉTHODES STYLES ADAPTATIFS ET COULEURS
 const detectBrandColors = () => {
   if (props.config.theme !== 'brand_adaptive') return
 
   try {
-    // Détecter les couleurs principales du site
     const primaryButtons = document.querySelectorAll('button[class*="primary"], .btn-primary, [class*="cta"]')
     
     if (primaryButtons.length > 0) {
@@ -590,7 +576,6 @@ const detectBrandColors = () => {
 }
 
 const adjustColor = (color: string, percent: number): string => {
-  // Convertir hex vers RGB puis ajuster luminosité
   const hex = color.replace('#', '')
   const r = parseInt(hex.substr(0, 2), 16)
   const g = parseInt(hex.substr(2, 2), 16)
@@ -612,7 +597,6 @@ const adjustColor = (color: string, percent: number): string => {
 const getTriggerButtonClasses = () => {
   let classes = 'cs-w-full cs-flex cs-items-center cs-justify-center cs-text-white cs-font-semibold cs-transition-all cs-duration-200 hover:cs-opacity-90 cs-cursor-pointer cs-relative cs-shadow-lg hover:cs-shadow-xl cs-transform hover:cs--translate-y-1'
   
-  // Theme-based styling
   switch (props.config.theme) {
     case 'minimal':
       classes += ' cs-py-3 cs-px-6 cs-rounded-lg cs-text-sm'
@@ -633,11 +617,9 @@ const getChatContainerClasses = () => {
   if (isMobile.value) {
     classes += ' cs-w-full cs-h-full cs-rounded-none'
   } else {
-    // ✅ ÉLARGI À 450PX (au lieu de 384px)
     classes += ' cs-w-450 cs-h-[650px] cs-rounded-2xl cs-shadow-2xl cs-border'
   }
   
-  // Theme-based styling
   switch (props.config.theme) {
     case 'minimal':
       classes += ' cs-shadow-lg'
@@ -656,47 +638,23 @@ const getMessagesContainerClasses = () => {
   return 'cs-flex-1 cs-p-6 cs-space-y-6 cs-overflow-y-auto cs-bg-gradient-to-b cs-from-gray-50 cs-to-white'
 }
 
-// const getMessageBubbleClasses = () => {
-//  return 'cs-shadow-sm hover:cs-shadow-md cs-transition-shadow'
-// }
-
-// ✅ MÉTHODES COMMANDE
-const getOrderStepDescription = (step: string): string => {
-  const descriptions: Record<string, string> = {
-    product: 'Sélection du produit et quantité',
-    name: 'Informations personnelles',
-    phone: 'Numéro de téléphone',
-    address: 'Adresse de livraison',
-    payment: 'Mode de paiement',
-    confirmation: 'Confirmation de la commande'
-  }
-  return descriptions[step] || 'Étape de commande'
-}
-
-const getOrderStepPlaceholder = (step: string): string => {
-  const placeholders: Record<string, string> = {
-    product: 'Ex: 2 exemplaires',
-    name: 'Votre nom complet...',
-    phone: 'Votre numéro de téléphone...',
-    address: 'Votre adresse de livraison...',
-    payment: 'Choisissez un mode de paiement...',
-    confirmation: 'Confirmez votre commande...'
-  }
-  return placeholders[step] || 'Tapez votre réponse...'
-}
-
 // Methods
 const openChat = async () => {
+  if (isOpen.value) return
+
   isOpen.value = true
   hasUnreadMessages.value = false
   errorMessage.value = null
   
-  // Detect brand colors if adaptive theme
   if (props.config.theme === 'brand_adaptive') {
     detectBrandColors()
   }
   
-  // Track analytics
+  // ✅ NOUVEAU : ENVOYER MESSAGE D'ACCUEIL AUTOMATIQUEMENT DÈS L'OUVERTURE
+  if (messages.value.length === 0) {
+    await sendWelcomeMessage()
+  }
+  
   if (typeof window !== 'undefined' && (window as any).ChatSeller) {
     ;(window as any).ChatSeller.track('widget_opened', {
       productId: props.config.productId,
@@ -706,15 +664,67 @@ const openChat = async () => {
     })
   }
 
-  // Scroll to bottom after opening
   await nextTick()
   scrollToBottom()
+}
+
+// ✅ NOUVELLE MÉTHODE : Envoyer message d'accueil automatique
+const sendWelcomeMessage = async () => {
+  try {
+    const chatSeller = (window as any).ChatSeller
+    if (!chatSeller) return
+
+    // ✅ Envoyer avec isFirstMessage = true pour avoir le contexte produit
+    const response = await chatSeller.sendMessage('', conversationId.value, {
+      isFirstMessage: true,
+      productInfo: {
+        id: props.config.productId,
+        name: props.config.productName,
+        price: props.config.productPrice,
+        url: props.config.productUrl
+      }
+    })
+    
+    if (response.success) {
+      conversationId.value = response.data.conversationId
+      
+      // Ajouter le message d'accueil avec contexte produit
+      const aiMessage: Message = {
+        id: uuidv4(),
+        role: 'assistant',
+        content: response.data.message,
+        timestamp: new Date()
+      }
+      messages.value.push(aiMessage)
+      
+      console.log('✅ Message d\'accueil avec contexte produit envoyé automatiquement')
+    }
+
+  } catch (error: any) {
+    console.error('❌ Erreur envoi message d\'accueil:', error)
+    
+    // Fallback : message d'accueil par défaut avec contexte produit si possible
+    const welcomeMessage = productInfo.value?.name 
+      ? `Bonjour ! 👋 Je suis ${agentName.value}.
+
+Je vois que vous vous intéressez à **"${productInfo.value.name}"**. C'est un excellent choix ! 💫
+
+Comment puis-je vous aider ? 😊`
+      : props.config.agentConfig?.welcomeMessage || t('defaultWelcome')
+      
+    const fallbackMessage: Message = {
+      id: uuidv4(),
+      role: 'assistant',
+      content: welcomeMessage,
+      timestamp: new Date()
+    }
+    messages.value.push(fallbackMessage)
+  }
 }
 
 const closeChat = () => {
   isOpen.value = false
   
-  // Track analytics
   if (typeof window !== 'undefined' && (window as any).ChatSeller) {
     ;(window as any).ChatSeller.track('widget_closed', {
       conversationId: conversationId.value,
@@ -736,7 +746,6 @@ const sendMessage = async () => {
   currentMessage.value = ''
   errorMessage.value = null
 
-  // Add user message
   const userMessage: Message = {
     id: uuidv4(),
     role: 'user',
@@ -745,10 +754,8 @@ const sendMessage = async () => {
   }
   messages.value.push(userMessage)
 
-  // Show typing indicator
   isTyping.value = true
 
-  // Scroll to bottom
   await nextTick()
   scrollToBottom()
 
@@ -758,25 +765,14 @@ const sendMessage = async () => {
       throw new Error('ChatSeller SDK not available')
     }
 
-    // ✅ LOGIQUE DE GESTION DES COMMANDES
-    if (!isInOrderFlow.value) {
-      const intentResult = await chatSeller.analyzeOrderIntent?.(messageContent, conversationId.value, productInfo.value)
-
-      if (intentResult?.success && intentResult.data?.hasOrderIntent) {
-        if (intentResult.data.action === 'start_order') {
-          await startOrderFlow(messageContent)
-          return
-        }
+    const response = await chatSeller.sendMessage(messageContent, conversationId.value, {
+      productInfo: {
+        id: props.config.productId,
+        name: props.config.productName,
+        price: props.config.productPrice,
+        url: props.config.productUrl
       }
-    }
-
-    if (isInOrderFlow.value && currentOrderStep.value) {
-      await processOrderStep(messageContent)
-      return
-    }
-
-    // ✅ Conversation normale avec base de connaissance
-    const response = await chatSeller.sendMessage(messageContent, conversationId.value)
+    })
     
     if (response.success) {
       if (response.data.conversationId) {
@@ -791,7 +787,14 @@ const sendMessage = async () => {
       }
       messages.value.push(aiMessage)
       
-      // Track analytics
+      // ✅ GÉRER L'ÉTAT DE COLLECTE DE COMMANDE
+      if (response.data.orderCollection) {
+        orderCollectionState.value = response.data.orderCollection
+      } else if (orderCollectionState.value && orderCollectionState.value.step === 'confirmation') {
+        // Commande terminée
+        orderCollectionState.value = null
+      }
+      
       chatSeller.track('message_received', {
         conversationId: conversationId.value,
         agentName: response.data.agent?.name || agentName.value,
@@ -808,7 +811,6 @@ const sendMessage = async () => {
     errorMessage.value = 'Désolé, une erreur est survenue. Veuillez réessayer.'
     lastFailedMessage.value = messageContent
     
-    // Ajouter un message de fallback
     const fallbackMessage: Message = {
       id: uuidv4(),
       role: 'assistant',
@@ -825,142 +827,6 @@ const sendMessage = async () => {
   }
 }
 
-// ✅ GESTION DES COMMANDES
-const startOrderFlow = async (initialMessage: string) => {
-  try {
-    const chatSeller = (window as any).ChatSeller
-    
-    const result = await chatSeller.startOrder?.(conversationId.value, productInfo.value, initialMessage)
-
-    if (result?.success) {
-      isInOrderFlow.value = true
-      currentOrderStep.value = result.data.currentStep
-      orderData.value = result.data.collectedData
-
-      const aiMessage: Message = {
-        id: uuidv4(),
-        role: 'assistant',
-        content: result.data.message,
-        timestamp: new Date()
-      }
-      messages.value.push(aiMessage)
-    }
-  } catch (error) {
-    console.error('❌ Erreur start order flow:', error)
-  } finally {
-    isTyping.value = false
-    await nextTick()
-    scrollToBottom()
-  }
-}
-
-const processOrderStep = async (message: string) => {
-  try {
-    const chatSeller = (window as any).ChatSeller
-    
-    const extractedData = extractDataFromMessage(message, currentOrderStep.value!)
-    
-    const result = await chatSeller.processOrderStep?.(conversationId.value, currentOrderStep.value!, extractedData)
-
-    if (result?.success) {
-      currentOrderStep.value = result.data.currentStep
-      orderData.value = result.data.collectedData
-
-      if (result.data.collectedData.summary) {
-        orderSummary.value = result.data.collectedData.summary
-      }
-
-      const aiMessage: Message = {
-        id: uuidv4(),
-        role: 'assistant',
-        content: result.data.message,
-        timestamp: new Date()
-      }
-      messages.value.push(aiMessage)
-    }
-  } catch (error) {
-    console.error('❌ Erreur process order step:', error)
-  } finally {
-    isTyping.value = false
-    await nextTick()
-    scrollToBottom()
-  }
-}
-
-const extractDataFromMessage = (message: string, step: string): any => {
-  switch (step) {
-    case 'name':
-      return { name: message.trim() }
-    case 'phone':
-      const phoneMatch = message.match(/(\+?[0-9\s\-\(\)]{8,})/)
-      return { phone: phoneMatch?.[1]?.replace(/\s/g, '') || message.trim() }
-    case 'address':
-      return { address: message.trim() }
-    case 'payment':
-      return { paymentMethod: message.trim() }
-    case 'quantity':
-      const qtyMatch = message.match(/(\d+)/)
-      return { quantity: qtyMatch?.[1] ? parseInt(qtyMatch[1]) : 1 }
-    default:
-      return { value: message.trim() }
-  }
-}
-
-const confirmOrder = async () => {
-  isProcessingOrder.value = true
-  
-  try {
-    const chatSeller = (window as any).ChatSeller
-    
-    const result = await chatSeller.completeOrder?.(conversationId.value, orderData.value)
-
-    if (result?.success) {
-      const confirmationMessage: Message = {
-        id: uuidv4(),
-        role: 'assistant',
-        content: result.data.message,
-        timestamp: new Date()
-      }
-      messages.value.push(confirmationMessage)
-
-      // Réinitialiser le flux de commande
-      isInOrderFlow.value = false
-      currentOrderStep.value = null
-      orderData.value = {}
-      orderSummary.value = null
-
-      // Track conversion
-      chatSeller.track('order_completed', {
-        conversationId: conversationId.value,
-        orderId: result.data.orderId,
-        orderNumber: result.data.orderNumber
-      })
-    }
-  } catch (error) {
-    console.error('❌ Erreur confirm order:', error)
-    errorMessage.value = 'Erreur lors de la finalisation de la commande'
-  } finally {
-    isProcessingOrder.value = false
-    await nextTick()
-    scrollToBottom()
-  }
-}
-
-const cancelOrder = () => {
-  isInOrderFlow.value = false
-  currentOrderStep.value = null
-  orderData.value = {}
-  orderSummary.value = null
-
-  const cancelMessage: Message = {
-    id: uuidv4(),
-    role: 'assistant',
-    content: 'Commande annulée. N\'hésitez pas si vous changez d\'avis ! Comment puis-je vous aider autrement ?',
-    timestamp: new Date()
-  }
-  messages.value.push(cancelMessage)
-}
-
 const sendQuickMessage = (message: string) => {
   currentMessage.value = message
   sendMessage()
@@ -975,12 +841,28 @@ const retryLastMessage = () => {
   }
 }
 
+// ✅ FORMATAGE AMÉLIORÉ DES MESSAGES POUR LISIBILITÉ
 const formatMessage = (content: string) => {
   return content
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="cs-text-blue-500 cs-underline">$1</a>')
-    .replace(/\n/g, '<br>')
+    // Gestion des markdown
+    .replace(/\*\*(.*?)\*\*/g, '<strong class="cs-font-semibold cs-text-gray-900">$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em class="cs-italic cs-text-gray-700">$1</em>')
+    
+    // Gestion des liens
+    .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="cs-text-blue-600 cs-underline hover:cs-text-blue-800 cs-transition-colors">$1</a>')
+    
+    // Gestion des émojis avec espacement
+    .replace(/([😀 - 🙏 - 🌀 - 🗿 - 🚀 - ➿])/g, '<span class="cs-inline-block cs-mx-1">$1</span>')
+    
+    // Gestion des sauts de ligne
+    .replace(/\n\n/g, '<br><br class="cs-my-2">')
+    .replace(/\n/g, '<br class="cs-my-1">')
+    
+    // Amélioration des listes
+    .replace(/^\- (.*)/gm, '<span class="cs-block cs-ml-2 cs-relative"><span class="cs-absolute cs--ml-2 cs-text-blue-600">•</span>$1</span>')
+    
+    // Amélioration des prix
+    .replace(/(\d+(?:[.,]\d{2})?\s*(?:FCFA|€|USD|\$))/g, '<span class="cs-font-semibold cs-text-green-600 cs-bg-green-50 cs-px-1 cs-rounded">$1</span>')
 }
 
 const formatTime = (date: Date) => {
@@ -991,7 +873,7 @@ const formatTime = (date: Date) => {
 }
 
 const formatPrice = (price: number) => {
-  const currency = 'XOF' // Par défaut pour le marché sénégalais
+  const currency = 'XOF'
   
   return new Intl.NumberFormat(props.config.language || 'fr', {
     style: 'currency',
@@ -1020,7 +902,6 @@ watch(messages, () => {
 
 // Lifecycle
 onMounted(() => {
-  // Track widget load
   if (typeof window !== 'undefined' && (window as any).ChatSeller) {
     ;(window as any).ChatSeller.track('widget_loaded', {
       productId: props.config.productId,
@@ -1033,20 +914,36 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* ✅ CSS AVEC PRÉFIXES POUR ÉVITER LES CONFLITS */
+/* ✅ STYLES POUR LE FORMATAGE AMÉLIORÉ DES MESSAGES */
+.cs-message-formatted {
+  line-height: 1.6;
+  word-break: break-word;
+}
 
-/* Reset pour le widget seulement */
+.cs-message-formatted strong {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.cs-message-formatted em {
+  font-style: italic;
+  color: #4b5563;
+}
+
+.cs-message-formatted br {
+  line-height: 1.2;
+}
+
+/* ✅ CSS INCHANGÉ - UTILISE LES MÊMES STYLES QUE L'ORIGINAL */
 .cs-chatseller-widget,
 .cs-chatseller-widget * {
   box-sizing: border-box;
 }
 
-/* ✅ LARGEUR ÉLARGIE À 450PX */
 .cs-w-450 { 
-  width: 28.125rem !important; /* 450px */
+  width: 28.125rem !important;
 }
 
-/* Transitions modernes */
 .cs-fade-enter-active, .cs-fade-leave-active {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -1070,7 +967,6 @@ onMounted(() => {
   transform: scale(0.95) translateY(-20px);
 }
 
-/* Widget trigger button moderne */
 .cs-chat-trigger-button {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
@@ -1086,7 +982,6 @@ onMounted(() => {
   transform: translateY(-1px);
 }
 
-/* Modal overlay moderne */
 .cs-chat-modal-overlay {
   position: fixed;
   top: 0;
@@ -1109,7 +1004,6 @@ onMounted(() => {
   justify-content: stretch;
 }
 
-/* Chat container moderne */
 .cs-chat-container.cs-modern-chat {
   max-height: 90vh;
   position: relative;
@@ -1118,7 +1012,6 @@ onMounted(() => {
   -webkit-backdrop-filter: blur(20px);
 }
 
-/* Chat header moderne avec gradient */
 .cs-chat-header.cs-modern-header {
   padding: 1.25rem;
   background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
@@ -1138,7 +1031,6 @@ onMounted(() => {
   pointer-events: none;
 }
 
-/* Product context moderne */
 .cs-product-context.cs-modern-context {
   padding: 1rem 1.25rem;
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
@@ -1146,7 +1038,6 @@ onMounted(() => {
   position: relative;
 }
 
-/* Messages container moderne */
 .cs-messages-container.cs-modern-messages {
   scrollbar-width: thin;
   scrollbar-color: #cbd5e0 #f7fafc;
@@ -1168,7 +1059,6 @@ onMounted(() => {
   background: linear-gradient(to bottom, #9ca3af, #6b7280);
 }
 
-/* Message bubbles modernes */
 .cs-message-bubble.cs-modern-bubble {
   word-wrap: break-word;
   max-width: 100%;
@@ -1192,28 +1082,18 @@ onMounted(() => {
   pointer-events: none;
 }
 
-/* Typing indicator moderne */
 .cs-typing-indicator.cs-modern-typing {
   position: relative;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
 
-/* Quick actions modernes */
 .cs-quick-actions.cs-modern-actions {
   padding: 1.25rem;
   border-top: 1px solid #e2e8f0;
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
 }
 
-/* Order form moderne */
-.cs-order-form.cs-modern-order {
-  padding: 1.25rem;
-  border-top: 1px solid #e2e8f0;
-  background: linear-gradient(135deg, #fef7ff 0%, #f3e8ff 100%);
-}
-
-/* Input message moderne */
 .cs-message-input.cs-modern-input {
   padding: 1.25rem;
   border-top: 1px solid #e2e8f0;
@@ -1234,7 +1114,6 @@ onMounted(() => {
   box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
 }
 
-/* Hover effects pour les boutons */
 .cs-transform.hover\:cs--translate-y-0\.5:hover {
   transform: translateY(-2px);
 }
@@ -1243,8 +1122,27 @@ onMounted(() => {
   transform: translateY(-4px);
 }
 
-/* Responsive adjustments */
-@media (max-width: 767px) {
+/* ✅ STYLES POUR LE FORMATAGE AMÉLIORÉ DES MESSAGES */
+.cs-message-formatted {
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+.cs-message-formatted strong {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.cs-message-formatted em {
+  font-style: italic;
+  color: #4b5563;
+}
+
+.cs-message-formatted br {
+  line-height: 1.2;
+}
+
+@media (max-width: 640px) {
   .cs-chat-modal-overlay {
     padding: 0;
   }
@@ -1258,6 +1156,20 @@ onMounted(() => {
   
   .cs-message-content {
     max-width: calc(100vw - 140px);
+  }
+}
+
+@media (max-width: 768px) {
+  .xl\:col-span-2 {
+    @apply col-span-1;
+  }
+  
+  .lg\:grid-cols-2 {
+    @apply grid-cols-1;
+  }
+  
+  .space-y-8 {
+    @apply space-y-6;
   }
 }
 
@@ -1350,7 +1262,6 @@ onMounted(() => {
 .cs-bg-green-600 { background-color: #16a34a; }
 .cs-bg-blue-50 { background-color: #eff6ff; }
 
-/* Gradients */
 .cs-bg-gradient-to-br { background-image: linear-gradient(to bottom right, var(--tw-gradient-stops)); }
 .cs-bg-gradient-to-r { background-image: linear-gradient(to right, var(--tw-gradient-stops)); }
 .cs-bg-gradient-to-b { background-image: linear-gradient(to bottom, var(--tw-gradient-stops)); }
@@ -1475,7 +1386,6 @@ onMounted(() => {
   animation: cs-spin 1s linear infinite;
 }
 
-/* Animations */
 @keyframes cs-bounce {
   0%, 60%, 100% {
     transform: translateY(0);
@@ -1503,7 +1413,6 @@ onMounted(() => {
   }
 }
 
-/* Backdrop filter support */
 .cs-backdrop-blur-sm {
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);

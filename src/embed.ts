@@ -1,4 +1,4 @@
-// src/embed.ts - WIDGET OPTIMISÉ POUR PERFORMANCE < 3S
+// src/embed.ts - WIDGET OPTIMISÉ POUR SHOPIFY ET PERFORMANCE
 export interface ChatSellerConfig {
   shopId: string
   apiUrl?: string
@@ -60,7 +60,6 @@ class ChatSeller {
   private agentConfig: AgentConfig | null = null
   private conversationId: string | null = null
   
-  // ✅ NOUVELLE PROPRIÉTÉ POUR CACHE PERFORMANCE
   private configPromise: Promise<void> | null = null
   private chatComponent: any = null
 
@@ -73,18 +72,19 @@ class ChatSeller {
       position: 'above-cta',
       buttonText: 'Parler à un conseiller',
       language: 'fr',
-      autoDetectProduct: true
+      autoDetectProduct: true,
+      debug: false
     }
   }
 
-  // ✅ INIT OPTIMISÉ POUR PERFORMANCE
+  // ✅ INIT OPTIMISÉ POUR PERFORMANCE ET SHOPIFY
   async init(config: ChatSellerConfig) {
     if (this.isInitialized) {
       console.warn('🟡 ChatSeller déjà initialisé')
       return
     }
 
-    console.log('🚀 Initialisation ChatSeller widget OPTIMISÉ...', config.shopId)
+    console.log('🚀 Initialisation ChatSeller widget OPTIMISÉ pour Shopify...', config.shopId)
     const startTime = performance.now()
 
     this.config = { ...this.config, ...config }
@@ -100,24 +100,24 @@ class ChatSeller {
       // ✅ ÉTAPE 1: Création widget immédiate avec config par défaut
       this.createWidget()
       
-      // ✅ ÉTAPE 2: Détection produit synchrone rapide
+      // ✅ ÉTAPE 2: Détection produit améliorée pour Shopify
       if (this.config.autoDetectProduct) {
         this.detectProductInfo()
       }
       
       this.isInitialized = true
       
-      // ✅ ÉTAPE 3: Chargement config API en arrière-plan (NON BLOQUANT)
+      // ✅ ÉTAPE 3: Chargement config API en arrière-plan
       this.loadShopConfigurationAsync()
       
       const initTime = performance.now() - startTime
       console.log(`✅ ChatSeller widget initialisé en ${initTime.toFixed(2)}ms`)
       
-      // ✅ ÉTAPE 4: Track rapide
       this.track('widget_initialized', {
         shopId: this.config.shopId,
         initTime,
-        productDetected: !!(this.config.productName || this.config.productId)
+        productDetected: !!(this.config.productName || this.config.productId),
+        platform: this.detectPlatform()
       })
       
     } catch (error) {
@@ -126,7 +126,27 @@ class ChatSeller {
     }
   }
 
-  // ✅ NOUVEAU: Chargement config ASYNCHRONE et NON BLOQUANT
+  // ✅ NOUVEAU: Détection de plateforme e-commerce
+  private detectPlatform(): string {
+    // Shopify
+    if ((window as any).Shopify || (window as any).ShopifyAnalytics || document.querySelector('script[src*="shopify"]')) {
+      return 'shopify'
+    }
+    
+    // WooCommerce
+    if ((window as any).wc || document.querySelector('body.woocommerce') || document.querySelector('.woocommerce')) {
+      return 'woocommerce'
+    }
+    
+    // Autres plateformes
+    if (document.querySelector('[data-platform]')) {
+      return document.querySelector('[data-platform]')?.getAttribute('data-platform') || 'unknown'
+    }
+    
+    return 'custom'
+  }
+
+  // ✅ CHARGEMENT CONFIG ASYNCHRONE
   private async loadShopConfigurationAsync(): Promise<void> {
     if (this.configPromise) {
       return this.configPromise
@@ -141,13 +161,11 @@ class ChatSeller {
       console.log('🔄 Chargement configuration shop (arrière-plan):', this.config.shopId)
       
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 5000) // 5s timeout
+      const timeoutId = setTimeout(() => controller.abort(), 5000)
       
-      const response = await fetch(`${this.config.apiUrl}/public/shops/${this.config.shopId}/config`, {
+      const response = await fetch(`${this.config.apiUrl}/public/shops/${this.config.shopId}/agent`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         signal: controller.signal
       })
 
@@ -163,7 +181,6 @@ class ChatSeller {
         this.shopConfig = data.data.shop
         this.agentConfig = data.data.agent
         
-        // ✅ FUSIONNER ET METTRE À JOUR LE WIDGET (SI NÉCESSAIRE)
         this.mergeApiConfiguration()
         this.updateWidgetWithConfig()
         
@@ -178,24 +195,21 @@ class ChatSeller {
       
     } catch (error) {
       console.warn('⚠️ Configuration par défaut utilisée (API non disponible):', error)
-      // Continuer avec la config par défaut - pas bloquant
     }
   }
 
-  // ✅ MISE À JOUR WIDGET AVEC CONFIG API
   private updateWidgetWithConfig(): void {
     if (!this.widgetElement || !this.shopConfig) return
 
-    // Mettre à jour la couleur et le texte du bouton
     const triggerBtn = this.widgetElement.querySelector('#chatseller-trigger-btn') as HTMLElement
     if (triggerBtn) {
       const primaryColor = this.config.primaryColor || '#007AFF'
       triggerBtn.style.background = `linear-gradient(135deg, ${primaryColor} 0%, ${this.adjustColor(primaryColor, -15)} 100%)`
       
       if (this.config.buttonText !== triggerBtn.textContent?.trim()) {
-        const textNode = triggerBtn.querySelector('span:not(svg)')
-        if (textNode) {
-          textNode.textContent = this.config.buttonText || 'Parler à un conseiller'
+        const textSpan = triggerBtn.querySelector('span')
+        if (textSpan) {
+          textSpan.textContent = this.config.buttonText || 'Parler à un conseiller'
         }
       }
     }
@@ -229,70 +243,146 @@ class ChatSeller {
     }
   }
 
-  // ✅ DÉTECTION PRODUIT CORRIGÉE POUR RETOURNER BOOLEAN
+  // ✅ DÉTECTION PRODUIT ULTRA-AMÉLIORÉE POUR SHOPIFY
   private detectProductInfo(): boolean {
     try {
-      // Méta tags OpenGraph
-      const ogTitle = document.querySelector('meta[property="og:title"]')?.getAttribute('content')
-      const ogPrice = document.querySelector('meta[property="og:price:amount"]')?.getAttribute('content')
+      console.log('🔍 Détection produit Shopify améliorée...')
       
-      // Schema.org Product
-      const productSchema = document.querySelector('script[type="application/ld+json"]')
-      let schemaData = null
-      if (productSchema) {
-        try {
-          schemaData = JSON.parse(productSchema.textContent || '')
-        } catch (e) {}
-      }
-
-      // ✅ SHOPIFY SPÉCIFIQUE - MÉTHODES MULTIPLES
-      const shopifyProduct = (window as any).ShopifyAnalytics?.meta?.product
-      const shopifyPageType = (window as any).Shopify?.theme?.name || (window as any).meta?.page?.pageType
-      
-      // Détection générique par sélecteurs
-      const titleSelectors = ['h1.product-title', '.product-name', 'h1', '[data-product-title]', '.product-single__title']
-      const priceSelectors = [
-        '.price', '.product-price', '[data-price]', '.cost',
-        '.money', '.price-item--sale', '.price__current',
-        '.product-form__price', '.price-list .price-item'
-      ]
-
       let detectedName = this.config.productName
       let detectedPrice = this.config.productPrice
+      let detectedId = this.config.productId
       let hasDetection = false
 
-      // Priorité: Shopify > OG > Schema > Generic
+      // ✅ PRIORITÉ 1: Shopify Analytics (le plus fiable)
+      const shopifyProduct = (window as any).ShopifyAnalytics?.meta?.product
       if (shopifyProduct && shopifyProduct.title) {
         detectedName = shopifyProduct.title
         detectedPrice = shopifyProduct.price ? shopifyProduct.price / 100 : undefined
+        detectedId = shopifyProduct.id?.toString() || shopifyProduct.variant_id?.toString()
         hasDetection = true
-      } else if (ogTitle) {
-        detectedName = ogTitle
-        detectedPrice = ogPrice ? parseFloat(ogPrice) : undefined
-        hasDetection = true
-      } else if (schemaData?.name) {
-        detectedName = schemaData.name
-        detectedPrice = schemaData.offers?.price ? parseFloat(schemaData.offers.price) : undefined
-        hasDetection = true
-      } else {
-        // Fallback générique
-        for (const selector of titleSelectors) {
+        console.log('✅ Produit Shopify détecté via Analytics:', detectedName)
+      }
+      
+      // ✅ PRIORITÉ 2: Variables globales Shopify multiples
+      else {
+        const shopifyGlobals = [
+          (window as any).meta?.product,
+          (window as any).product,
+          (window as any).theme?.settings?.product,
+          (window as any).Shopify?.shop?.product
+        ]
+        
+        for (const shopifyData of shopifyGlobals) {
+          if (shopifyData && shopifyData.title) {
+            detectedName = shopifyData.title
+            detectedPrice = shopifyData.price ? (shopifyData.price / 100) : undefined
+            detectedId = shopifyData.id?.toString()
+            hasDetection = true
+            console.log('✅ Produit Shopify détecté via variable globale')
+            break
+          }
+        }
+      }
+      
+      // ✅ PRIORITÉ 3: Scripts JSON-LD Shopify
+      if (!hasDetection) {
+        const jsonLdScripts = document.querySelectorAll('script[type="application/ld+json"]')
+        for (const script of jsonLdScripts) {
+          try {
+            const data = JSON.parse(script.textContent || '')
+            if (data['@type'] === 'Product' && data.name) {
+              detectedName = data.name
+              detectedPrice = data.offers?.price ? parseFloat(data.offers.price) : undefined
+              detectedId = data.sku || data.productID
+              hasDetection = true
+              console.log('✅ Produit détecté via JSON-LD Shopify')
+              break
+            }
+          } catch (e) {
+            continue
+          }
+        }
+      }
+      
+      // ✅ PRIORITÉ 4: Sélecteurs CSS SHOPIFY-SPÉCIFIQUES étendus
+      if (!hasDetection) {
+        const shopifySelectors = {
+          title: [
+            // Shopify Dawn et variantes récentes
+            '.product__title',
+            '.product-form__title',
+            '.product-meta__title',
+            'h1.product-title',
+            '[data-product-title]',
+            '.h1.product__title',
+            '.product-single-header h1',
+            '.product__info h1',
+            
+            // Thèmes Shopify populaires
+            '.product-single__title',        // Debut
+            '.product-form__title',          // Dawn
+            '.product__content h1',          // Venture
+            '.product-details__title',       // Brooklyn
+            '.product-form__info h1',        // Minimal
+            '.product-detail__title',        // Boundless
+            '.product-info h1',              // Simple
+            '.product-title',                // Narrative
+            '.rte h1',                       // Supply
+            
+            // Fallbacks génériques
+            'h1[class*="product"]',
+            '[class*="product-title"]',
+            '[class*="product-name"]'
+          ],
+          price: [
+            // Shopify spécifiques avancés
+            '.price-item--sale .price',
+            '.price__current',
+            '.product-form__price .price',
+            '.price-list .price-item:not(.price-item--compare)',
+            '.money',
+            '[data-price]',
+            '.product-price .price__current',
+            '.product__price .price',
+            
+            // Thèmes spécifiques
+            '.product-form__price',          // Dawn
+            '.product-price__price',         // Debut
+            '.price-sale',                   // Venture
+            '.product-single__price',        // Brooklyn
+            '.price-current',                // Minimal
+            '.product-price',                // Boundless
+            '.price--on-sale',               // Simple
+            '.product__price',               // Narrative
+            
+            // Fallbacks
+            '[class*="price"]:not([class*="compare"])',
+            '.cost',
+            '[data-product-price]'
+          ]
+        }
+
+        // Détection titre avec priorité Shopify
+        for (const selector of shopifySelectors.title) {
           const element = document.querySelector(selector)
           if (element?.textContent?.trim()) {
             detectedName = element.textContent.trim()
             hasDetection = true
+            console.log('✅ Produit détecté via sélecteur Shopify CSS:', selector)
             break
           }
         }
         
-        for (const selector of priceSelectors) {
+        // Détection prix avec priorité Shopify
+        for (const selector of shopifySelectors.price) {
           const element = document.querySelector(selector)
           if (element?.textContent?.trim()) {
             const priceText = element.textContent.trim()
-            const priceMatch = priceText.match(/[\d,]+(?:\.\d{2})?/)
+            // Formats monétaires multiples: $19.99, 19,99 €, 1999, 19.99, etc.
+            const priceMatch = priceText.match(/[\d,]+(?:[.,]\d{2})?/)
             if (priceMatch) {
-              detectedPrice = parseFloat(priceMatch[0].replace(',', ''))
-              hasDetection = true
+              detectedPrice = parseFloat(priceMatch[0].replace(',', '.'))
+              console.log('✅ Prix détecté via sélecteur Shopify CSS:', selector, detectedPrice)
               break
             }
           }
@@ -306,24 +396,28 @@ class ChatSeller {
       if (detectedPrice && !this.config.productPrice) {
         this.config.productPrice = detectedPrice
       }
+      if (detectedId && !this.config.productId) {
+        this.config.productId = detectedId
+      }
       
       // Détection URL et ID
       if (!this.config.productUrl) {
         this.config.productUrl = window.location.href
       }
-      if (!this.config.productId) {
+      if (!this.config.productId && !detectedId) {
         this.config.productId = this.extractProductIdFromUrl()
       }
 
       if (hasDetection && (detectedName || detectedPrice)) {
-        console.log('✅ Produit détecté:', {
+        console.log('✅ Produit détecté avec succès:', {
           name: detectedName,
           price: detectedPrice,
-          id: this.config.productId
+          id: this.config.productId,
+          url: this.config.productUrl,
+          platform: this.detectPlatform()
         })
       }
 
-      // ✅ RETOURNER UN BOOLEAN POUR LE TEST
       return hasDetection && !!(detectedName || detectedPrice)
 
     } catch (error) {
@@ -335,9 +429,15 @@ class ChatSeller {
   private extractProductIdFromUrl(): string {
     try {
       const url = window.location.href
-      // Shopify: /products/product-handle
+      
+      // ✅ SHOPIFY AMÉLIORÉ: /products/product-handle ou /products/product-handle?variant=123
       const shopifyMatch = url.match(/\/products\/([^/?#]+)/)
-      if (shopifyMatch?.[1]) return shopifyMatch[1]
+      if (shopifyMatch?.[1]) {
+        const productHandle = shopifyMatch[1]
+        // Vérifier s'il y a un variant ID
+        const variantMatch = url.match(/variant=(\d+)/)
+        return variantMatch?.[1] || productHandle
+      }
       
       // WooCommerce: /?product_id=123 ou /product/product-name/
       const wooMatch = url.match(/product_id=(\d+)/) || url.match(/\/product\/([^/?#]+)/)
@@ -366,7 +466,7 @@ class ChatSeller {
     })
   }
 
-  // ✅ CRÉATION WIDGET IMMÉDIATE (SANS ATTENDRE API)
+  // ✅ CRÉATION WIDGET OPTIMISÉE POUR SHOPIFY
   private createWidget() {
     let container = document.getElementById('chatseller-widget')
     
@@ -377,6 +477,7 @@ class ChatSeller {
     if (!container) {
       container = document.createElement('div')
       container.id = 'chatseller-widget'
+      container.style.cssText = 'margin: 8px 0; position: relative; z-index: 999999;'
       this.insertWidgetAtPosition(container)
     }
 
@@ -387,22 +488,119 @@ class ChatSeller {
   private insertWidgetAtPosition(container: HTMLElement): void {
     const position = this.config.position || 'above-cta'
     
-    const ctaSelectors = [
-      '#add-to-cart-btn', '.add-to-cart', '[data-add-to-cart]',
-      '#buy-now-btn', '.buy-now', '.purchase-btn',
-      '.product-actions', '.product-form__buttons',
-      '.single_add_to_cart_button', '.button.add_to_cart_button',
-      '.btn-addtocart', '.product-form__cart'
+    // ✅ SÉLECTEURS SHOPIFY ULTRA-AMÉLIORÉS PAR THÈME
+    const shopifyCtaSelectors = [
+      // ✅ Shopify Dawn (thème par défaut 2024)
+      '.product-form__buttons',
+      '.product-form__cart',
+      'form[action*="/cart/add"] .product-form__buttons',
+      'form[action*="/cart/add"] button[type="submit"]',
+      '.product-form button[name="add"]',
+      
+      // ✅ Shopify Debut
+      '.product-form__cart-submit',
+      '.btn.product-form__cart-submit',
+      '.product-form__add-button',
+      
+      // ✅ Shopify Venture
+      '.product-form__item--submit',
+      '.product__form-action',
+      
+      // ✅ Shopify Brooklyn
+      '.product-single__cart-submit',
+      '.product-single__cart',
+      
+      // ✅ Shopify Minimal
+      '.product-form__cart--submit',
+      '.product-form__submit',
+      
+      // ✅ Shopify Boundless
+      '.product-single__add-to-cart',
+      '.product-single__shopify-payment-button',
+      
+      // ✅ Shopify Simple
+      '.product-add',
+      '.product__add-to-cart',
+      
+      // ✅ Shopify Narrative
+      '.product__cart-submit',
+      '.product-form__submit-button',
+      
+      // ✅ Shopify Supply
+      '.product-form__add-to-cart',
+      '.js-product-form-submit',
+      
+      // ✅ Sélecteurs génériques Shopify
+      '.single_add_to_cart_button',
+      '.btn-addtocart',
+      '.add-to-cart',
+      '[data-add-to-cart]',
+      'button[name="add"]',
+      
+      // ✅ Autres plateformes
+      '#add-to-cart-btn',
+      '#buy-now-btn',
+      '.buy-now',
+      '.purchase-btn',
+      '.product-actions'
     ]
     
     let targetElement = null
     let insertMethod: 'before' | 'after' | 'append' = 'before'
     
-    for (const selector of ctaSelectors) {
+    // ✅ RECHERCHE INTELLIGENTE AVEC PRIORITÉ SHOPIFY
+    for (const selector of shopifyCtaSelectors) {
       targetElement = document.querySelector(selector)
-      if (targetElement) break
+      if (targetElement) {
+        console.log(`✅ Élément CTA Shopify trouvé: ${selector}`)
+        break
+      }
     }
     
+    // ✅ FALLBACK 1: Recherche dans les formulaires Shopify
+    if (!targetElement) {
+      const productForm = document.querySelector('form[action*="/cart/add"]')
+      if (productForm) {
+        targetElement = productForm
+        insertMethod = 'after'
+        console.log('✅ Formulaire Shopify trouvé, insertion après')
+      }
+    }
+    
+    // ✅ FALLBACK 2: Recherche générale par sections Shopify
+    if (!targetElement) {
+      const shopifySections = [
+        '.product',
+        '.product-single',
+        '.product-details', 
+        '.product__info',
+        '.product-form',
+        'main[role="main"]',
+        'main'
+      ]
+      
+      for (const sectionSelector of shopifySections) {
+        const section = document.querySelector(sectionSelector)
+        if (section) {
+          targetElement = section
+          insertMethod = 'append'
+          console.log(`✅ Section Shopify trouvée: ${sectionSelector}`)
+          break
+        }
+      }
+    }
+    
+    // ✅ FALLBACK 3: Container forcé si spécifié
+    if (this.config.forceContainer) {
+      const forcedContainer = document.querySelector(this.config.forceContainer)
+      if (forcedContainer) {
+        targetElement = forcedContainer
+        insertMethod = 'append'
+        console.log(`✅ Container forcé trouvé: ${this.config.forceContainer}`)
+      }
+    }
+    
+    // ✅ LOGIQUE D'INSERTION SELON POSITION
     switch (position) {
       case 'above-cta':
         insertMethod = 'before'
@@ -412,34 +610,41 @@ class ChatSeller {
         break
       case 'beside-cta':
         insertMethod = 'after'
-        container.style.display = 'inline-block'
-        container.style.marginLeft = '1rem'
+        container.style.cssText += 'display: inline-block; margin-left: 1rem;'
         break
       default:
         insertMethod = 'before'
     }
     
+    // ✅ INSERTION AVEC VÉRIFICATIONS ROBUSTES
     if (targetElement) {
-      if (insertMethod === 'before') {
-        targetElement.parentNode?.insertBefore(container, targetElement)
-      } else if (insertMethod === 'after') {
-        targetElement.parentNode?.insertBefore(container, targetElement.nextSibling)
-      } else {
-        targetElement.appendChild(container)
+      try {
+        if (insertMethod === 'before') {
+          targetElement.parentNode?.insertBefore(container, targetElement)
+        } else if (insertMethod === 'after') {
+          targetElement.parentNode?.insertBefore(container, targetElement.nextSibling)
+        } else {
+          targetElement.appendChild(container)
+        }
+        console.log(`✅ Widget ChatSeller inséré ${insertMethod} l'élément CTA Shopify`)
+      } catch (error) {
+        console.warn('⚠️ Erreur insertion widget, fallback vers body:', error)
+        document.body.appendChild(container)
       }
     } else {
+      // Dernier fallback
       document.body.appendChild(container)
+      console.log('⚠️ Aucun élément CTA trouvé, widget ajouté au body')
     }
   }
 
-  // ✅ RENDU WIDGET OPTIMISÉ
+  // ✅ RENDU WIDGET OPTIMISÉ SHOPIFY
   private renderWidget() {
     if (!this.widgetElement) return
 
     const buttonText = this.config.buttonText || 'Parler à un conseiller'
     const primaryColor = this.config.primaryColor || '#007AFF'
 
-    // ✅ HTML OPTIMISÉ AVEC LAZY LOADING
     this.widgetElement.innerHTML = `
       <div style="width: 100%; margin: 8px 0; position: relative; z-index: 999999;">
         <button 
@@ -482,7 +687,7 @@ class ChatSeller {
       triggerBtn.addEventListener('click', () => this.openChat())
     }
 
-    console.log('✅ Widget rendu avec succès')
+    console.log('✅ Widget ChatSeller rendu avec succès sur Shopify')
   }
 
   private adjustColor(color: string, percent: number): string {
@@ -510,7 +715,7 @@ class ChatSeller {
     }
   }
 
-  // ✅ OUVERTURE CHAT AVEC LAZY LOADING COMPOSANT VUE
+  // ✅ OUVERTURE CHAT AVEC LAZY LOADING ET MESSAGE D'ACCUEIL
   private async openChat() {
     if (this.isOpen) return
 
@@ -526,7 +731,7 @@ class ChatSeller {
           config: this.config
         })
       } catch (error) {
-        console.error('❌ Erreur chargement composant:', error)
+        console.error('❌ Erreur chargement composant Vue:', error)
         this.createSimpleChatModal()
         return
       }
@@ -534,12 +739,43 @@ class ChatSeller {
     
     this.createChatModal()
     
-    console.log('💬 Chat ouvert')
+    // ✅ ENVOYER LE MESSAGE D'ACCUEIL AUTOMATIQUEMENT
+    await this.sendWelcomeMessage()
+    
+    console.log('💬 Chat ouvert avec message d\'accueil automatique')
+  }
+
+  // ✅ NOUVELLE MÉTHODE : Envoyer message d'accueil automatique
+  private async sendWelcomeMessage() {
+    try {
+      // Attendre que la config soit chargée
+      if (this.configPromise) {
+        await this.configPromise
+      }
+
+      // Envoyer le premier message automatiquement avec détection produit
+      const response = await this.sendMessage('', null, {
+        isFirstMessage: true,
+        productInfo: {
+          id: this.config.productId,
+          name: this.config.productName,
+          price: this.config.productPrice,
+          url: this.config.productUrl
+        }
+      })
+
+      if (response.success) {
+        this.conversationId = response.data.conversationId
+        console.log('✅ Message d\'accueil avec contexte produit envoyé automatiquement')
+      }
+
+    } catch (error) {
+      console.warn('⚠️ Erreur envoi message d\'accueil:', error)
+    }
   }
 
   // ✅ MODAL SIMPLE EN CAS D'ÉCHEC LAZY LOADING
   private createSimpleChatModal() {
-    // Modal HTML simple sans Vue.js en fallback
     if (this.modalElement) {
       this.modalElement.remove()
     }
@@ -591,7 +827,7 @@ class ChatSeller {
               padding: 16px; border-radius: 16px; margin-bottom: 16px;
               border: 1px solid #e2e8f0;
             ">
-              ${this.config.agentConfig?.welcomeMessage || 'Bonjour ! Comment puis-je vous aider ?'}
+              ${this.generateWelcomeMessageForModal()}
             </div>
           </div>
           
@@ -618,11 +854,20 @@ class ChatSeller {
     closeBtn?.addEventListener('click', () => this.closeChat())
   }
 
-  // ✅ RESTE DES MÉTHODES (createChatModal, setupChatEventListeners, etc.)
+  // ✅ GÉNÉRER MESSAGE D'ACCUEIL AVEC CONTEXTE PRODUIT POUR MODAL SIMPLE
+  private generateWelcomeMessageForModal(): string {
+    const agentName = this.config.agentConfig?.name || 'Assistant'
+    const productName = this.config.productName
+    
+    if (productName) {
+      return `Bonjour ! Je suis ${agentName}. 👋<br><br>Je vois que vous vous intéressez à <strong>"${productName}"</strong>. C'est un excellent choix !<br><br>Comment puis-je vous aider ? 😊`
+    }
+    
+    return `${this.config.agentConfig?.welcomeMessage || `Bonjour ! Je suis ${agentName}, votre assistant d'achat. Comment puis-je vous aider ?`}`
+  }
+
   private createChatModal() {
-    // Utiliser le composant Vue si disponible, sinon fallback
     if (this.chatComponent) {
-      // Intégrer le composant Vue
       this.integrateVueComponent()
     } else {
       this.createSimpleChatModal()
@@ -630,12 +875,10 @@ class ChatSeller {
   }
 
   private integrateVueComponent() {
-    // Créer un container pour le composant Vue
     const vueContainer = document.createElement('div')
     vueContainer.id = 'chatseller-vue-container'
     document.body.appendChild(vueContainer)
     
-    // Monter le composant Vue
     this.chatComponent.mount(vueContainer)
     this.modalElement = vueContainer
   }
@@ -662,29 +905,28 @@ class ChatSeller {
     this.messages.push(message)
   }
 
-  private async sendMessageToAPI(message: string): Promise<any> {
+  // ✅ MÉTHODE AMÉLIORÉE POUR ENVOYER MESSAGES
+  async sendMessage(message: string, conversationId?: string | null, options?: any): Promise<any> {
     try {
-      // S'assurer que la config est chargée avant l'envoi
       if (this.configPromise) {
         await this.configPromise
       }
 
       const payload = {
-        message,
-        conversationId: this.conversationId,
         shopId: this.config.shopId,
-        agentId: this.config.agentConfig?.id,
-        productContext: {
+        message,
+        conversationId: conversationId || this.conversationId,
+        productInfo: {
           id: this.config.productId,
           name: this.config.productName,
           price: this.config.productPrice,
           url: this.config.productUrl
         },
-        systemPrompt: this.config.agentConfig?.systemPrompt,
-        knowledgeBase: this.config.agentConfig?.knowledgeBase || []
+        visitorId: `visitor_${Date.now()}`,
+        isFirstMessage: options?.isFirstMessage || false
       }
 
-      const response = await fetch(`${this.config.apiUrl}/public/chat/message`, {
+      const response = await fetch(`${this.config.apiUrl}/public/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -709,6 +951,7 @@ class ChatSeller {
     if (!this.widgetElement) {
       const container = document.createElement('div')
       container.id = 'chatseller-widget-fallback'
+      container.style.cssText = 'margin: 8px 0; position: relative; z-index: 999999;'
       document.body.appendChild(container)
       this.widgetElement = container
     }
@@ -766,7 +1009,6 @@ class ChatSeller {
     console.log('📊 Track event:', event, data)
     
     if (this.config.shopId) {
-      // Track asynchrone pour ne pas bloquer
       fetch(`${this.config.apiUrl}/public/analytics/track`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -782,7 +1024,7 @@ class ChatSeller {
     }
   }
 
-  // ✅ MÉTHODES POUR TESTS
+  // ✅ MÉTHODES POUR TESTS ET DEBUG
   getProductDetection(): boolean {
     return this.detectProductInfo()
   }
@@ -800,6 +1042,7 @@ class ChatSeller {
         hasKnowledgeBase: (this.agentConfig.knowledgeBase || []).length > 0
       } : null,
       conversationId: this.conversationId,
+      platform: this.detectPlatform(),
       timestamp: new Date().toISOString()
     }
   }
@@ -824,9 +1067,9 @@ class ChatSeller {
 // ✅ INSTANCE GLOBALE
 const chatSeller = new ChatSeller()
 
-// ✅ AUTO-INIT OPTIMISÉ
+// ✅ AUTO-INIT OPTIMISÉ POUR SHOPIFY
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🌐 DOM chargé, recherche configuration ChatSeller...')
+  console.log('🌐 DOM chargé Shopify, recherche configuration ChatSeller...')
   
   if ((window as any).ChatSellerConfig) {
     console.log('🌍 Initialisation via window.ChatSellerConfig')
@@ -835,6 +1078,16 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('⚠️ Configuration ChatSeller non trouvée')
   }
 })
+
+// ✅ FALLBACK POUR SHOPIFY (parfois le DOM est déjà chargé)
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  setTimeout(() => {
+    if ((window as any).ChatSellerConfig && !chatSeller.isReady) {
+      console.log('🔄 Fallback Shopify: Initialisation différée')
+      chatSeller.init((window as any).ChatSellerConfig)
+    }
+  }, 1000)
+}
 
 // ✅ EXPORT
 declare global {
