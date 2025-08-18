@@ -485,157 +485,212 @@ class ChatSeller {
     this.renderWidget()
   }
 
-  private insertWidgetAtPosition(container: HTMLElement): void {
+    // ✅ INSERTION ULTRA-AMÉLIORÉE POUR SHOPIFY
+    private insertWidgetAtPosition(container: HTMLElement): void {
     const position = this.config.position || 'above-cta'
     
-    // ✅ SÉLECTEURS SHOPIFY ULTRA-AMÉLIORÉS PAR THÈME
-    const shopifyCtaSelectors = [
-      // ✅ Shopify Dawn (thème par défaut 2024)
-      '.product-form__buttons',
-      '.product-form__cart',
-      'form[action*="/cart/add"] .product-form__buttons',
-      'form[action*="/cart/add"] button[type="submit"]',
-      '.product-form button[name="add"]',
-      
-      // ✅ Shopify Debut
-      '.product-form__cart-submit',
-      '.btn.product-form__cart-submit',
-      '.product-form__add-button',
-      
-      // ✅ Shopify Venture
-      '.product-form__item--submit',
-      '.product__form-action',
-      
-      // ✅ Shopify Brooklyn
-      '.product-single__cart-submit',
-      '.product-single__cart',
-      
-      // ✅ Shopify Minimal
-      '.product-form__cart--submit',
-      '.product-form__submit',
-      
-      // ✅ Shopify Boundless
-      '.product-single__add-to-cart',
-      '.product-single__shopify-payment-button',
-      
-      // ✅ Shopify Simple
-      '.product-add',
-      '.product__add-to-cart',
-      
-      // ✅ Shopify Narrative
-      '.product__cart-submit',
-      '.product-form__submit-button',
-      
-      // ✅ Shopify Supply
-      '.product-form__add-to-cart',
-      '.js-product-form-submit',
-      
-      // ✅ Sélecteurs génériques Shopify
-      '.single_add_to_cart_button',
-      '.btn-addtocart',
-      '.add-to-cart',
-      '[data-add-to-cart]',
-      'button[name="add"]',
-      
-      // ✅ Autres plateformes
-      '#add-to-cart-btn',
-      '#buy-now-btn',
-      '.buy-now',
-      '.purchase-btn',
-      '.product-actions'
-    ]
-    
-    let targetElement = null
-    let insertMethod: 'before' | 'after' | 'append' = 'before'
-    
-    // ✅ RECHERCHE INTELLIGENTE AVEC PRIORITÉ SHOPIFY
-    for (const selector of shopifyCtaSelectors) {
-      targetElement = document.querySelector(selector)
-      if (targetElement) {
-        console.log(`✅ Élément CTA Shopify trouvé: ${selector}`)
-        break
+    // ✅ FONCTION DE RETRY AVEC TIMEOUT
+    const tryInsertWidget = (attempt: number = 1, maxAttempts: number = 5): void => {
+      if (this.config.debug) {
+        console.log(`🔍 ChatSeller: Tentative ${attempt}/${maxAttempts} - Recherche éléments Shopify...`)
       }
-    }
-    
-    // ✅ FALLBACK 1: Recherche dans les formulaires Shopify
-    if (!targetElement) {
-      const productForm = document.querySelector('form[action*="/cart/add"]')
-      if (productForm) {
-        targetElement = productForm
-        insertMethod = 'after'
-        console.log('✅ Formulaire Shopify trouvé, insertion après')
-      }
-    }
-    
-    // ✅ FALLBACK 2: Recherche générale par sections Shopify
-    if (!targetElement) {
-      const shopifySections = [
-        '.product',
-        '.product-single',
-        '.product-details', 
-        '.product__info',
-        '.product-form',
-        'main[role="main"]',
-        'main'
+
+      // ✅ SÉLECTEURS SHOPIFY 2024 ULTRA-PRIORITAIRES
+      const shopifyCtaSelectors = [
+        // Dawn (thème par défaut Shopify 2024)
+        '.product-form__buttons',
+        '.product-form__cart',
+        'form[action*="/cart/add"] .product-form__buttons',
+        'form[action*="/cart/add"] button[type="submit"]',
+        '.product-form button[name="add"]',
+        '.product-form__add-button',
+        '.product-form__cart-submit',
+        
+        // Debut et autres thèmes populaires
+        '.btn.product-form__cart-submit',
+        '.product-form__submit',
+        '.product-single__cart-submit',
+        '.product-single__cart',
+        
+        // Sélecteurs génériques Shopify
+        '.shopify-payment-button',
+        '.single_add_to_cart_button',
+        '.btn-addtocart',
+        '.add-to-cart',
+        '[data-add-to-cart]',
+        'button[name="add"]',
+        '.btn[name="add"]',
+        '.product-submit',
+        '.add-to-cart-form button',
+        
+        // Fallbacks universels
+        '#add-to-cart-btn',
+        '#buy-now-btn',
+        '.buy-now',
+        '.purchase-btn'
       ]
       
-      for (const sectionSelector of shopifySections) {
-        const section = document.querySelector(sectionSelector)
-        if (section) {
-          targetElement = section
-          insertMethod = 'append'
-          console.log(`✅ Section Shopify trouvée: ${sectionSelector}`)
+      let targetElement = null
+      let insertMethod: 'before' | 'after' | 'append' = 'before'
+      
+      // ✅ RECHERCHE PRIORITAIRE
+      for (const selector of shopifyCtaSelectors) {
+        targetElement = document.querySelector(selector)
+        if (targetElement) {
+          console.log(`✅ Élément CTA Shopify trouvé: ${selector}`)
           break
         }
       }
-    }
-    
-    // ✅ FALLBACK 3: Container forcé si spécifié
-    if (this.config.forceContainer) {
-      const forcedContainer = document.querySelector(this.config.forceContainer)
-      if (forcedContainer) {
-        targetElement = forcedContainer
-        insertMethod = 'append'
-        console.log(`✅ Container forcé trouvé: ${this.config.forceContainer}`)
-      }
-    }
-    
-    // ✅ LOGIQUE D'INSERTION SELON POSITION
-    switch (position) {
-      case 'above-cta':
-        insertMethod = 'before'
-        break
-      case 'below-cta':
-        insertMethod = 'after'
-        break
-      case 'beside-cta':
-        insertMethod = 'after'
-        container.style.cssText += 'display: inline-block; margin-left: 1rem;'
-        break
-      default:
-        insertMethod = 'before'
-    }
-    
-    // ✅ INSERTION AVEC VÉRIFICATIONS ROBUSTES
-    if (targetElement) {
-      try {
-        if (insertMethod === 'before') {
-          targetElement.parentNode?.insertBefore(container, targetElement)
-        } else if (insertMethod === 'after') {
-          targetElement.parentNode?.insertBefore(container, targetElement.nextSibling)
-        } else {
-          targetElement.appendChild(container)
+      
+      // ✅ FALLBACK 1: Recherche dans les formulaires Shopify
+      if (!targetElement) {
+        const productForm = document.querySelector('form[action*="/cart/add"]')
+        if (productForm) {
+          // Chercher le bouton submit dans ce formulaire
+          const submitBtn = productForm.querySelector('button[type="submit"], input[type="submit"], .btn')
+          targetElement = submitBtn || productForm
+          insertMethod = submitBtn ? 'before' : 'append'
+          console.log('✅ Formulaire Shopify trouvé')
         }
-        console.log(`✅ Widget ChatSeller inséré ${insertMethod} l'élément CTA Shopify`)
-      } catch (error) {
-        console.warn('⚠️ Erreur insertion widget, fallback vers body:', error)
-        document.body.appendChild(container)
       }
-    } else {
-      // Dernier fallback
-      document.body.appendChild(container)
-      console.log('⚠️ Aucun élément CTA trouvé, widget ajouté au body')
+      
+      // ✅ FALLBACK 2: Recherche par sections Shopify
+      if (!targetElement) {
+        const shopifySections = [
+          '.product',
+          '.product-single', 
+          '.product-details',
+          '.product__info',
+          '.product-form',
+          '.product-wrapper',
+          '.product-content',
+          'main[role="main"]',
+          'main',
+          '#main',
+          '.main-content'
+        ]
+        
+        for (const sectionSelector of shopifySections) {
+          const section = document.querySelector(sectionSelector)
+          if (section) {
+            // Chercher un bouton dans cette section
+            const button = section.querySelector('button[type="submit"], .btn, [class*="add"], [class*="cart"]')
+            if (button) {
+              targetElement = button
+              insertMethod = 'before'
+              console.log(`✅ Bouton trouvé dans section: ${sectionSelector}`)
+              break
+            } else {
+              targetElement = section
+              insertMethod = 'append'
+              console.log(`✅ Section trouvée: ${sectionSelector}`)
+              break
+            }
+          }
+        }
+      }
+      
+      // ✅ FALLBACK 3: Container forcé
+      if (this.config.forceContainer && !targetElement) {
+        const forcedContainer = document.querySelector(this.config.forceContainer)
+        if (forcedContainer) {
+          targetElement = forcedContainer
+          insertMethod = 'append'
+          console.log(`✅ Container forcé: ${this.config.forceContainer}`)
+        }
+      }
+      
+      // ✅ LOGIQUE D'INSERTION
+      if (targetElement) {
+        try {
+          switch (position) {
+            case 'above-cta':
+              insertMethod = 'before'
+              break
+            case 'below-cta':
+              insertMethod = 'after'
+              break
+            case 'beside-cta':
+              insertMethod = 'after'
+              container.style.cssText += 'display: inline-block; margin-left: 1rem;'
+              break
+          }
+          
+          if (insertMethod === 'before') {
+            targetElement.parentNode?.insertBefore(container, targetElement)
+          } else if (insertMethod === 'after') {
+            targetElement.parentNode?.insertBefore(container, targetElement.nextSibling)
+          } else {
+            targetElement.appendChild(container)
+          }
+          
+          console.log(`✅ Widget ChatSeller inséré ${insertMethod} l'élément CTA`)
+          
+          // Vérifier que le widget est visible
+          setTimeout(() => {
+            const widgetBtn = container.querySelector('#chatseller-trigger-btn')
+            if (widgetBtn && (widgetBtn as HTMLElement).offsetParent === null) {
+              console.warn('⚠️ Widget inséré mais non visible, tentative de correction...')
+              container.style.cssText += 'display: block !important; visibility: visible !important; position: relative !important;'
+            }
+          }, 100)
+          
+          return // Succès, arrêter les tentatives
+          
+        } catch (error) {
+          console.warn(`⚠️ Erreur insertion tentative ${attempt}:`, error)
+        }
+      }
+      
+      // ✅ RETRY LOGIC
+      if (attempt < maxAttempts) {
+        setTimeout(() => {
+          tryInsertWidget(attempt + 1, maxAttempts)
+        }, 1000 * attempt) // Délai progressif
+      } else {
+        // ✅ DERNIER FALLBACK: Insertion body avec position fixe
+        console.log('⚠️ Aucun élément CTA trouvé, insertion body avec position adaptée')
+        
+        // Créer un container avec position fixe pour Shopify
+        container.style.cssText = `
+          position: fixed !important;
+          bottom: 20px !important;
+          right: 20px !important;
+          z-index: 999999 !important;
+          max-width: 280px !important;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
+        `
+        
+        document.body.appendChild(container)
+        
+        if (this.config.debug) {
+          this.logShopifyDiagnostic()
+        }
+      }
     }
+    
+    // Commencer les tentatives d'insertion
+    tryInsertWidget()
+  }
+
+  // ✅ DIAGNOSTIC SHOPIFY DÉTAILLÉ
+  private logShopifyDiagnostic(): void {
+    console.log('🔍 ChatSeller DIAGNOSTIC SHOPIFY:')
+    console.log('  - URL:', window.location.href)
+    console.log('  - Shopify détecté:', !!(window as any).Shopify)
+    console.log('  - ShopifyAnalytics:', !!(window as any).ShopifyAnalytics)
+    console.log('  - Formulaires cart:', document.querySelectorAll('form[action*="/cart/add"]').length)
+    console.log('  - Boutons submit:', document.querySelectorAll('button[type="submit"]').length)
+    console.log('  - Elements product:', document.querySelectorAll('[class*="product"]').length)
+    console.log('  - Theme liquid détecté:', !!document.querySelector('script[src*="shopify"]'))
+    
+    // Lister les 10 premiers boutons trouvés
+    const buttons = Array.from(document.querySelectorAll('button, .btn, [class*="add"], [class*="cart"]')).slice(0, 10)
+    console.log('  - Boutons trouvés:', buttons.map(btn => ({
+      tag: btn.tagName,
+      class: btn.className,
+      text: btn.textContent?.trim().substring(0, 50)
+    })))
   }
 
   // ✅ RENDU WIDGET OPTIMISÉ SHOPIFY
@@ -675,7 +730,7 @@ class ChatSeller {
           onmouseout="this.style.opacity='1'; this.style.transform='translateY(0px)'; this.style.boxShadow='0 8px 25px rgba(0, 0, 0, 0.15)'"
         >
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink: 0;">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.906-1.479L3 21l2.521-5.094A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"></path>
           </svg>
           <span>${buttonText}</span>
         </button>
@@ -1087,6 +1142,16 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
       chatSeller.init((window as any).ChatSellerConfig)
     }
   }, 1000)
+}
+
+// ✅ ÉCOUTER LES CHANGEMENTS DE SECTION SHOPIFY (AJAX)
+if ((window as any).Shopify) {
+  document.addEventListener('shopify:section:load', () => {
+    console.log('🔄 Shopify: Section rechargée, re-initialisation widget')
+    if ((window as any).ChatSellerConfig && !chatSeller.isReady) {
+      setTimeout(() => chatSeller.init((window as any).ChatSellerConfig), 500)
+    }
+  })
 }
 
 // ✅ EXPORT
