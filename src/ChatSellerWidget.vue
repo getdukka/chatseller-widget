@@ -1,31 +1,30 @@
 <template>
   <div class="cs-chatseller-widget">
-    <!-- ✅ BOUTON WIDGET (Non-flottant, intégré dans la page) -->
+    <!-- ✅ BOUTON WIDGET AVEC COULEURS DYNAMIQUES -->
     <Transition name="cs-fade">
       <button
         v-if="!isOpen"
         @click="openChat"
-        :style="{ 
-          backgroundColor: config.primaryColor || '#007AFF',
-          ...(config.theme === 'brand_adaptive' ? adaptiveStyles : {})
-        }"
-        class="cs-chat-trigger-button"
+        :style="brandButtonStyles"
+        class="cs-chat-trigger-button cs-brand-style"
         :class="getTriggerButtonClasses()"
       >
-        <svg class="cs-w-5 cs-h-5 cs-mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.906-1.479L3 21l2.521-5.094A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"></path>
-        </svg>
-        {{ config.buttonText || 'Parler à un conseiller' }}
+        <div class="cs-button-content">
+          <svg class="cs-chat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.906-1.479L3 21l2.521-5.094A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"></path>
+          </svg>
+          <span class="cs-button-text">{{ config.buttonText || 'Parler à un conseiller' }}</span>
+        </div>
         
-        <!-- Badge notification optionnel -->
+        <!-- Badge notification -->
         <span 
           v-if="hasUnreadMessages"
-          class="cs-absolute cs--top-1 cs--right-1 cs-w-3 cs-h-3 cs-bg-red-500 cs-rounded-full cs-animate-pulse"
+          class="cs-notification-badge"
         ></span>
       </button>
     </Transition>
 
-    <!-- ✅ MODAL CHAT MODERNE - ÉLARGI À 450PX -->
+    <!-- ✅ MODAL CHAT AVEC DESIGN ADAPTATIF DESKTOP/MOBILE -->
     <Transition name="cs-modal">
       <div
         v-if="isOpen"
@@ -33,227 +32,115 @@
         :class="{ 'cs-mobile': isMobile }"
         @click.self="closeChatOnOverlay"
       >
+        <!-- Interface Mobile (style WhatsApp avec couleurs de marque) -->
         <div 
-          class="cs-chat-container cs-modern-chat"
-          :class="getChatContainerClasses()"
-          :style="{ 
-            borderColor: config.primaryColor || '#007AFF',
-            ...(config.theme === 'brand_adaptive' ? adaptiveStyles : {})
-          }"
+          v-if="isMobile"
+          class="cs-chat-container cs-mobile-container"
+          :style="brandContainerStyles"
         >
           
-          <!-- ✅ HEADER CHAT MODERNE AVEC GRADIENT -->
-          <div 
-            class="cs-chat-header cs-modern-header"
-            :style="{ 
-              background: `linear-gradient(135deg, ${config.primaryColor || '#007AFF'} 0%, ${adjustColor(config.primaryColor || '#007AFF', -20)} 100%)`
-            }"
-          >
-            <div class="cs-flex cs-items-center cs-space-x-3">
-              <div class="cs-relative">
-                <img
-                  :src="agentAvatar"
-                  :alt="agentName"
-                  class="cs-w-12 cs-h-12 cs-rounded-full cs-border-3 cs-border-white cs-border-opacity-30 cs-shadow-lg"
-                  @error="handleAvatarError"
-                >
-                <div class="cs-absolute cs-bottom-0 cs-right-0 cs-w-4 cs-h-4 cs-bg-green-400 cs-rounded-full cs-border-2 cs-border-white cs-animate-pulse"></div>
-              </div>
-              <div>
-                <h3 class="cs-font-semibold cs-text-white cs-text-lg cs-tracking-tight">{{ agentName }}</h3>
-                <p class="cs-text-sm cs-text-white cs-text-opacity-90 cs-flex cs-items-center">
-                  <span class="cs-text-xs cs-bg-green-400 cs-text-green-900 cs-px-2 cs-py-0.5 cs-rounded-full cs-font-medium cs-mr-2">
-                    En ligne
-                  </span>
-                  {{ agentTitle }}
-                </p>
-              </div>
-            </div>
-            
-            <button
-              @click="closeChat"
-              class="cs-text-white cs-text-opacity-80 hover:cs-text-opacity-100 cs-p-2 cs-rounded-full hover:cs-bg-white hover:cs-bg-opacity-10 cs-transition-all cs-group"
-            >
-              <svg class="cs-w-6 cs-h-6 cs-group-hover:cs-rotate-90 cs-transition-transform cs-duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
-          </div>
-
-          <!-- ✅ CONTEXTE PRODUIT MODERNE (si détecté) -->
-          <div
-            v-if="productInfo"
-            class="cs-product-context cs-modern-context"
-          >
-            <div class="cs-flex cs-items-center cs-space-x-4">
-              <div class="cs-flex cs-items-center cs-space-x-2">
-                <div class="cs-w-3 cs-h-3 cs-bg-green-500 cs-rounded-full cs-animate-pulse"></div>
-                <div class="cs-text-xs cs-font-medium cs-text-green-700 cs-bg-green-50 cs-px-2 cs-py-1 cs-rounded-full">
-                  {{ t('viewing_product') }}
+          <!-- Header Mobile -->
+          <div class="cs-chat-header cs-mobile-header" :style="brandHeaderStyles">
+            <div class="cs-header-content">
+              <div class="cs-agent-info">
+                <div class="cs-agent-avatar-container">
+                  <img
+                    :src="agentAvatar"
+                    :alt="agentName"
+                    class="cs-agent-avatar"
+                    @error="handleAvatarError"
+                  >
+                  <div class="cs-online-indicator" :style="{ backgroundColor: primaryColor }"></div>
+                </div>
+                <div class="cs-agent-details">
+                  <h3 class="cs-agent-name">{{ agentName }}</h3>
+                  <p class="cs-agent-status">
+                    <span class="cs-status-dot" :style="{ backgroundColor: primaryColor }"></span>
+                    En ligne • {{ agentTitle }}
+                  </p>
                 </div>
               </div>
-              <div class="cs-flex-1 cs-min-w-0">
-                <p class="cs-text-sm cs-font-semibold cs-text-gray-900 cs-truncate">{{ productInfo.name }}</p>
-                <p v-if="productInfo.price" class="cs-text-sm cs-text-gray-600">
+              
+              <button @click="closeChat" class="cs-close-button">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Contexte produit Mobile -->
+          <div
+            v-if="productInfo"
+            class="cs-product-context cs-mobile-product"
+            :style="brandProductContextStyles"
+          >
+            <div class="cs-product-card">
+              <div class="cs-product-indicator">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+                <span>Produit consulté</span>
+              </div>
+              <div class="cs-product-details">
+                <h4 class="cs-product-name">{{ productInfo.name }}</h4>
+                <p v-if="productInfo.price" class="cs-product-price" :style="{ color: primaryColor }">
                   {{ formatPrice(productInfo.price) }}
                 </p>
               </div>
             </div>
           </div>
 
-          <!-- ✅ CONTAINER MESSAGES ÉLARGI -->
-          <div
-            ref="messagesContainer"
-            class="cs-messages-container cs-modern-messages"
-            :class="getMessagesContainerClasses()"
-          >
-            
-            <!-- ✅ PAS DE MESSAGE D'ACCUEIL STATIQUE - Géré par l'API -->
-            
-            <!-- Messages de conversation modernes -->
+          <!-- Messages Mobile -->
+          <div ref="messagesContainer" class="cs-messages-container cs-mobile-messages">
             <div
               v-for="message in messages"
               :key="message.id"
-              class="cs-message"
-              :class="message.role === 'user' ? 'cs-user-message' : 'cs-assistant-message'"
+              class="cs-message-wrapper"
+              :class="message.role === 'user' ? 'cs-user-wrapper' : 'cs-assistant-wrapper'"
             >
-              <!-- Message assistant moderne -->
-              <div
-                v-if="message.role === 'assistant'"
-                class="cs-flex cs-items-start cs-space-x-3"
-              >
-                <div class="cs-relative">
-                  <img
-                    :src="agentAvatar"
-                    :alt="agentName"
-                    class="cs-w-10 cs-h-10 cs-rounded-full cs-flex-shrink-0 cs-border-2 cs-border-gray-100"
-                    @error="handleAvatarError"
-                  >
-                  <div class="cs-absolute cs-bottom-0 cs-right-0 cs-w-3 cs-h-3 cs-bg-green-400 cs-rounded-full cs-border cs-border-white"></div>
+              
+              <!-- Message assistant -->
+              <div v-if="message.role === 'assistant'" class="cs-message cs-assistant-message">
+                <div class="cs-message-avatar">
+                  <img :src="agentAvatar" :alt="agentName" class="cs-avatar-small" @error="handleAvatarError">
                 </div>
-                <div class="cs-message-content cs-max-w-sm">
-                  <div class="cs-flex cs-items-center cs-space-x-2 cs-mb-2">
-                    <span class="cs-font-semibold cs-text-sm cs-text-gray-900">{{ agentName }}</span>
-                    <span class="cs-text-xs cs-text-gray-500 cs-bg-gray-100 cs-px-2 cs-py-0.5 cs-rounded-full">{{ formatTime(message.timestamp) }}</span>
-                  </div>
-                  <div 
-                    class="cs-message-bubble cs-modern-bubble cs-bg-gradient-to-br cs-from-gray-50 cs-to-gray-100 cs-text-gray-800 cs-p-4 cs-rounded-2xl cs-rounded-tl-md cs-shadow-sm cs-border cs-border-gray-200"
-                  >
-                    <!-- ✅ FORMATAGE AMÉLIORÉ DES MESSAGES -->
-                    <div class="cs-text-sm cs-leading-relaxed cs-message-formatted" v-html="formatMessage(message.content)"></div>
+                <div class="cs-message-content">
+                  <div class="cs-message-bubble cs-assistant-bubble">
+                    <div class="cs-message-text" v-html="formatMessage(message.content)"></div>
+                    <div class="cs-message-time">{{ formatTime(message.timestamp) }}</div>
                   </div>
                 </div>
               </div>
 
-              <!-- Message utilisateur moderne -->
-              <div
-                v-else
-                class="cs-flex cs-items-start cs-space-x-3 cs-justify-end"
-              >
-                <div class="cs-message-content cs-text-right cs-max-w-sm">
-                  <div class="cs-flex cs-items-center cs-space-x-2 cs-mb-2 cs-justify-end">
-                    <span class="cs-text-xs cs-text-gray-500 cs-bg-gray-100 cs-px-2 cs-py-0.5 cs-rounded-full">{{ formatTime(message.timestamp) }}</span>
-                    <span class="cs-font-semibold cs-text-sm cs-text-gray-900">{{ t('you') }}</span>
-                  </div>
-                  <div 
-                    class="cs-message-bubble cs-modern-bubble cs-text-white cs-p-4 cs-rounded-2xl cs-rounded-tr-md cs-shadow-sm cs-backdrop-blur-sm"
-                    :style="{ 
-                      background: `linear-gradient(135deg, ${config.primaryColor || '#007AFF'} 0%, ${adjustColor(config.primaryColor || '#007AFF', -15)} 100%)`
-                    }"
-                  >
-                    <p class="cs-text-sm cs-leading-relaxed">{{ message.content }}</p>
-                  </div>
-                </div>
-                <div class="cs-w-10 cs-h-10 cs-bg-gradient-to-br cs-from-gray-400 cs-to-gray-500 cs-rounded-full cs-flex cs-items-center cs-justify-center cs-flex-shrink-0 cs-shadow-sm">
-                  <span class="cs-text-white cs-text-sm cs-font-semibold">{{ t('you_initial') }}</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Indicateur de frappe moderne -->
-            <div v-if="isTyping" class="cs-message cs-assistant-message">
-              <div class="cs-flex cs-items-start cs-space-x-3">
-                <div class="cs-relative">
-                  <img
-                    :src="agentAvatar"
-                    :alt="agentName"
-                    class="cs-w-10 cs-h-10 cs-rounded-full cs-flex-shrink-0 cs-border-2 cs-border-gray-100"
-                    @error="handleAvatarError"
-                  >
-                  <div class="cs-absolute cs-bottom-0 cs-right-0 cs-w-3 cs-h-3 cs-bg-green-400 cs-rounded-full cs-border cs-border-white cs-animate-pulse"></div>
-                </div>
-                <div class="cs-typing-indicator cs-modern-typing cs-bg-gradient-to-r cs-from-gray-100 cs-to-gray-50 cs-p-4 cs-rounded-2xl cs-rounded-tl-md cs-shadow-sm cs-border cs-border-gray-200">
-                  <div class="cs-flex cs-items-center cs-space-x-1">
-                    <span class="cs-text-xs cs-text-gray-500 cs-mr-2">{{ agentName }} est en train d'écrire</span>
-                    <div class="cs-flex cs-space-x-1">
-                      <div class="cs-w-2 cs-h-2 cs-bg-gray-400 cs-rounded-full cs-animate-bounce" style="animation-delay: 0s"></div>
-                      <div class="cs-w-2 cs-h-2 cs-bg-gray-400 cs-rounded-full cs-animate-bounce" style="animation-delay: 0.2s"></div>
-                      <div class="cs-w-2 cs-h-2 cs-bg-gray-400 cs-rounded-full cs-animate-bounce" style="animation-delay: 0.4s"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Message d'erreur moderne -->
-            <div v-if="errorMessage" class="cs-message cs-error-message">
-              <div class="cs-bg-red-50 cs-border cs-border-red-200 cs-rounded-2xl cs-p-4 cs-max-w-sm cs-mx-auto cs-shadow-sm">
-                <div class="cs-flex cs-items-start">
-                  <div class="cs-w-8 cs-h-8 cs-bg-red-100 cs-rounded-full cs-flex cs-items-center cs-justify-center cs-flex-shrink-0">
-                    <svg class="cs-w-4 cs-h-4 cs-text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
-                    </svg>
-                  </div>
-                  <div class="cs-ml-3">
-                    <p class="cs-text-sm cs-text-red-800 cs-font-medium">{{ errorMessage }}</p>
-                    <button 
-                      v-if="lastFailedMessage"
-                      @click="retryLastMessage"
-                      class="cs-text-xs cs-text-red-600 cs-underline cs-mt-2 hover:cs-text-red-800 cs-transition-colors cs-font-medium"
-                    >
-                      {{ t('retry') }}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- ✅ AFFICHAGE COLLECTE DE COMMANDE AMÉLIORÉ -->
-            <div v-if="orderCollectionState" class="cs-message cs-assistant-message">
-              <div class="cs-flex cs-items-start cs-space-x-3">
-                <div class="cs-relative">
-                  <img
-                    :src="agentAvatar"
-                    :alt="agentName"
-                    class="cs-w-10 cs-h-10 cs-rounded-full cs-flex-shrink-0 cs-border-2 cs-border-gray-100"
-                    @error="handleAvatarError"
-                  >
-                  <div class="cs-absolute cs-bottom-0 cs-right-0 cs-w-3 cs-h-3 cs-bg-blue-400 cs-rounded-full cs-border cs-border-white cs-animate-pulse"></div>
-                </div>
-                <div class="cs-message-content cs-max-w-sm">
-                  <div class="cs-bg-blue-50 cs-border cs-border-blue-200 cs-rounded-2xl cs-p-4 cs-shadow-sm">
-                    <div class="cs-flex cs-items-center cs-mb-3">
-                      <svg class="cs-w-5 cs-h-5 cs-text-blue-600 cs-mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+              <!-- Message utilisateur -->
+              <div v-else class="cs-message cs-user-message">
+                <div class="cs-message-content">
+                  <div class="cs-message-bubble cs-user-bubble" :style="brandUserBubbleStyles">
+                    <div class="cs-message-text">{{ message.content }}</div>
+                    <div class="cs-message-time">
+                      {{ formatTime(message.timestamp) }}
+                      <svg class="cs-message-check" width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                       </svg>
-                      <span class="cs-text-sm cs-font-semibold cs-text-blue-800">Collecte de commande</span>
                     </div>
-                    <div class="cs-text-sm cs-text-blue-700">
-                      <p><strong>Étape:</strong> {{ getOrderStepLabel(orderCollectionState.step) }}</p>
-                      <div v-if="orderCollectionState.data" class="cs-mt-2 cs-space-y-1">
-                        <p v-if="orderCollectionState.data.productName">
-                          <strong>Produit:</strong> {{ orderCollectionState.data.productName }}
-                        </p>
-                        <p v-if="orderCollectionState.data.quantity">
-                          <strong>Quantité:</strong> {{ orderCollectionState.data.quantity }}
-                        </p>
-                        <p v-if="orderCollectionState.data.customerPhone">
-                          <strong>Téléphone:</strong> {{ orderCollectionState.data.customerPhone }}
-                        </p>
-                        <p v-if="orderCollectionState.data.customerFirstName">
-                          <strong>Nom:</strong> {{ orderCollectionState.data.customerFirstName }} {{ orderCollectionState.data.customerLastName || '' }}
-                        </p>
-                      </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Typing indicator -->
+            <div v-if="isTyping" class="cs-message-wrapper cs-assistant-wrapper">
+              <div class="cs-message cs-assistant-message">
+                <div class="cs-message-avatar">
+                  <img :src="agentAvatar" :alt="agentName" class="cs-avatar-small" @error="handleAvatarError">
+                </div>
+                <div class="cs-message-content">
+                  <div class="cs-typing-bubble">
+                    <div class="cs-typing-indicator">
+                      <div class="cs-typing-dot"></div>
+                      <div class="cs-typing-dot"></div>
+                      <div class="cs-typing-dot"></div>
                     </div>
                   </div>
                 </div>
@@ -263,94 +150,256 @@
             <div ref="messagesEndRef" />
           </div>
 
-          <!-- ✅ ACTIONS RAPIDES MODERNES (seulement si pas de collecte en cours) -->
-          <div
-            v-if="showQuickActions && !orderCollectionState"
-            class="cs-quick-actions cs-modern-actions"
-          >
-            <div class="cs-mb-3">
-              <p class="cs-text-xs cs-text-gray-600 cs-text-center cs-font-medium">{{ t('quick_actions') }}</p>
-            </div>
-            <div class="cs-grid cs-grid-cols-1 cs-gap-3">
-              <button
-                @click="sendQuickMessage(quickActions.buyNow)"
-                class="cs-w-full cs-text-white cs-p-4 cs-rounded-xl cs-text-sm cs-font-semibold cs-transition-all hover:cs-opacity-90 cs-flex cs-items-center cs-justify-center cs-shadow-sm hover:cs-shadow-md cs-transform hover:cs--translate-y-0.5"
-                :style="{ 
-                  background: `linear-gradient(135deg, ${config.primaryColor || '#007AFF'} 0%, ${adjustColor(config.primaryColor || '#007AFF', -15)} 100%)`
-                }"
-              >
-                <svg class="cs-w-5 cs-h-5 cs-mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <!-- Actions rapides Mobile -->
+          <div v-if="showQuickActions" class="cs-quick-actions cs-mobile-actions">
+            <div class="cs-actions-grid">
+              <button @click="sendQuickMessage(quickActions.buyNow)" class="cs-quick-action cs-primary-action" :style="brandPrimaryActionStyles">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                 </svg>
                 {{ quickActions.buyNow }}
               </button>
               
-              <div class="cs-grid cs-grid-cols-2 cs-gap-3">
-                <button
-                  @click="sendQuickMessage(quickActions.haveQuestions)"
-                  class="cs-border-2 cs-text-gray-700 cs-p-3 cs-rounded-xl cs-text-sm cs-font-medium cs-transition-all hover:cs-bg-gray-50 cs-shadow-sm hover:cs-shadow-md cs-transform hover:cs--translate-y-0.5"
-                  :style="{ 
-                    borderColor: config.primaryColor || '#007AFF', 
-                    color: config.primaryColor || '#007AFF' 
-                  }"
-                >
-                  <svg class="cs-w-4 cs-h-4 cs-mx-auto cs-mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                  </svg>
-                  {{ quickActions.haveQuestions }}
-                </button>
-                
-                <button
-                  @click="sendQuickMessage(quickActions.wantToKnowMore)"
-                  class="cs-border-2 cs-text-gray-700 cs-p-3 cs-rounded-xl cs-text-sm cs-font-medium cs-transition-all hover:cs-bg-gray-50 cs-shadow-sm hover:cs-shadow-md cs-transform hover:cs--translate-y-0.5"
-                  :style="{ 
-                    borderColor: config.primaryColor || '#007AFF', 
-                    color: config.primaryColor || '#007AFF' 
-                  }"
-                >
-                  <svg class="cs-w-4 cs-h-4 cs-mx-auto cs-mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                  </svg>
-                  {{ quickActions.wantToKnowMore }}
-                </button>
-              </div>
+              <button @click="sendQuickMessage(quickActions.haveQuestions)" class="cs-quick-action cs-secondary-action" :style="brandSecondaryActionStyles">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                {{ quickActions.haveQuestions }}
+              </button>
+              
+              <button @click="sendQuickMessage(quickActions.wantToKnowMore)" class="cs-quick-action cs-secondary-action" :style="brandSecondaryActionStyles">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                {{ quickActions.wantToKnowMore }}
+              </button>
             </div>
           </div>
 
-          <!-- ✅ INPUT MESSAGE MODERNE -->
-          <div class="cs-message-input cs-modern-input">
-            <div class="cs-flex cs-items-end cs-space-x-3">
-              <div class="cs-flex-1">
-                <input
-                  v-model="currentMessage"
-                  @keypress.enter="sendMessage"
-                  :placeholder="inputPlaceholder"
-                  class="cs-w-full cs-p-4 cs-border-2 cs-border-gray-200 cs-rounded-xl cs-text-sm focus:cs-outline-none focus:cs-ring-2 focus:cs-border-transparent cs-transition-all cs-resize-none cs-bg-white cs-shadow-sm focus:cs-shadow-md"
-                  :style="{ 
-                    '--tw-ring-color': config.primaryColor || '#007AFF'
-                  }"
-                  :disabled="isTyping || isLoading"
-                >
+          <!-- Input Mobile -->
+          <div class="cs-message-input cs-mobile-input">
+            <div class="cs-input-container">
+              <div class="cs-input-wrapper">
+                <input v-model="currentMessage" @keypress.enter="sendMessage" :placeholder="inputPlaceholder" class="cs-message-field" :disabled="isTyping || isLoading">
               </div>
-              <button
-                @click="sendMessage"
-                :disabled="!currentMessage.trim() || isTyping || isLoading"
-                class="cs-p-4 cs-text-white cs-rounded-xl cs-transition-all disabled:cs-opacity-50 cs-flex cs-items-center cs-justify-center cs-min-w-14 cs-shadow-sm hover:cs-shadow-md cs-transform hover:cs--translate-y-0.5"
-                :style="{ 
-                  background: `linear-gradient(135deg, ${config.primaryColor || '#007AFF'} 0%, ${adjustColor(config.primaryColor || '#007AFF', -15)} 100%)`
-                }"
-              >
-                <svg v-if="!isTyping" class="cs-w-5 cs-h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <button @click="sendMessage" :disabled="!currentMessage.trim() || isTyping || isLoading" class="cs-send-button" :style="brandSendButtonStyles">
+                <svg v-if="!isTyping" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                 </svg>
-                <svg v-else class="cs-w-5 cs-h-5 cs-animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg v-else class="cs-loading-icon" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                 </svg>
               </button>
             </div>
-            <p class="cs-text-xs cs-text-gray-500 cs-mt-3 cs-text-center cs-bg-gray-50 cs-px-3 cs-py-2 cs-rounded-lg">
-              {{ t('powered_by') }} <strong class="cs-font-semibold" :style="{ color: config.primaryColor || '#007AFF' }">ChatSeller</strong> • {{ t('ai_assistant') }}
-            </p>
+            
+            <div class="cs-footer">
+              <p>Propulsé par <strong :style="{ color: primaryColor }">ChatSeller</strong> • Assistant IA</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ✅ INTERFACE DESKTOP INNOVANTE -->
+        <div 
+          v-else
+          class="cs-chat-container cs-desktop-container"
+          :style="brandDesktopStyles"
+        >
+          
+          <!-- Header Desktop Moderne -->
+          <div class="cs-desktop-header" :style="brandDesktopHeaderStyles">
+            <div class="cs-header-glassmorphism">
+              <div class="cs-agent-presentation">
+                <div class="cs-agent-avatar-large">
+                  <img :src="agentAvatar" :alt="agentName" @error="handleAvatarError">
+                  <div class="cs-status-ring" :style="{ borderColor: primaryColor }">
+                    <div class="cs-status-core" :style="{ backgroundColor: primaryColor }"></div>
+                  </div>
+                </div>
+                <div class="cs-agent-intro">
+                  <h2 class="cs-agent-title">{{ agentName }}</h2>
+                  <p class="cs-agent-subtitle">{{ agentTitle }}</p>
+                  <div class="cs-status-badge" :style="brandStatusBadgeStyles">
+                    <span class="cs-status-pulse" :style="{ backgroundColor: primaryColor }"></span>
+                    Disponible maintenant
+                  </div>
+                </div>
+              </div>
+              
+              <button @click="closeChat" class="cs-close-button-desktop">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Contexte produit Desktop -->
+          <div v-if="productInfo" class="cs-product-showcase" :style="brandProductShowcaseStyles">
+            <div class="cs-product-highlight">
+              <div class="cs-product-badge" :style="{ backgroundColor: primaryColor }">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                Produit en consultation
+              </div>
+              <div class="cs-product-info">
+                <h3 class="cs-product-title">{{ productInfo.name }}</h3>
+                <p v-if="productInfo.price" class="cs-product-price-large" :style="{ color: primaryColor }">
+                  {{ formatPrice(productInfo.price) }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Messages Desktop avec layout amélioré -->
+          <div ref="messagesContainer" class="cs-messages-container cs-desktop-messages">
+            <div
+              v-for="message in messages"
+              :key="message.id"
+              class="cs-message-item"
+              :class="message.role === 'user' ? 'cs-user-item' : 'cs-assistant-item'"
+            >
+              
+              <!-- Message assistant Desktop -->
+              <div v-if="message.role === 'assistant'" class="cs-desktop-message cs-assistant-desktop">
+                <div class="cs-message-avatar-desktop">
+                  <img :src="agentAvatar" :alt="agentName" @error="handleAvatarError">
+                </div>
+                <div class="cs-message-content-desktop">
+                  <div class="cs-message-header-desktop">
+                    <span class="cs-sender-name">{{ agentName }}</span>
+                    <span class="cs-message-timestamp">{{ formatTime(message.timestamp) }}</span>
+                  </div>
+                  <div class="cs-message-bubble-desktop cs-assistant-bubble-desktop">
+                    <div class="cs-message-text-desktop" v-html="formatMessage(message.content)"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Message utilisateur Desktop -->
+              <div v-else class="cs-desktop-message cs-user-desktop">
+                <div class="cs-message-content-desktop">
+                  <div class="cs-message-header-desktop">
+                    <span class="cs-message-timestamp">{{ formatTime(message.timestamp) }}</span>
+                    <span class="cs-sender-name">Vous</span>
+                  </div>
+                  <div class="cs-message-bubble-desktop cs-user-bubble-desktop" :style="brandUserBubbleDesktopStyles">
+                    <div class="cs-message-text-desktop">{{ message.content }}</div>
+                  </div>
+                </div>
+                <div class="cs-user-avatar-desktop" :style="{ backgroundColor: primaryColor }">
+                  <span>{{ agentName.charAt(0).toUpperCase() }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Typing indicator Desktop -->
+            <div v-if="isTyping" class="cs-message-item cs-assistant-item">
+              <div class="cs-desktop-message cs-assistant-desktop">
+                <div class="cs-message-avatar-desktop">
+                  <img :src="agentAvatar" :alt="agentName" @error="handleAvatarError">
+                </div>
+                <div class="cs-message-content-desktop">
+                  <div class="cs-message-header-desktop">
+                    <span class="cs-sender-name">{{ agentName }}</span>
+                    <span class="cs-typing-text">est en train d'écrire...</span>
+                  </div>
+                  <div class="cs-typing-bubble-desktop">
+                    <div class="cs-typing-indicator-desktop">
+                      <div class="cs-typing-dot-desktop" :style="{ backgroundColor: primaryColor }"></div>
+                      <div class="cs-typing-dot-desktop" :style="{ backgroundColor: primaryColor }"></div>
+                      <div class="cs-typing-dot-desktop" :style="{ backgroundColor: primaryColor }"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div ref="messagesEndRef" />
+          </div>
+
+          <!-- Actions rapides Desktop -->
+          <div v-if="showQuickActions" class="cs-quick-actions cs-desktop-actions">
+            <div class="cs-actions-title">
+              <h4>Comment puis-je vous aider ?</h4>
+              <p>Choisissez une option ou tapez votre question</p>
+            </div>
+            <div class="cs-actions-grid-desktop">
+              <button @click="sendQuickMessage(quickActions.buyNow)" class="cs-action-card cs-primary-card" :style="brandPrimaryCardStyles">
+                <div class="cs-card-icon" :style="{ backgroundColor: primaryColor }">
+                  <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                  </svg>
+                </div>
+                <div class="cs-card-content">
+                  <h5>Acheter maintenant</h5>
+                  <p>Je suis prêt(e) à finaliser ma commande</p>
+                </div>
+              </button>
+              
+              <button @click="sendQuickMessage(quickActions.haveQuestions)" class="cs-action-card cs-secondary-card">
+                <div class="cs-card-icon cs-secondary-icon" :style="{ backgroundColor: lighterPrimaryColor }">
+                  <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                </div>
+                <div class="cs-card-content">
+                  <h5>Poser une question</h5>
+                  <p>J'ai des questions sur ce produit</p>
+                </div>
+              </button>
+              
+              <button @click="sendQuickMessage(quickActions.wantToKnowMore)" class="cs-action-card cs-secondary-card">
+                <div class="cs-card-icon cs-secondary-icon" :style="{ backgroundColor: lighterPrimaryColor }">
+                  <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                </div>
+                <div class="cs-card-content">
+                  <h5>En savoir plus</h5>
+                  <p>Découvrir les détails et avantages</p>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Input Desktop sophistiqué -->
+          <div class="cs-message-input cs-desktop-input">
+            <div class="cs-input-sophisticated">
+              <div class="cs-input-group">
+                <div class="cs-input-field-container">
+                  <input 
+                    v-model="currentMessage" 
+                    @keypress.enter="sendMessage" 
+                    :placeholder="inputPlaceholder" 
+                    class="cs-message-field-desktop" 
+                    :disabled="isTyping || isLoading"
+                  >
+                  <div class="cs-input-enhancement" :style="{ borderColor: primaryColor }"></div>
+                </div>
+                <button 
+                  @click="sendMessage" 
+                  :disabled="!currentMessage.trim() || isTyping || isLoading" 
+                  class="cs-send-button-desktop" 
+                  :style="brandSendButtonDesktopStyles"
+                >
+                  <svg v-if="!isTyping" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                  </svg>
+                  <svg v-else class="cs-loading-icon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                  </svg>
+                </button>
+              </div>
+              <div class="cs-input-footer">
+                <div class="cs-footer-left">
+                  <span class="cs-footer-branding">Propulsé par <strong :style="{ color: primaryColor }">ChatSeller</strong></span>
+                </div>
+                <div class="cs-footer-right">
+                  <span class="cs-privacy">🔒 Conversation sécurisée</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -368,22 +417,6 @@ interface Message {
   role: 'user' | 'assistant'
   content: string
   timestamp: Date
-}
-
-interface OrderCollectionState {
-  step: 'quantity' | 'phone' | 'name' | 'address' | 'payment' | 'confirmation'
-  data: {
-    productId?: string
-    productName?: string
-    productPrice?: number
-    quantity?: number
-    customerPhone?: string
-    customerFirstName?: string
-    customerLastName?: string
-    customerEmail?: string
-    customerAddress?: string
-    paymentMethod?: string
-  }
 }
 
 interface Translations {
@@ -410,62 +443,20 @@ const errorMessage = ref<string | null>(null)
 const lastFailedMessage = ref<string | null>(null)
 const hasUnreadMessages = ref(false)
 
-// ✅ NOUVEAU STATE : Gestion des commandes
-const orderCollectionState = ref<OrderCollectionState | null>(null)
-
-// ✅ ADAPTIVE STYLES (pour theme brand_adaptive)
-const adaptiveStyles = ref<any>({})
-
 // Translations
 const translations: Translations = {
   fr: {
-    online: "En ligne",
     you: 'Vous',
-    you_initial: 'V',
     viewing_product: 'Produit consulté',
-    quick_actions: 'Actions rapides',
     wantToBuyNow: "Je veux l'acheter maintenant",
     haveQuestions: "J'ai des questions",
     wantToKnowMore: "Je veux en savoir plus",
     typeMessage: "Tapez votre message...",
     defaultWelcome: "Bonjour ! Je suis votre assistant d'achat. Comment puis-je vous aider ?",
-    retry: "Réessayer",
-    powered_by: "Propulsé par",
-    ai_assistant: "Assistant IA"
-  },
-  en: {
-    online: "Online",
-    you: 'You',
-    you_initial: 'Y',
-    viewing_product: 'Viewing product',
-    quick_actions: 'Quick actions',
-    wantToBuyNow: "I want to buy it now",
-    haveQuestions: "I have questions",
-    wantToKnowMore: "I want to know more",
-    typeMessage: "Type your message...",
-    defaultWelcome: "Hello! I'm your shopping assistant. How can I help you?",
-    retry: "Retry",
-    powered_by: "Powered by",
-    ai_assistant: "AI Assistant"
-  },
-  wo: {
-    online: "Fi nekk",
-    you: 'Yow',
-    you_initial: 'Y',
-    viewing_product: 'Produit yi nga tàng',
-    quick_actions: 'Jëf yu gaaw',
-    wantToBuyNow: "Bëgg naa ko jënd",
-    haveQuestions: "Am naa làkk",
-    wantToKnowMore: "Bëgg naa gëm ci",
-    typeMessage: "Bind sa mbind...",
-    defaultWelcome: "Salaam! Maa ngi njëkk bu ñëpp. Na nga maa jëf?",
-    retry: "Jël",
-    powered_by: "Defar na",
-    ai_assistant: "Njëkk IA"
+    retry: "Réessayer"
   }
 }
 
-// Translation function
 const t = (key: string): string => {
   const lang = props.config.language || 'fr'
   const langTranslations = translations[lang]
@@ -475,6 +466,91 @@ const t = (key: string): string => {
          (frTranslations && frTranslations[key]) || 
          key
 }
+
+// ✅ COULEURS DYNAMIQUES BASÉES SUR LA CONFIGURATION
+const primaryColor = computed(() => props.config.primaryColor || '#E91E63')
+
+const lighterPrimaryColor = computed(() => {
+  return adjustColor(primaryColor.value, 20)
+})
+
+const darkerPrimaryColor = computed(() => {
+  return adjustColor(primaryColor.value, -20)
+})
+
+// ✅ STYLES DYNAMIQUES POUR TOUS LES ÉLÉMENTS
+const brandButtonStyles = computed(() => ({
+  background: `linear-gradient(135deg, ${primaryColor.value} 0%, ${darkerPrimaryColor.value} 100%)`,
+  borderColor: primaryColor.value
+}))
+
+const brandHeaderStyles = computed(() => ({
+  background: `linear-gradient(135deg, ${darkerPrimaryColor.value} 0%, ${adjustColor(primaryColor.value, -30)} 100%)`
+}))
+
+const brandContainerStyles = computed(() => ({
+  background: '#f0f0f0'
+}))
+
+const brandProductContextStyles = computed(() => ({
+  background: `linear-gradient(135deg, ${adjustColor(primaryColor.value, 40)} 0%, ${adjustColor(primaryColor.value, 30)} 100%)`
+}))
+
+const brandUserBubbleStyles = computed(() => ({
+  background: `linear-gradient(135deg, ${adjustColor(primaryColor.value, 30)} 0%, ${adjustColor(primaryColor.value, 20)} 100%)`,
+  border: `1px solid ${adjustColor(primaryColor.value, 10)}`
+}))
+
+const brandPrimaryActionStyles = computed(() => ({
+  background: `linear-gradient(135deg, ${primaryColor.value} 0%, ${darkerPrimaryColor.value} 100%)`
+}))
+
+const brandSecondaryActionStyles = computed(() => ({
+  background: '#f8f9fa',
+  color: primaryColor.value,
+  border: `1px solid ${adjustColor(primaryColor.value, 40)}`
+}))
+
+const brandSendButtonStyles = computed(() => ({
+  background: `linear-gradient(135deg, ${primaryColor.value} 0%, ${darkerPrimaryColor.value} 100%)`
+}))
+
+// ✅ STYLES DESKTOP INNOVANTS
+const brandDesktopStyles = computed(() => ({
+  background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
+  border: `1px solid ${adjustColor(primaryColor.value, 50)}`,
+  boxShadow: `0 20px 80px rgba(0, 0, 0, 0.1), 0 0 0 1px ${adjustColor(primaryColor.value, 60)} inset`
+}))
+
+const brandDesktopHeaderStyles = computed(() => ({
+  background: `linear-gradient(135deg, ${primaryColor.value}15 0%, ${primaryColor.value}08 100%)`
+}))
+
+const brandStatusBadgeStyles = computed(() => ({
+  background: `${primaryColor.value}15`,
+  color: darkerPrimaryColor.value,
+  border: `1px solid ${primaryColor.value}30`
+}))
+
+const brandProductShowcaseStyles = computed(() => ({
+  background: `linear-gradient(135deg, ${primaryColor.value}10 0%, ${primaryColor.value}05 100%)`,
+  border: `1px solid ${primaryColor.value}20`
+}))
+
+const brandUserBubbleDesktopStyles = computed(() => ({
+  background: `linear-gradient(135deg, ${primaryColor.value} 0%, ${darkerPrimaryColor.value} 100%)`,
+  boxShadow: `0 4px 16px ${primaryColor.value}30`
+}))
+
+const brandPrimaryCardStyles = computed(() => ({
+  border: `2px solid ${primaryColor.value}`,
+  boxShadow: `0 8px 32px ${primaryColor.value}20`
+}))
+
+const brandSendButtonDesktopStyles = computed(() => ({
+  background: `linear-gradient(135deg, ${primaryColor.value} 0%, ${darkerPrimaryColor.value} 100%)`,
+  boxShadow: `0 4px 16px ${primaryColor.value}30`
+}))
 
 // Computed
 const isMobile = computed(() => {
@@ -496,7 +572,7 @@ const agentAvatar = computed(() => {
   if (props.config.agentConfig?.avatar) {
     return props.config.agentConfig.avatar
   }
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(agentName.value)}&background=${(props.config.primaryColor || '#007AFF').replace('#', '')}&color=fff&size=128`
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(agentName.value)}&background=${primaryColor.value.replace('#', '')}&color=fff&size=128`
 })
 
 const productInfo = computed(() => {
@@ -512,13 +588,10 @@ const productInfo = computed(() => {
 })
 
 const showQuickActions = computed(() => {
-  return messages.value.length === 0 && !isTyping.value && !isLoading.value && !orderCollectionState.value
+  return messages.value.length === 0 && !isTyping.value && !isLoading.value
 })
 
 const inputPlaceholder = computed(() => {
-  if (orderCollectionState.value) {
-    return getOrderStepPlaceholder(orderCollectionState.value.step)
-  }
   return t('typeMessage')
 })
 
@@ -528,117 +601,38 @@ const quickActions = computed(() => ({
   wantToKnowMore: t('wantToKnowMore')
 }))
 
-// ✅ HELPER METHODS POUR COMMANDES
-const getOrderStepLabel = (step: string): string => {
-  const labels = {
-    quantity: 'Quantité souhaitée',
-    phone: 'Numéro de téléphone',
-    name: 'Nom et prénom',
-    address: 'Adresse de livraison',
-    payment: 'Mode de paiement',
-    confirmation: 'Confirmation commande'
-  }
-  return labels[step as keyof typeof labels] || step
-}
-
-const getOrderStepPlaceholder = (step: string): string => {
-  const placeholders = {
-    quantity: 'Ex: 2 exemplaires',
-    phone: 'Votre numéro de téléphone...',
-    name: 'Votre nom et prénom...',
-    address: 'Votre adresse de livraison...',
-    payment: 'Mode de paiement préféré...',
-    confirmation: 'Confirmez votre commande...'
-  }
-  return placeholders[step as keyof typeof placeholders] || 'Tapez votre réponse...'
-}
-
-// ✅ MÉTHODES STYLES ADAPTATIFS ET COULEURS
-const detectBrandColors = () => {
-  if (props.config.theme !== 'brand_adaptive') return
-
+// Utilitaires couleurs
+function adjustColor(color: string, percent: number): string {
   try {
-    const primaryButtons = document.querySelectorAll('button[class*="primary"], .btn-primary, [class*="cta"]')
+    const hex = color.replace('#', '')
+    if (hex.length !== 6) return color
     
-    if (primaryButtons.length > 0) {
-      const buttonStyles = window.getComputedStyle(primaryButtons[0] as Element)
-      const detectedColor = buttonStyles.backgroundColor
-      
-      if (detectedColor && detectedColor !== 'rgba(0, 0, 0, 0)') {
-        adaptiveStyles.value = {
-          backgroundColor: detectedColor
-        }
-      }
+    const r = parseInt(hex.substr(0, 2), 16)
+    const g = parseInt(hex.substr(2, 2), 16)
+    const b = parseInt(hex.substr(4, 2), 16)
+    
+    const adjust = (channel: number) => {
+      const adjusted = channel + (channel * percent / 100)
+      return Math.max(0, Math.min(255, Math.round(adjusted)))
     }
+    
+    const newR = adjust(r)
+    const newG = adjust(g)
+    const newB = adjust(b)
+    
+    const toHex = (n: number) => n.toString(16).padStart(2, '0')
+    
+    return `#${toHex(newR)}${toHex(newG)}${toHex(newB)}`
   } catch (error) {
-    console.warn('Could not detect brand colors:', error)
+    return color
   }
-}
-
-const adjustColor = (color: string, percent: number): string => {
-  const hex = color.replace('#', '')
-  const r = parseInt(hex.substr(0, 2), 16)
-  const g = parseInt(hex.substr(2, 2), 16)
-  const b = parseInt(hex.substr(4, 2), 16)
-  
-  const adjust = (channel: number) => {
-    const adjusted = channel + (channel * percent / 100)
-    return Math.max(0, Math.min(255, Math.round(adjusted)))
-  }
-  
-  const newR = adjust(r)
-  const newG = adjust(g)
-  const newB = adjust(b)
-  
-  return `rgb(${newR}, ${newG}, ${newB})`
-}
-
-// Styles CSS classes
-const getTriggerButtonClasses = () => {
-  let classes = 'cs-w-full cs-flex cs-items-center cs-justify-center cs-text-white cs-font-semibold cs-transition-all cs-duration-200 hover:cs-opacity-90 cs-cursor-pointer cs-relative cs-shadow-lg hover:cs-shadow-xl cs-transform hover:cs--translate-y-1'
-  
-  switch (props.config.theme) {
-    case 'minimal':
-      classes += ' cs-py-3 cs-px-6 cs-rounded-lg cs-text-sm'
-      break
-    case 'brand_adaptive':
-      classes += ' cs-py-4 cs-px-8 cs-rounded-xl cs-text-base cs-font-bold'
-      break
-    default: // modern
-      classes += ' cs-py-4 cs-px-8 cs-rounded-xl cs-text-base'
-  }
-  
-  return classes
-}
-
-const getChatContainerClasses = () => {
-  let classes = 'cs-bg-white cs-flex cs-flex-col cs-overflow-hidden cs-backdrop-blur-xl'
-  
-  if (isMobile.value) {
-    classes += ' cs-w-full cs-h-full cs-rounded-none'
-  } else {
-    classes += ' cs-w-450 cs-h-[650px] cs-rounded-2xl cs-shadow-2xl cs-border'
-  }
-  
-  switch (props.config.theme) {
-    case 'minimal':
-      classes += ' cs-shadow-lg'
-      break
-    case 'brand_adaptive':
-      classes += ' cs-shadow-2xl'
-      break
-    default: // modern
-      classes += ' cs-shadow-2xl'
-  }
-  
-  return classes
-}
-
-const getMessagesContainerClasses = () => {
-  return 'cs-flex-1 cs-p-6 cs-space-y-6 cs-overflow-y-auto cs-bg-gradient-to-b cs-from-gray-50 cs-to-white'
 }
 
 // Methods
+const getTriggerButtonClasses = () => {
+  return 'cs-modern-trigger'
+}
+
 const openChat = async () => {
   if (isOpen.value) return
 
@@ -646,35 +640,19 @@ const openChat = async () => {
   hasUnreadMessages.value = false
   errorMessage.value = null
   
-  if (props.config.theme === 'brand_adaptive') {
-    detectBrandColors()
-  }
-  
-  // ✅ NOUVEAU : ENVOYER MESSAGE D'ACCUEIL AUTOMATIQUEMENT DÈS L'OUVERTURE
   if (messages.value.length === 0) {
     await sendWelcomeMessage()
   }
   
-  if (typeof window !== 'undefined' && (window as any).ChatSeller) {
-    ;(window as any).ChatSeller.track('widget_opened', {
-      productId: props.config.productId,
-      productName: props.config.productName,
-      agentName: agentName.value,
-      theme: props.config.theme
-    })
-  }
-
   await nextTick()
   scrollToBottom()
 }
 
-// ✅ NOUVELLE MÉTHODE : Envoyer message d'accueil automatique
 const sendWelcomeMessage = async () => {
   try {
     const chatSeller = (window as any).ChatSeller
     if (!chatSeller) return
 
-    // ✅ Envoyer avec isFirstMessage = true pour avoir le contexte produit
     const response = await chatSeller.sendMessage('', conversationId.value, {
       isFirstMessage: true,
       productInfo: {
@@ -688,7 +666,6 @@ const sendWelcomeMessage = async () => {
     if (response.success) {
       conversationId.value = response.data.conversationId
       
-      // Ajouter le message d'accueil avec contexte produit
       const aiMessage: Message = {
         id: uuidv4(),
         role: 'assistant',
@@ -696,14 +673,11 @@ const sendWelcomeMessage = async () => {
         timestamp: new Date()
       }
       messages.value.push(aiMessage)
-      
-      console.log('✅ Message d\'accueil avec contexte produit envoyé automatiquement')
     }
 
   } catch (error: any) {
     console.error('❌ Erreur envoi message d\'accueil:', error)
     
-    // Fallback : message d'accueil par défaut avec contexte produit si possible
     const welcomeMessage = productInfo.value?.name 
       ? `Bonjour ! 👋 Je suis ${agentName.value}.
 
@@ -724,13 +698,6 @@ Comment puis-je vous aider ? 😊`
 
 const closeChat = () => {
   isOpen.value = false
-  
-  if (typeof window !== 'undefined' && (window as any).ChatSeller) {
-    ;(window as any).ChatSeller.track('widget_closed', {
-      conversationId: conversationId.value,
-      messageCount: messages.value.length
-    })
-  }
 }
 
 const closeChatOnOverlay = () => {
@@ -787,20 +754,6 @@ const sendMessage = async () => {
       }
       messages.value.push(aiMessage)
       
-      // ✅ GÉRER L'ÉTAT DE COLLECTE DE COMMANDE
-      if (response.data.orderCollection) {
-        orderCollectionState.value = response.data.orderCollection
-      } else if (orderCollectionState.value && orderCollectionState.value.step === 'confirmation') {
-        // Commande terminée
-        orderCollectionState.value = null
-      }
-      
-      chatSeller.track('message_received', {
-        conversationId: conversationId.value,
-        agentName: response.data.agent?.name || agentName.value,
-        responseTime: response.data.responseTime
-      })
-      
     } else {
       throw new Error(response.error || 'Erreur lors de l\'envoi du message')
     }
@@ -832,37 +785,14 @@ const sendQuickMessage = (message: string) => {
   sendMessage()
 }
 
-const retryLastMessage = () => {
-  if (lastFailedMessage.value) {
-    currentMessage.value = lastFailedMessage.value
-    errorMessage.value = null
-    lastFailedMessage.value = null
-    sendMessage()
-  }
-}
-
-// ✅ FORMATAGE AMÉLIORÉ DES MESSAGES POUR LISIBILITÉ
 const formatMessage = (content: string) => {
   return content
-    // Gestion des markdown
-    .replace(/\*\*(.*?)\*\*/g, '<strong class="cs-font-semibold cs-text-gray-900">$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em class="cs-italic cs-text-gray-700">$1</em>')
-    
-    // Gestion des liens
-    .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="cs-text-blue-600 cs-underline hover:cs-text-blue-800 cs-transition-colors">$1</a>')
-    
-    // Gestion des émojis avec espacement
-    .replace(/([😀 - 🙏 - 🌀 - 🗿 - 🚀 - ➿])/g, '<span class="cs-inline-block cs-mx-1">$1</span>')
-    
-    // Gestion des sauts de ligne
-    .replace(/\n\n/g, '<br><br class="cs-my-2">')
-    .replace(/\n/g, '<br class="cs-my-1">')
-    
-    // Amélioration des listes
-    .replace(/^\- (.*)/gm, '<span class="cs-block cs-ml-2 cs-relative"><span class="cs-absolute cs--ml-2 cs-text-blue-600">•</span>$1</span>')
-    
-    // Amélioration des prix
-    .replace(/(\d+(?:[.,]\d{2})?\s*(?:FCFA|€|USD|\$))/g, '<span class="cs-font-semibold cs-text-green-600 cs-bg-green-50 cs-px-1 cs-rounded">$1</span>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong class="cs-bold">$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em class="cs-italic">$1</em>')
+    .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="cs-link">$1</a>')
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n/g, '<br>')
+    .replace(/(\d+(?:[.,]\d{2})?\s*(?:FCFA|€|USD|\$))/g, '<span class="cs-price">$1</span>')
 }
 
 const formatTime = (date: Date) => {
@@ -884,7 +814,7 @@ const formatPrice = (price: number) => {
 
 const handleAvatarError = (event: Event) => {
   const img = event.target as HTMLImageElement
-  img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(agentName.value)}&background=6B7280&color=fff&size=128`
+  img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(agentName.value)}&background=${primaryColor.value.replace('#', '')}&color=fff&size=128`
 }
 
 const scrollToBottom = () => {
@@ -900,102 +830,88 @@ watch(messages, () => {
   })
 }, { deep: true })
 
-// Lifecycle
 onMounted(() => {
   if (typeof window !== 'undefined' && (window as any).ChatSeller) {
     ;(window as any).ChatSeller.track('widget_loaded', {
       productId: props.config.productId,
       productName: props.config.productName,
-      agentConfigured: !!props.config.agentConfig,
-      shopConfigLoaded: (window as any).ChatSeller.isConfigLoaded
+      agentConfigured: !!props.config.agentConfig
     })
   }
 })
 </script>
 
 <style scoped>
-/* ✅ STYLES POUR LE FORMATAGE AMÉLIORÉ DES MESSAGES */
-.cs-message-formatted {
-  line-height: 1.6;
-  word-break: break-word;
-}
-
-.cs-message-formatted strong {
-  font-weight: 600;
-  color: #1f2937;
-}
-
-.cs-message-formatted em {
-  font-style: italic;
-  color: #4b5563;
-}
-
-.cs-message-formatted br {
-  line-height: 1.2;
-}
-
-/* ✅ CSS INCHANGÉ - UTILISE LES MÊMES STYLES QUE L'ORIGINAL */
+/* ✅ BASE STYLES AVEC COULEURS DYNAMIQUES */
 .cs-chatseller-widget,
 .cs-chatseller-widget * {
   box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
-.cs-w-450 { 
-  width: 28.125rem !important;
-}
-
-.cs-fade-enter-active, .cs-fade-leave-active {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.cs-fade-enter-from, .cs-fade-leave-to {
-  opacity: 0;
-  transform: translateY(8px);
-}
-
-.cs-modal-enter-active {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.cs-modal-leave-active {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.cs-modal-enter-from {
-  opacity: 0;
-  transform: scale(0.95) translateY(20px);
-}
-.cs-modal-leave-to {
-  opacity: 0;
-  transform: scale(0.95) translateY(-20px);
-}
-
+/* ✅ STYLES COMMUNS */
 .cs-chat-trigger-button {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-  background: linear-gradient(135deg, var(--primary-color, #007AFF) 0%, var(--primary-dark, #0051D5) 100%);
+  width: 100%;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 16px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 8px 0;
 }
 
 .cs-chat-trigger-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
-.cs-chat-trigger-button:active {
-  transform: translateY(-1px);
+.cs-button-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
+.cs-chat-icon {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2.5;
+}
+
+.cs-notification-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 12px;
+  height: 12px;
+  background: #ff3b30;
+  border-radius: 50%;
+  border: 2px solid white;
+  animation: pulse 2s infinite;
+}
+
+/* Modal overlay */
 .cs-chat-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
   z-index: 2147483647;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  padding: 16px;
 }
 
 .cs-chat-modal-overlay.cs-mobile {
@@ -1004,417 +920,976 @@ onMounted(() => {
   justify-content: stretch;
 }
 
-.cs-chat-container.cs-modern-chat {
-  max-height: 90vh;
+/* ✅ MOBILE CONTAINER (style WhatsApp avec couleurs dynamiques) */
+.cs-mobile-container {
+  width: 100%;
+  height: 100%;
+  max-height: 100vh;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+@media (min-width: 768px) {
+  .cs-mobile-container {
+    width: 480px;
+    height: 700px;
+    max-height: 90vh;
+    border-radius: 16px;
+    box-shadow: 0 16px 64px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.cs-mobile-header {
+  color: white;
+  padding: 16px 20px;
+  flex-shrink: 0;
+}
+
+.cs-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cs-agent-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cs-agent-avatar-container {
+  position: relative;
+}
+
+.cs-agent-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.cs-online-indicator {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 14px;
+  height: 14px;
+  border: 2px solid white;
+  border-radius: 50%;
+}
+
+.cs-agent-details {
+  flex: 1;
+}
+
+.cs-agent-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.cs-agent-status {
+  margin: 2px 0 0 0;
+  font-size: 13px;
+  opacity: 0.9;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cs-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.cs-close-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.cs-close-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Mobile product context */
+.cs-mobile-product {
+  border-bottom: 1px solid #e0e0e0;
+  padding: 12px 20px;
+  flex-shrink: 0;
+}
+
+.cs-product-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cs-product-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #4a5568;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.cs-product-details {
+  flex: 1;
+}
+
+.cs-product-name {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.cs-product-price {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Mobile messages */
+.cs-mobile-messages {
+  flex: 1;
+  background: #e5ddd5;
+  background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23f5f5f5' fill-opacity='0.1'%3E%3Cpath d='M20 20c0 6.627-5.373 12-12 12s-12-5.373-12-12 5.373-12 12-12 12 5.373 12 12zm-14-.828c-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8c0 4.418-3.582 8-8 8zm4-8c0-2.21-1.79-4-4-4s-4 1.79-4 4 1.79 4 4 4 4-1.79 4-4z'/%3E%3C/g%3E%3C/svg%3E");
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cs-message-wrapper {
+  display: flex;
+  max-width: 100%;
+}
+
+.cs-assistant-wrapper {
+  justify-content: flex-start;
+}
+
+.cs-user-wrapper {
+  justify-content: flex-end;
+}
+
+.cs-message {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: 85%;
+}
+
+.cs-user-message {
+  flex-direction: row-reverse;
+}
+
+.cs-message-avatar {
+  flex-shrink: 0;
+}
+
+.cs-avatar-small {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.cs-message-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.cs-message-bubble {
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.4;
+  word-wrap: break-word;
+  position: relative;
+  max-width: 100%;
+}
+
+.cs-assistant-bubble {
+  background: white;
+  color: #303030;
+  border-radius: 8px 8px 8px 2px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.cs-user-bubble {
+  color: white;
+  border-radius: 8px 8px 2px 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.cs-message-text {
+  margin-bottom: 4px;
+}
+
+.cs-message-time {
+  font-size: 11px;
+  color: #667781;
+  text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.cs-message-check {
+  width: 12px;
+  height: 12px;
+  color: #4fc3f7;
+}
+
+/* Typing indicator */
+.cs-typing-bubble {
+  background: white;
+  padding: 12px 16px;
+  border-radius: 8px 8px 8px 2px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.cs-typing-indicator {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.cs-typing-dot {
+  width: 8px;
+  height: 8px;
+  background: #667781;
+  border-radius: 50%;
+  animation: typing 1.4s infinite;
+}
+
+.cs-typing-dot:nth-child(1) { animation-delay: 0s; }
+.cs-typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.cs-typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* Mobile actions */
+.cs-mobile-actions {
+  background: white;
+  border-top: 1px solid #e0e0e0;
+  padding: 16px 20px;
+  flex-shrink: 0;
+}
+
+.cs-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.cs-quick-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cs-primary-action {
+  color: white;
+}
+
+.cs-primary-action:hover {
+  opacity: 0.9;
+}
+
+.cs-secondary-action:hover {
+  background: #e0e0e0;
+}
+
+/* Mobile input */
+.cs-mobile-input {
+  background: #f0f0f0;
+  border-top: 1px solid #e0e0e0;
+  padding: 12px 16px;
+  flex-shrink: 0;
+}
+
+.cs-input-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.cs-input-wrapper {
+  flex: 1;
+}
+
+.cs-message-field {
+  width: 100%;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  padding: 10px 16px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.cs-message-field:disabled {
+  background: #f5f5f5;
+  color: #999;
+}
+
+.cs-send-button {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.cs-send-button:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.cs-send-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.cs-loading-icon {
+  animation: spin 1s linear infinite;
+}
+
+.cs-footer {
+  text-align: center;
+}
+
+.cs-footer p {
+  margin: 0;
+  font-size: 11px;
+  color: #667781;
+}
+
+/* ✅ DESKTOP CONTAINER INNOVANT */
+.cs-desktop-container {
+  width: 520px;
+  height: 720px;
+  max-height: 90vh;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
 
-.cs-chat-header.cs-modern-header {
-  padding: 1.25rem;
-  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  position: relative;
-  overflow: hidden;
-}
-
-.cs-chat-header.cs-modern-header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
-  pointer-events: none;
-}
-
-.cs-product-context.cs-modern-context {
-  padding: 1rem 1.25rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-bottom: 1px solid #e2e8f0;
+/* Desktop header avec glassmorphism */
+.cs-desktop-header {
+  padding: 24px;
+  flex-shrink: 0;
   position: relative;
 }
 
-.cs-messages-container.cs-modern-messages {
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e0 #f7fafc;
-  background: linear-gradient(to bottom, #f8fafc 0%, #ffffff 100%);
-}
-
-.cs-messages-container.cs-modern-messages::-webkit-scrollbar {
-  width: 6px;
-}
-.cs-messages-container.cs-modern-messages::-webkit-scrollbar-track {
-  background: #f7fafc;
-  border-radius: 3px;
-}
-.cs-messages-container.cs-modern-messages::-webkit-scrollbar-thumb {
-  background: linear-gradient(to bottom, #cbd5e0, #9ca3af);
-  border-radius: 3px;
-}
-.cs-messages-container.cs-modern-messages::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to bottom, #9ca3af, #6b7280);
-}
-
-.cs-message-bubble.cs-modern-bubble {
-  word-wrap: break-word;
-  max-width: 100%;
-  position: relative;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-.cs-message-bubble.cs-modern-bubble::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: exclude;
-  pointer-events: none;
-}
-
-.cs-typing-indicator.cs-modern-typing {
-  position: relative;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-.cs-quick-actions.cs-modern-actions {
-  padding: 1.25rem;
-  border-top: 1px solid #e2e8f0;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-}
-
-.cs-message-input.cs-modern-input {
-  padding: 1.25rem;
-  border-top: 1px solid #e2e8f0;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-}
-
-.cs-message-input.cs-modern-input input {
+.cs-header-glassmorphism {
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 2px solid rgba(226, 232, 240, 0.8);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.cs-message-input.cs-modern-input input:focus {
-  background: rgba(255, 255, 255, 0.95);
-  border-color: var(--primary-color, #007AFF);
-  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+.cs-agent-presentation {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
-.cs-transform.hover\:cs--translate-y-0\.5:hover {
+.cs-agent-avatar-large {
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+
+.cs-agent-avatar-large img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.cs-status-ring {
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  border: 2px solid;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.cs-status-core {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 18px;
+  height: 18px;
+  border: 3px solid white;
+  border-radius: 50%;
+}
+
+.cs-agent-intro {
+  flex: 1;
+}
+
+.cs-agent-title {
+  margin: 0 0 4px 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: -0.02em;
+}
+
+.cs-agent-subtitle {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  color: #666;
+  font-weight: 500;
+}
+
+.cs-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.cs-status-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.cs-close-button-desktop {
+  background: rgba(0, 0, 0, 0.05);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  color: #666;
+}
+
+.cs-close-button-desktop:hover {
+  background: rgba(0, 0, 0, 0.1);
+  transform: rotate(90deg);
+}
+
+/* Desktop product showcase */
+.cs-product-showcase {
+  margin: 0 24px;
+  border-radius: 12px;
+  padding: 16px;
+  flex-shrink: 0;
+}
+
+.cs-product-highlight {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cs-product-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.cs-product-info {
+  flex: 1;
+  text-align: right;
+}
+
+.cs-product-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.cs-product-price-large {
+  margin: 4px 0 0 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* Desktop messages */
+.cs-desktop-messages {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: linear-gradient(to bottom, #f8fafc 0%, #ffffff 50%);
+}
+
+.cs-message-item {
+  display: flex;
+  max-width: 100%;
+}
+
+.cs-assistant-item {
+  justify-content: flex-start;
+}
+
+.cs-user-item {
+  justify-content: flex-end;
+}
+
+.cs-desktop-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 80%;
+}
+
+.cs-user-desktop {
+  flex-direction: row-reverse;
+}
+
+.cs-message-avatar-desktop {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.cs-message-avatar-desktop img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cs-user-avatar-desktop {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.cs-message-content-desktop {
+  flex: 1;
+  min-width: 0;
+}
+
+.cs-message-header-desktop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.cs-user-desktop .cs-message-header-desktop {
+  justify-content: flex-end;
+}
+
+.cs-sender-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+}
+
+.cs-message-timestamp {
+  font-size: 11px;
+  color: #999;
+}
+
+.cs-typing-text {
+  font-size: 11px;
+  color: #999;
+  font-style: italic;
+}
+
+.cs-message-bubble-desktop {
+  padding: 12px 16px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  position: relative;
+}
+
+.cs-assistant-bubble-desktop {
+  background: white;
+  border: 1px solid #e2e8f0;
+  color: #374151;
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.cs-user-bubble-desktop {
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.cs-message-text-desktop {
+  word-wrap: break-word;
+}
+
+.cs-typing-bubble-desktop {
+  background: white;
+  border: 1px solid #e2e8f0;
+  padding: 12px 16px;
+  border-radius: 16px;
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.cs-typing-indicator-desktop {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.cs-typing-dot-desktop {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: typing 1.4s infinite;
+}
+
+.cs-typing-dot-desktop:nth-child(1) { animation-delay: 0s; }
+.cs-typing-dot-desktop:nth-child(2) { animation-delay: 0.2s; }
+.cs-typing-dot-desktop:nth-child(3) { animation-delay: 0.4s; }
+
+/* Desktop actions */
+.cs-desktop-actions {
+  padding: 24px;
+  flex-shrink: 0;
+  background: linear-gradient(to top, #ffffff 0%, #f8fafc 100%);
+}
+
+.cs-actions-title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.cs-actions-title h4 {
+  margin: 0 0 4px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.cs-actions-title p {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.cs-actions-grid-desktop {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.cs-action-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+}
+
+.cs-action-card:hover {
   transform: translateY(-2px);
 }
 
-.cs-transform.hover\:cs--translate-y-1:hover {
+.cs-primary-card:hover {
   transform: translateY(-4px);
 }
 
-/* ✅ STYLES POUR LE FORMATAGE AMÉLIORÉ DES MESSAGES */
-.cs-message-formatted {
-  line-height: 1.6;
-  word-break: break-word;
+.cs-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
 }
 
-.cs-message-formatted strong {
+.cs-secondary-icon {
+  color: white;
+}
+
+.cs-card-content {
+  flex: 1;
+}
+
+.cs-card-content h5 {
+  margin: 0 0 4px 0;
+  font-size: 16px;
   font-weight: 600;
-  color: #1f2937;
+  color: #1a1a1a;
 }
 
-.cs-message-formatted em {
+.cs-card-content p {
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+  line-height: 1.4;
+}
+
+/* Desktop input */
+.cs-desktop-input {
+  padding: 24px;
+  flex-shrink: 0;
+  background: white;
+  border-top: 1px solid #e2e8f0;
+}
+
+.cs-input-sophisticated {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cs-input-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cs-input-field-container {
+  flex: 1;
+  position: relative;
+}
+
+.cs-message-field-desktop {
+  width: 100%;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.cs-message-field-desktop:focus {
+  background: white;
+  border-color: currentColor;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+}
+
+.cs-input-enhancement {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  border-radius: 1px;
+  transform: translateX(-50%);
+  transition: width 0.3s ease;
+}
+
+.cs-message-field-desktop:focus + .cs-input-enhancement {
+  width: 100%;
+}
+
+.cs-send-button-desktop {
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.cs-send-button-desktop:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.cs-send-button-desktop:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.cs-input-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cs-footer-branding {
+  font-size: 11px;
+  color: #999;
+}
+
+.cs-privacy {
+  font-size: 10px;
+  color: #999;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Formatage des messages */
+.cs-bold {
+  font-weight: 600;
+  color: inherit;
+}
+
+.cs-italic {
   font-style: italic;
-  color: #4b5563;
+  opacity: 0.9;
 }
 
-.cs-message-formatted br {
-  line-height: 1.2;
+.cs-link {
+  color: #1976d2;
+  text-decoration: underline;
 }
 
+.cs-price {
+  background: rgba(0, 150, 0, 0.1);
+  color: #009600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes typing {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-10px); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Transitions Vue.js */
+.cs-fade-enter-active, .cs-fade-leave-active {
+  transition: all 0.3s ease;
+}
+.cs-fade-enter-from, .cs-fade-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.cs-modal-enter-active {
+  transition: all 0.4s ease;
+}
+.cs-modal-leave-active {
+  transition: all 0.3s ease;
+}
+.cs-modal-enter-from {
+  opacity: 0;
+  transform: scale(0.9) translateY(20px);
+}
+.cs-modal-leave-to {
+  opacity: 0;
+  transform: scale(0.9) translateY(-20px);
+}
+
+/* Responsive */
 @media (max-width: 640px) {
-  .cs-chat-modal-overlay {
-    padding: 0;
-  }
-  
-  .cs-chat-container {
-    width: 100% !important;
-    height: 100% !important;
-    border-radius: 0 !important;
-    max-height: 100vh;
-  }
-  
-  .cs-message-content {
-    max-width: calc(100vw - 140px);
+  .cs-message-field {
+    font-size: 16px; /* Éviter le zoom sur iOS */
   }
 }
 
-@media (max-width: 768px) {
-  .xl\:col-span-2 {
-    @apply col-span-1;
-  }
-  
-  .lg\:grid-cols-2 {
-    @apply grid-cols-1;
-  }
-  
-  .space-y-8 {
-    @apply space-y-6;
-  }
+/* Scrollbar */
+.cs-desktop-messages::-webkit-scrollbar,
+.cs-mobile-messages::-webkit-scrollbar {
+  width: 6px;
 }
 
-/* Utility classes avec préfixes cs- étendues */
-.cs-w-full { width: 100%; }
-.cs-w-12 { width: 3rem; }
-.cs-w-10 { width: 2.5rem; }
-.cs-w-8 { width: 2rem; }
-.cs-w-5 { width: 1.25rem; }
-.cs-w-4 { width: 1rem; }
-.cs-w-3 { width: 0.75rem; }
-.cs-w-2 { width: 0.5rem; }
-.cs-min-w-14 { min-width: 3.5rem; }
-
-.cs-h-full { height: 100%; }
-.cs-h-12 { height: 3rem; }
-.cs-h-10 { height: 2.5rem; }
-.cs-h-8 { height: 2rem; }
-.cs-h-5 { height: 1.25rem; }
-.cs-h-4 { height: 1rem; }
-.cs-h-3 { height: 0.75rem; }
-.cs-h-2 { height: 0.5rem; }
-.cs-h-px { height: 1px; }
-
-.cs-flex { display: flex; }
-.cs-flex-1 { flex: 1 1 0%; }
-.cs-flex-shrink-0 { flex-shrink: 0; }
-.cs-items-center { align-items: center; }
-.cs-items-start { align-items: flex-start; }
-.cs-items-end { align-items: flex-end; }
-.cs-justify-center { justify-content: center; }
-.cs-justify-end { justify-content: flex-end; }
-.cs-justify-between { justify-content: space-between; }
-.cs-flex-col { flex-direction: column; }
-
-.cs-grid { display: grid; }
-.cs-grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-.cs-grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-
-.cs-space-x-2 > :not([hidden]) ~ :not([hidden]) { margin-left: 0.5rem; }
-.cs-space-x-3 > :not([hidden]) ~ :not([hidden]) { margin-left: 0.75rem; }
-.cs-space-x-4 > :not([hidden]) ~ :not([hidden]) { margin-left: 1rem; }
-.cs-space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.5rem; }
-
-.cs-gap-3 { gap: 0.75rem; }
-
-.cs-p-3 { padding: 0.75rem; }
-.cs-p-4 { padding: 1rem; }
-.cs-p-6 { padding: 1.5rem; }
-.cs-px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
-.cs-px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
-.cs-px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
-.cs-px-8 { padding-left: 2rem; padding-right: 2rem; }
-.cs-py-0\.5 { padding-top: 0.125rem; padding-bottom: 0.125rem; }
-.cs-py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
-.cs-py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-.cs-py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
-.cs-py-4 { padding-top: 1rem; padding-bottom: 1rem; }
-
-.cs-m-2 { margin: 0.5rem; }
-.cs-ml-3 { margin-left: 0.75rem; }
-.cs-mr-2 { margin-right: 0.5rem; }
-.cs-mt-2 { margin-top: 0.5rem; }
-.cs-mt-3 { margin-top: 0.75rem; }
-.cs-mt-4 { margin-top: 1rem; }
-.cs-mb-1 { margin-bottom: 0.25rem; }
-.cs-mb-2 { margin-bottom: 0.5rem; }
-.cs-mb-3 { margin-bottom: 0.75rem; }
-.cs-mb-4 { margin-bottom: 1rem; }
-.cs-mx-auto { margin-left: auto; margin-right: auto; }
-
-.cs-rounded-full { border-radius: 9999px; }
-.cs-rounded-2xl { border-radius: 1rem; }
-.cs-rounded-xl { border-radius: 0.75rem; }
-.cs-rounded-lg { border-radius: 0.5rem; }
-.cs-rounded-md { border-radius: 0.375rem; }
-.cs-rounded-tl-md { border-top-left-radius: 0.375rem; }
-.cs-rounded-tr-md { border-top-right-radius: 0.375rem; }
-
-.cs-bg-white { background-color: white; }
-.cs-bg-gray-50 { background-color: #f9fafb; }
-.cs-bg-gray-100 { background-color: #f3f4f6; }
-.cs-bg-gray-200 { background-color: #e5e7eb; }
-.cs-bg-gray-300 { background-color: #d1d5db; }
-.cs-bg-red-50 { background-color: #fef2f2; }
-.cs-bg-red-100 { background-color: #fee2e2; }
-.cs-bg-red-500 { background-color: #ef4444; }
-.cs-bg-green-50 { background-color: #f0fdf4; }
-.cs-bg-green-400 { background-color: #4ade80; }
-.cs-bg-green-600 { background-color: #16a34a; }
-.cs-bg-blue-50 { background-color: #eff6ff; }
-
-.cs-bg-gradient-to-br { background-image: linear-gradient(to bottom right, var(--tw-gradient-stops)); }
-.cs-bg-gradient-to-r { background-image: linear-gradient(to right, var(--tw-gradient-stops)); }
-.cs-bg-gradient-to-b { background-image: linear-gradient(to bottom, var(--tw-gradient-stops)); }
-.cs-from-gray-50 { --tw-gradient-from: #f9fafb; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(249, 250, 251, 0)); }
-.cs-from-gray-100 { --tw-gradient-from: #f3f4f6; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(243, 244, 246, 0)); }
-.cs-from-gray-400 { --tw-gradient-from: #9ca3af; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(156, 163, 175, 0)); }
-.cs-to-gray-50 { --tw-gradient-to: #f9fafb; }
-.cs-to-gray-100 { --tw-gradient-to: #f3f4f6; }
-.cs-to-gray-500 { --tw-gradient-to: #6b7280; }
-.cs-to-white { --tw-gradient-to: white; }
-
-.cs-text-white { color: white; }
-.cs-text-gray-500 { color: #6b7280; }
-.cs-text-gray-600 { color: #4b5563; }
-.cs-text-gray-700 { color: #374151; }
-.cs-text-gray-800 { color: #1f2937; }
-.cs-text-gray-900 { color: #111827; }
-.cs-text-red-500 { color: #ef4444; }
-.cs-text-red-600 { color: #dc2626; }
-.cs-text-red-800 { color: #991b1b; }
-.cs-text-green-700 { color: #15803d; }
-.cs-text-green-900 { color: #14532d; }
-.cs-text-blue-500 { color: #3b82f6; }
-.cs-text-opacity-90 { color: rgba(255, 255, 255, 0.9); }
-
-.cs-border { border-width: 1px; }
-.cs-border-2 { border-width: 2px; }
-.cs-border-3 { border-width: 3px; }
-.cs-border-gray-100 { border-color: #f3f4f6; }
-.cs-border-gray-200 { border-color: #e5e7eb; }
-.cs-border-gray-300 { border-color: #d1d5db; }
-.cs-border-red-200 { border-color: #fecaca; }
-.cs-border-transparent { border-color: transparent; }
-.cs-border-white { border-color: white; }
-.cs-border-opacity-30 { border-color: rgba(255, 255, 255, 0.3); }
-
-.cs-shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
-.cs-shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
-.cs-shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
-.cs-shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
-.cs-shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
-
-.cs-font-medium { font-weight: 500; }
-.cs-font-semibold { font-weight: 600; }
-.cs-font-bold { font-weight: 700; }
-
-.cs-text-xs { font-size: 0.75rem; line-height: 1rem; }
-.cs-text-sm { font-size: 0.875rem; line-height: 1.25rem; }
-.cs-text-base { font-size: 1rem; line-height: 1.5rem; }
-.cs-text-lg { font-size: 1.125rem; line-height: 1.75rem; }
-
-.cs-text-center { text-align: center; }
-.cs-text-right { text-align: right; }
-
-.cs-leading-relaxed { line-height: 1.625; }
-.cs-tracking-tight { letter-spacing: -0.025em; }
-
-.cs-underline { text-decoration: underline; }
-.cs-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-.cs-cursor-pointer { cursor: pointer; }
-
-.cs-transition-all { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-.cs-transition-colors { transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-.cs-transition-shadow { transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-.cs-transition-transform { transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-.cs-duration-200 { transition-duration: 0.2s; }
-
-.cs-transform { transform: var(--tw-transform); }
-
-.cs-hover\:cs-opacity-90:hover { opacity: 0.9; }
-.cs-hover\:cs-bg-gray-50:hover { background-color: #f9fafb; }
-.cs-hover\:cs-bg-green-700:hover { background-color: #15803d; }
-.cs-hover\:cs-text-opacity-100:hover { color: rgba(255, 255, 255, 1); }
-.cs-hover\:cs-text-red-800:hover { color: #991b1b; }
-.cs-hover\:cs-shadow-md:hover { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
-.cs-hover\:cs-shadow-xl:hover { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
-.cs-hover\:cs-rotate-90:hover { transform: rotate(90deg); }
-
-.cs-group:hover .cs-group-hover\:cs-rotate-90 { transform: rotate(90deg); }
-
-.cs-disabled\:cs-opacity-50:disabled { opacity: 0.5; }
-
-.cs-focus\:cs-outline-none:focus { outline: none; }
-.cs-focus\:cs-ring-2:focus { box-shadow: 0 0 0 3px var(--tw-ring-color); }
-.cs-focus\:cs-border-transparent:focus { border-color: transparent; }
-.cs-focus\:cs-shadow-md:focus { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
-
-.cs-overflow-hidden { overflow: hidden; }
-.cs-overflow-y-auto { overflow-y: auto; }
-
-.cs-resize-none { resize: none; }
-
-.cs-relative { position: relative; }
-.cs-absolute { position: absolute; }
-.cs-fixed { position: fixed; }
-
-.cs-top-0 { top: 0; }
-.cs-left-0 { left: 0; }
-.cs-right-0 { right: 0; }
-.cs-bottom-0 { bottom: 0; }
-.cs--top-1 { top: -0.25rem; }
-.cs--right-1 { right: -0.25rem; }
-
-.cs-max-w-xs { max-width: 20rem; }
-.cs-max-w-sm { max-width: 24rem; }
-.cs-min-w-0 { min-width: 0; }
-
-.cs-z-50 { z-index: 50; }
-
-.cs-inline-block { display: inline-block; }
-
-.cs-animate-bounce {
-  animation: cs-bounce 1.4s infinite;
+.cs-desktop-messages::-webkit-scrollbar-track,
+.cs-mobile-messages::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
 }
 
-.cs-animate-pulse {
-  animation: cs-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+.cs-desktop-messages::-webkit-scrollbar-thumb,
+.cs-mobile-messages::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
 }
 
-.cs-animate-spin {
-  animation: cs-spin 1s linear infinite;
-}
-
-@keyframes cs-bounce {
-  0%, 60%, 100% {
-    transform: translateY(0);
-  }
-  30% {
-    transform: translateY(-6px);
-  }
-}
-
-@keyframes cs-pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-@keyframes cs-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.cs-backdrop-blur-sm {
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+.cs-desktop-messages::-webkit-scrollbar-thumb:hover,
+.cs-mobile-messages::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.5);
 }
 </style>
