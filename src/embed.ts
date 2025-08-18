@@ -344,7 +344,7 @@ class ChatSeller {
 
   const buttonText = this.config.buttonText || 'Parler à un conseiller'
   const primaryColor = this.config.primaryColor || '#3B82F6'
-  const borderRadius = this.getBorderRadiusValue(this.config.borderRadius || 'md') // ← AJOUT
+  const borderRadius = this.getBorderRadiusValue(this.config.borderRadius || 'md') // ✅ AJOUT
 
   this.widgetElement.innerHTML = `
     <div style="width: 100%; margin: 8px 0; position: relative;">
@@ -356,7 +356,7 @@ class ChatSeller {
           background: linear-gradient(135deg, ${primaryColor} 0%, ${this.adjustColor(primaryColor, -15)} 100%);
           color: white;
           border: none;
-          border-radius: ${borderRadius}; // ← CORRECTION : utilise la vraie valeur
+          border-radius: ${borderRadius}; /* ✅ UTILISE LA VRAIE VALEUR */
           font-size: 15px;
           font-weight: 600;
           cursor: pointer;
@@ -380,15 +380,15 @@ class ChatSeller {
     </div>
   `
 
-    const triggerBtn = this.widgetElement.querySelector('#chatseller-trigger-btn') as HTMLElement
-    if (triggerBtn) {
-      triggerBtn.addEventListener('click', (event) => {
-        event.preventDefault()
-        event.stopPropagation()
-        this.openChat()
-      })
-    }
+  const triggerBtn = this.widgetElement.querySelector('#chatseller-trigger-btn') as HTMLElement
+  if (triggerBtn) {
+    triggerBtn.addEventListener('click', (event) => {
+      event.preventDefault()
+      event.stopPropagation()
+      this.openChat()
+    })
   }
+}
 
   // ✅ MÉTHODE SIMPLIFIÉE : Ouverture directe avec Vue
   private openChat() {
