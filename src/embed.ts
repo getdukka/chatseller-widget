@@ -340,44 +340,45 @@ class ChatSeller {
   }
 
   private renderWidget() {
-    if (!this.widgetElement) return
+  if (!this.widgetElement) return
 
-    const buttonText = this.config.buttonText || 'Parler à un conseiller'
-    const primaryColor = this.config.primaryColor || '#3B82F6'
+  const buttonText = this.config.buttonText || 'Parler à un conseiller'
+  const primaryColor = this.config.primaryColor || '#3B82F6'
+  const borderRadius = this.getBorderRadiusValue(this.config.borderRadius || 'md') // ← AJOUT
 
-    this.widgetElement.innerHTML = `
-      <div style="width: 100%; margin: 8px 0; position: relative;">
-        <button 
-          id="chatseller-trigger-btn"
-          style="
-            width: 100%;
-            padding: 16px 24px;
-            background: linear-gradient(135deg, ${primaryColor} 0%, ${this.adjustColor(primaryColor, -15)} 100%);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            outline: none;
-          "
-          onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 35px rgba(0, 0, 0, 0.25)'"
-          onmouseout="this.style.transform='translateY(0px)'; this.style.boxShadow='0 8px 25px rgba(0, 0, 0, 0.15)'"
-        >
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.906-1.479L3 21l2.521-5.094A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"></path>
-          </svg>
-          <span>${buttonText}</span>
-        </button>
-      </div>
-    `
+  this.widgetElement.innerHTML = `
+    <div style="width: 100%; margin: 8px 0; position: relative;">
+      <button 
+        id="chatseller-trigger-btn"
+        style="
+          width: 100%;
+          padding: 16px 24px;
+          background: linear-gradient(135deg, ${primaryColor} 0%, ${this.adjustColor(primaryColor, -15)} 100%);
+          color: white;
+          border: none;
+          border-radius: ${borderRadius}; // ← CORRECTION : utilise la vraie valeur
+          font-size: 15px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          outline: none;
+        "
+        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 35px rgba(0, 0, 0, 0.25)'"
+        onmouseout="this.style.transform='translateY(0px)'; this.style.boxShadow='0 8px 25px rgba(0, 0, 0, 0.15)'"
+      >
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.906-1.479L3 21l2.521-5.094A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"></path>
+        </svg>
+        <span>${buttonText}</span>
+      </button>
+    </div>
+  `
 
     const triggerBtn = this.widgetElement.querySelector('#chatseller-trigger-btn') as HTMLElement
     if (triggerBtn) {
