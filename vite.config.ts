@@ -1,4 +1,4 @@
-// vite.config.ts - CONFIGURATION AVEC ESBUILD (PLUS RAPIDE)
+// vite.config.ts 
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
@@ -14,42 +14,45 @@ export default defineConfig({
     })
   ],
 
-  // ✅ BUILD AVEC ESBUILD (PLUS RAPIDE QUE TERSER)
+  // ✅ BUILD SINGLE ENTRY (EMBED ONLY)
   build: {
     target: 'es2018',
     
     rollupOptions: {
-      input: {
-        embed: resolve(__dirname, 'src/embed.ts')
-      },
+      // ✅ UN SEUL ENTRY POINT
+      input: resolve(__dirname, 'src/embed.ts'),
       output: {
         format: 'iife',
         name: 'ChatSeller',
-        entryFileNames: (chunkInfo) => {
-          return chunkInfo.name === 'embed' ? 'embed.js' : '[name].js'
+        entryFileNames: 'embed.js',
+        chunkFileNames: 'chunk-[name].js',
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name?.endsWith('.css')) {
+            return 'style.css'
+          }
+          return '[name].[ext]'
         }
       },
       external: []
     },
 
-    // ✅ ESBUILD AU LIEU DE TERSER
     minify: 'esbuild',
-
     sourcemap: false,
     outDir: 'dist',
-    emptyOutDir: true
+    emptyOutDir: true,
+    
+    // ✅ CSS INTÉGRÉ (pas de code-splitting)
+    cssCodeSplit: false
   },
 
-  // ✅ SERVER DÉVELOPPEMENT
   server: {
     host: '0.0.0.0',
     port: 3000,
     cors: true
   },
 
-  // ✅ PREVIEW
   preview: {
-    host: '0.0.0.0',
+    host: '0.0.0.0', 
     port: 3000,
     cors: true
   },

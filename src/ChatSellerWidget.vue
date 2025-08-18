@@ -432,19 +432,25 @@ const sendButtonStyles = computed(() => ({
 // Methods
 const sendWelcomeMessage = async () => {
   try {
-    // ✅ GÉNÉRER MESSAGE D'ACCUEIL CONTEXTUEL AUTOMATIQUE
+    // ✅ GÉNÉRER MESSAGE D'ACCUEIL CONTEXTUEL AUTOMATIQUE (SANS RÉPÉTITION)
     let welcomeMessage = ''
     
-    if (productInfo.value?.name) {
-      welcomeMessage = `Bonjour ! 👋 Je suis ${agentName.value}, ${agentTitle.value}.
+    // ✅ CORRECTION: Utiliser directement le welcomeMessage de la config si disponible
+    if (props.config.agentConfig?.welcomeMessage) {
+      welcomeMessage = props.config.agentConfig.welcomeMessage
+    } else {
+      // ✅ Fallback seulement si pas de welcomeMessage configuré
+      if (productInfo.value?.name) {
+        welcomeMessage = `Bonjour ! 👋 Je suis ${agentName.value}, ${agentTitle.value}.
 
 Je vois que vous vous intéressez à **"${productInfo.value.name}"**. C'est un excellent choix ! ✨
 
 Comment puis-je vous aider ? 😊`
-    } else {
-      welcomeMessage = `Bonjour ! 👋 Je suis ${agentName.value}, ${agentTitle.value}.
+      } else {
+        welcomeMessage = `Bonjour ! 👋 Je suis ${agentName.value}, ${agentTitle.value}.
 
 Comment puis-je vous aider aujourd'hui ? 😊`
+      }
     }
 
     const aiMessage: Message = {
@@ -479,20 +485,32 @@ const sendMessage = async () => {
   scrollToBottom()
 
   try {
-    // ✅ APPEL À L'API RÉELLE (sera corrigé dans la prochaine étape)
+    // ✅ APPEL À L'API RÉELLE AVEC GESTION CORRECTE DU CONTEXT
     const chatSeller = (window as any).ChatSeller
     if (chatSeller) {
       const response = await chatSeller.sendMessage(messageContent, conversationId.value, {
-        productInfo: productInfo.value
+        productInfo: productInfo.value,
+        // ✅ IMPORTANT: Ne pas renvoyer le welcomeMessage dans le contexte
+        isFollowUp: messages.value.length > 2 // Indique que ce n'est pas le premier échange
       })
       
       if (response.success) {
         conversationId.value = response.data.conversationId
         
+        // ✅ VÉRIFICATION: Ne pas ajouter le message si c'est une répétition du welcome
+        let aiMessageContent = response.data.message
+        
+        // ✅ FILTRE ANTI-RÉPÉTITION: Éviter que l'IA répète le message d'accueil
+        const welcomeMsg = props.config.agentConfig?.welcomeMessage || ''
+        if (welcomeMsg && aiMessageContent.includes(welcomeMsg.substring(0, 50))) {
+          console.warn('⚠️ Répétition message d\'accueil détectée, utilisation fallback')
+          aiMessageContent = getIntelligentResponse(messageContent)
+        }
+        
         const aiMessage: Message = {
           id: uuidv4(),
           role: 'assistant',
-          content: response.data.message,
+          content: aiMessageContent,
           timestamp: new Date()
         }
         messages.value.push(aiMessage)
@@ -500,7 +518,6 @@ const sendMessage = async () => {
         throw new Error('Erreur API')
       }
     } else {
-      // Fallback temporaire
       throw new Error('SDK non disponible')
     }
 

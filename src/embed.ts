@@ -1,4 +1,4 @@
-// src/embed.ts 
+// src/embed.ts - VERSION CORRIGÉE AVEC VUE COMPONENT
 export interface ChatSellerConfig {
   shopId: string
   apiUrl?: string
@@ -28,8 +28,7 @@ class ChatSeller {
   private shopConfig: any = null
   private agentConfig: any = null
   private conversationId: string | null = null
-  private configPromise: Promise<void> | null = null
-  private chatComponent: any = null
+  private vueApp: any = null
   private initAttempts = 0
 
   constructor() {
@@ -43,7 +42,7 @@ class ChatSeller {
       language: 'fr',
       autoDetectProduct: true,
       debug: false,
-      disableFallback: true // ✅ NOUVEAU: Désactiver fallback par défaut
+      disableFallback: true
     }
   }
 
@@ -67,21 +66,14 @@ class ChatSeller {
 
     try {
       await this.waitForDOM()
-      
-      // ✅ NETTOYAGE PRÉVENTIF
       this.cleanupExistingWidgets()
-      
-      // ✅ ÉTAPE 1: Création widget immédiate
       this.createWidget()
       
-      // ✅ ÉTAPE 2: Détection produit pour Shopify
       if (this.config.autoDetectProduct) {
         this.detectProductInfo()
       }
       
       this.isInitialized = true
-      
-      // ✅ ÉTAPE 3: Chargement config API en arrière-plan
       this.loadShopConfigurationAsync()
       
       const initTime = performance.now() - startTime
@@ -89,17 +81,16 @@ class ChatSeller {
       
     } catch (error) {
       console.error('❌ Échec initialisation ChatSeller:', error)
-      // ✅ PAS DE FALLBACK AUTOMATIQUE - Evite le double bouton
     }
   }
 
   private cleanupExistingWidgets(): void {
     const selectors = [
       '#chatseller-widget',
-      '#chatseller-fallback',
+      '#chatseller-modal',
+      '#chatseller-vue-modal',
       '[data-chatseller]',
-      '.chatseller-widget',
-      '.chatseller-button'
+      '.chatseller-widget'
     ]
     
     selectors.forEach(selector => {
@@ -138,7 +129,8 @@ class ChatSeller {
         
         console.log('✅ Configuration chargée:', {
           shop: this.shopConfig?.id,
-          agent: this.agentConfig?.name
+          agent: this.agentConfig?.name,
+          title: this.agentConfig?.title // ✅ NOUVEAU: Title personnalisable
         })
       }
       
@@ -155,7 +147,6 @@ class ChatSeller {
       const primaryColor = this.config.primaryColor || '#3B82F6'
       triggerBtn.style.background = `linear-gradient(135deg, ${primaryColor} 0%, ${this.adjustColor(primaryColor, -15)} 100%)`
       
-      // ✅ Appliquer les bordures arrondies correctement
       const borderRadius = this.config.borderRadius || 'md'
       triggerBtn.style.borderRadius = this.getBorderRadiusValue(borderRadius)
       
@@ -194,10 +185,11 @@ class ChatSeller {
       this.config.agentConfig = {
         id: this.agentConfig.id,
         name: this.agentConfig.name,
-        title: this.agentConfig.title || this.getDefaultTitle(this.agentConfig.type),
+        title: this.agentConfig.title || this.getDefaultTitle(this.agentConfig.type), // ✅ CORRECTION: Titre personnalisable
         avatar: this.agentConfig.avatar,
         welcomeMessage: this.agentConfig.welcomeMessage,
-        fallbackMessage: this.agentConfig.fallbackMessage
+        fallbackMessage: this.agentConfig.fallbackMessage,
+        personality: this.agentConfig.personality
       }
     }
   }
@@ -209,7 +201,7 @@ class ChatSeller {
       'support': 'Conseiller support',
       'upsell': 'Conseiller premium'
     }
-    return titles[type as keyof typeof titles] || 'Conseiller commercial'
+    return titles[type as keyof typeof titles] || 'Assistant commercial'
   }
 
   private detectProductInfo(): boolean {
@@ -220,7 +212,6 @@ class ChatSeller {
       let detectedPrice = this.config.productPrice
       let detectedId = this.config.productId
 
-      // ✅ Shopify Analytics (le plus fiable)
       const shopifyProduct = (window as any).ShopifyAnalytics?.meta?.product
       if (shopifyProduct && shopifyProduct.title) {
         detectedName = shopifyProduct.title
@@ -229,7 +220,6 @@ class ChatSeller {
         console.log('✅ Produit Shopify détecté:', detectedName)
       }
       
-      // ✅ Sélecteurs CSS Shopify spécifiques
       if (!detectedName) {
         const titleSelectors = [
           '.product__title',
@@ -267,7 +257,6 @@ class ChatSeller {
         }
       }
 
-      // ✅ Mettre à jour la config
       if (detectedName) this.config.productName = detectedName
       if (detectedPrice) this.config.productPrice = detectedPrice
       if (detectedId) this.config.productId = detectedId
@@ -298,7 +287,6 @@ class ChatSeller {
   private insertWidgetAtPosition(container: HTMLElement): void {
     const position = this.config.position || 'above-cta'
     
-    // ✅ Sélecteurs Shopify prioritaires
     const shopifyCtaSelectors = [
       '.product-form__buttons',
       'form[action*="/cart/add"] button[type="submit"]',
@@ -335,7 +323,6 @@ class ChatSeller {
       }
     }
     
-    // ✅ Fallback : ajouter au body seulement si pas disableFallback
     if (!this.config.disableFallback) {
       console.log('⚠️ Fallback: insertion body')
       container.style.cssText = `
@@ -391,35 +378,158 @@ class ChatSeller {
 
     const triggerBtn = this.widgetElement.querySelector('#chatseller-trigger-btn') as HTMLElement
     if (triggerBtn) {
-      // ✅ CORRECTION MAJEURE: Ouvrir directement le chat, pas de fallback
       triggerBtn.addEventListener('click', (event) => {
         event.preventDefault()
         event.stopPropagation()
-        this.openChat() // ✅ Ouvrir directement
+        this.openChat()
       })
     }
   }
 
-  // ✅ OUVERTURE CHAT DIRECTE
+  // ✅ NOUVELLE MÉTHODE: Ouverture avec composant Vue
   private async openChat() {
     if (this.isOpen) return
 
     this.isOpen = true
-    console.log('💬 Ouverture chat direct')
+    console.log('💬 Ouverture chat avec composant Vue')
     
-    // ✅ Charger et ouvrir le composant Vue
-    this.createChatModal()
+    try {
+      await this.createVueChatModal()
+    } catch (error) {
+      console.error('❌ Erreur ouverture chat Vue:', error)
+      this.createSimpleChatModal() // Fallback
+    }
   }
 
-  private createChatModal() {
-    if (this.modalElement) {
-      this.modalElement.remove()
+  // ✅ NOUVELLE MÉTHODE: Modal Vue
+  private async createVueChatModal() {
+    // ✅ Créer le container modal
+    this.modalElement = document.createElement('div')
+    this.modalElement.id = 'chatseller-vue-modal'
+    
+    const isMobile = window.innerWidth < 768
+    
+    // ✅ STYLES CORRIGÉS: 650px desktop, plein écran mobile
+    this.modalElement.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      z-index: 2147483647;
+      display: flex;
+      align-items: ${isMobile ? 'stretch' : 'center'};
+      justify-content: ${isMobile ? 'stretch' : 'center'};
+      padding: ${isMobile ? '0' : '16px'};
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    `
+
+    // ✅ Container pour l'app Vue
+    const vueContainer = document.createElement('div')
+    vueContainer.id = 'chatseller-vue-app'
+    
+    if (isMobile) {
+      // ✅ MOBILE: Plein écran
+      vueContainer.style.cssText = `
+        width: 100%;
+        height: 100%;
+        background: white;
+        display: flex;
+        flex-direction: column;
+      `
+    } else {
+      // ✅ DESKTOP: 650px de largeur
+      vueContainer.style.cssText = `
+        width: 650px;
+        height: 700px;
+        max-height: 90vh;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      `
     }
 
-    // ✅ Pour l'instant, modal simple en attendant la refonte
-    this.createSimpleChatModal()
+    this.modalElement.appendChild(vueContainer)
+    document.body.appendChild(this.modalElement)
+
+    // ✅ Charger le CSS du widget
+    await this.loadWidgetStyles()
+
+    // ✅ Charger et initialiser le composant Vue
+    await this.initVueWidget(vueContainer)
+
+    // ✅ Fermeture sur clic overlay (desktop seulement)
+    if (!isMobile) {
+      this.modalElement.addEventListener('click', (e) => {
+        if (e.target === this.modalElement) {
+          this.closeChat()
+        }
+      })
+    }
   }
 
+  // ✅ NOUVELLE MÉTHODE: Charger les styles CSS
+  private async loadWidgetStyles(): Promise<void> {
+    return new Promise((resolve) => {
+      // Vérifier si le CSS est déjà chargé
+      if (document.querySelector('link[href*="widget.css"]')) {
+        resolve()
+        return
+      }
+
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = `${window.location.origin.includes('localhost') ? 'http://localhost:3000' : 'https://widget.chatseller.app'}/widget.css`
+      link.onload = () => resolve()
+      link.onerror = () => {
+        console.warn('⚠️ CSS widget non trouvé, utilisation de styles par défaut')
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  }
+
+  // ✅ NOUVELLE MÉTHODE: Initialiser Vue
+  private async initVueWidget(container: HTMLElement): Promise<void> {
+    try {
+      // ✅ Charger le module Vue widget
+      const widgetModule = await import(`${window.location.origin.includes('localhost') ? 'http://localhost:3000' : 'https://widget.chatseller.app'}/widget.esm.js`)
+      
+      // ✅ Initialiser avec la config complète
+      this.vueApp = widgetModule.initChatWidget(container, {
+        config: {
+          shopId: this.config.shopId,
+          apiUrl: this.config.apiUrl,
+          agentConfig: this.config.agentConfig,
+          widget: {
+            primaryColor: this.config.primaryColor,
+            buttonText: this.config.buttonText,
+            language: this.config.language
+          },
+          productInfo: {
+            id: this.config.productId,
+            name: this.config.productName,
+            price: this.config.productPrice,
+            url: this.config.productUrl
+          }
+        },
+        onClose: () => this.closeChat()
+      })
+
+      console.log('✅ Composant Vue initialisé avec succès')
+
+    } catch (error) {
+      console.error('❌ Erreur chargement module Vue:', error)
+      throw error
+    }
+  }
+
+  // ✅ Fallback simple (en cas d'erreur Vue)
   private createSimpleChatModal() {
     const agentName = this.config.agentConfig?.name || 'Assistant'
     const agentTitle = this.config.agentConfig?.title || 'Conseiller commercial'
@@ -435,7 +545,7 @@ class ChatSeller {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       ">
         <div style="
-          width: 480px; height: 700px; max-height: 90vh;
+          width: 650px; height: 700px; max-height: 90vh;
           background: white; border-radius: 16px;
           box-shadow: 0 16px 64px rgba(0, 0, 0, 0.2);
           display: flex; flex-direction: column; overflow: hidden;
@@ -465,25 +575,13 @@ class ChatSeller {
             ">✕</button>
           </div>
           
-          ${this.config.productName ? `
-          <div style="
-            padding: 16px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;
-            display: flex; align-items: center; justify-content: space-between;
-          ">
-            <div>
-              <h4 style="margin: 0; font-size: 14px; font-weight: 600; color: #1a1a1a;">${this.config.productName}</h4>
-              ${this.config.productPrice ? `<p style="margin: 4px 0 0 0; font-size: 16px; font-weight: 700; color: ${primaryColor};">${this.config.productPrice} FCFA</p>` : ''}
-            </div>
-          </div>
-          ` : ''}
-          
           <div style="flex: 1; padding: 20px; display: flex; align-items: center; justify-content: center; background: #f8fafc;">
             <div style="text-align: center;">
               <p style="margin: 0; font-size: 16px; color: #374151;">
-                Interface de chat en cours de chargement...
+                ⚠️ Erreur de chargement du composant Vue
               </p>
               <p style="margin: 8px 0 0 0; font-size: 14px; color: #6b7280;">
-                La nouvelle interface sera prête sous peu
+                Veuillez rafraîchir la page ou contacter le support
               </p>
             </div>
           </div>
@@ -500,6 +598,11 @@ class ChatSeller {
   private closeChat() {
     this.isOpen = false
     if (this.modalElement) {
+      // ✅ Nettoyer l'app Vue
+      if (this.vueApp && this.vueApp.unmount) {
+        this.vueApp.unmount()
+        this.vueApp = null
+      }
       this.modalElement.remove()
       this.modalElement = null
     }
@@ -533,7 +636,7 @@ class ChatSeller {
     })
   }
 
-  // ✅ MÉTHODES PUBLIQUES
+  // ✅ MÉTHODES PUBLIQUES EXISTANTES
   async sendMessage(message: string, conversationId?: string | null, options?: any): Promise<any> {
     try {
       const payload = {
@@ -586,6 +689,9 @@ class ChatSeller {
   destroy() {
     this.cleanupExistingWidgets()
     if (this.modalElement) {
+      if (this.vueApp && this.vueApp.unmount) {
+        this.vueApp.unmount()
+      }
       this.modalElement.remove()
       this.modalElement = null
     }
@@ -597,7 +703,7 @@ class ChatSeller {
   }
 
   get version(): string {
-    return '1.2.0'
+    return '1.2.1'
   }
 }
 
