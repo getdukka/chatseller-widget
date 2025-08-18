@@ -1,4 +1,7 @@
-// src/embed.ts - VERSION CORRIGÉE AVEC VUE COMPONENT
+// src/embed.ts - VERSION SIMPLIFIÉE AVEC VUE INTÉGRÉ
+import { createApp, App as VueApp } from 'vue'
+import ChatSellerWidget from './ChatSellerWidget.vue'
+
 export interface ChatSellerConfig {
   shopId: string
   apiUrl?: string
@@ -130,7 +133,7 @@ class ChatSeller {
         console.log('✅ Configuration chargée:', {
           shop: this.shopConfig?.id,
           agent: this.agentConfig?.name,
-          title: this.agentConfig?.title // ✅ NOUVEAU: Title personnalisable
+          title: this.agentConfig?.title
         })
       }
       
@@ -185,7 +188,7 @@ class ChatSeller {
       this.config.agentConfig = {
         id: this.agentConfig.id,
         name: this.agentConfig.name,
-        title: this.agentConfig.title || this.getDefaultTitle(this.agentConfig.type), // ✅ CORRECTION: Titre personnalisable
+        title: this.agentConfig.title || this.getDefaultTitle(this.agentConfig.type),
         avatar: this.agentConfig.avatar,
         welcomeMessage: this.agentConfig.welcomeMessage,
         fallbackMessage: this.agentConfig.fallbackMessage,
@@ -386,30 +389,30 @@ class ChatSeller {
     }
   }
 
-  // ✅ NOUVELLE MÉTHODE: Ouverture avec composant Vue
-  private async openChat() {
+  // ✅ MÉTHODE SIMPLIFIÉE : Ouverture directe avec Vue
+  private openChat() {
     if (this.isOpen) return
 
     this.isOpen = true
-    console.log('💬 Ouverture chat avec composant Vue')
+    console.log('💬 Ouverture chat avec Vue intégré')
     
     try {
-      await this.createVueChatModal()
+      this.createVueChatModal()
     } catch (error) {
       console.error('❌ Erreur ouverture chat Vue:', error)
       this.createSimpleChatModal() // Fallback
     }
   }
 
-  // ✅ NOUVELLE MÉTHODE: Modal Vue
-  private async createVueChatModal() {
+  // ✅ MÉTHODE SIMPLIFIÉE : Modal Vue directe
+  private createVueChatModal() {
     // ✅ Créer le container modal
     this.modalElement = document.createElement('div')
     this.modalElement.id = 'chatseller-vue-modal'
     
     const isMobile = window.innerWidth < 768
     
-    // ✅ STYLES CORRIGÉS: 650px desktop, plein écran mobile
+    // ✅ STYLES CORRIGÉS
     this.modalElement.style.cssText = `
       position: fixed;
       top: 0;
@@ -426,42 +429,10 @@ class ChatSeller {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     `
 
-    // ✅ Container pour l'app Vue
-    const vueContainer = document.createElement('div')
-    vueContainer.id = 'chatseller-vue-app'
-    
-    if (isMobile) {
-      // ✅ MOBILE: Plein écran
-      vueContainer.style.cssText = `
-        width: 100%;
-        height: 100%;
-        background: white;
-        display: flex;
-        flex-direction: column;
-      `
-    } else {
-      // ✅ DESKTOP: 650px de largeur
-      vueContainer.style.cssText = `
-        width: 650px;
-        height: 700px;
-        max-height: 90vh;
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-      `
-    }
-
-    this.modalElement.appendChild(vueContainer)
     document.body.appendChild(this.modalElement)
 
-    // ✅ Charger le CSS du widget
-    await this.loadWidgetStyles()
-
-    // ✅ Charger et initialiser le composant Vue
-    await this.initVueWidget(vueContainer)
+    // ✅ INITIALISER DIRECTEMENT LE COMPOSANT VUE
+    this.initVueWidget()
 
     // ✅ Fermeture sur clic overlay (desktop seulement)
     if (!isMobile) {
@@ -473,58 +444,45 @@ class ChatSeller {
     }
   }
 
-  // ✅ NOUVELLE MÉTHODE: Charger les styles CSS
-  private async loadWidgetStyles(): Promise<void> {
-    return new Promise((resolve) => {
-      // Vérifier si le CSS est déjà chargé
-      if (document.querySelector('link[href*="widget.css"]')) {
-        resolve()
-        return
-      }
-
-      const link = document.createElement('link')
-      link.rel = 'stylesheet'
-      link.href = `${window.location.origin.includes('localhost') ? 'http://localhost:3000' : 'https://widget.chatseller.app'}/widget.css`
-      link.onload = () => resolve()
-      link.onerror = () => {
-        console.warn('⚠️ CSS widget non trouvé, utilisation de styles par défaut')
-        resolve()
-      }
-      document.head.appendChild(link)
-    })
-  }
-
-  // ✅ NOUVELLE MÉTHODE: Initialiser Vue
-  private async initVueWidget(container: HTMLElement): Promise<void> {
+  // ✅ MÉTHODE SIMPLIFIÉE : Initialiser Vue directement
+  private initVueWidget(): void {
     try {
-      // ✅ Charger le module Vue widget
-      const widgetModule = await import(`${window.location.origin.includes('localhost') ? 'http://localhost:3000' : 'https://widget.chatseller.app'}/widget.esm.js`)
+      console.log('🎨 Initialisation composant Vue...')
       
-      // ✅ Initialiser avec la config complète
-      this.vueApp = widgetModule.initChatWidget(container, {
-        config: {
-          shopId: this.config.shopId,
-          apiUrl: this.config.apiUrl,
-          agentConfig: this.config.agentConfig,
-          widget: {
-            primaryColor: this.config.primaryColor,
-            buttonText: this.config.buttonText,
-            language: this.config.language
-          },
-          productInfo: {
-            id: this.config.productId,
-            name: this.config.productName,
-            price: this.config.productPrice,
-            url: this.config.productUrl
-          }
+      // ✅ VÉRIFICATION MODALLEMENT EXISTE
+      if (!this.modalElement) {
+        throw new Error('Modal element non trouvé')
+      }
+      
+      // ✅ CONFIGURATION POUR LE COMPOSANT VUE
+      const widgetConfig = {
+        shopId: this.config.shopId,
+        apiUrl: this.config.apiUrl,
+        agentConfig: this.config.agentConfig || {
+          name: 'Assistant',
+          title: 'Conseiller commercial'
         },
-        onClose: () => this.closeChat()
+        primaryColor: this.config.primaryColor,
+        buttonText: this.config.buttonText,
+        language: this.config.language,
+        productId: this.config.productId,
+        productName: this.config.productName,
+        productPrice: this.config.productPrice,
+        productUrl: this.config.productUrl
+      }
+
+      // ✅ CRÉER L'APPLICATION VUE DIRECTEMENT
+      this.vueApp = createApp(ChatSellerWidget, {
+        config: widgetConfig
       })
+
+      // ✅ MONTER SUR LE MODAL (TypeScript safe)
+      this.vueApp.mount(this.modalElement)
 
       console.log('✅ Composant Vue initialisé avec succès')
 
     } catch (error) {
-      console.error('❌ Erreur chargement module Vue:', error)
+      console.error('❌ Erreur initialisation Vue:', error)
       throw error
     }
   }
@@ -578,10 +536,10 @@ class ChatSeller {
           <div style="flex: 1; padding: 20px; display: flex; align-items: center; justify-content: center; background: #f8fafc;">
             <div style="text-align: center;">
               <p style="margin: 0; font-size: 16px; color: #374151;">
-                ⚠️ Erreur de chargement du composant Vue
+                🔧 Chargement du chat...
               </p>
               <p style="margin: 8px 0 0 0; font-size: 14px; color: #6b7280;">
-                Veuillez rafraîchir la page ou contacter le support
+                Initialisation en cours...
               </p>
             </div>
           </div>
@@ -599,7 +557,7 @@ class ChatSeller {
     this.isOpen = false
     if (this.modalElement) {
       // ✅ Nettoyer l'app Vue
-      if (this.vueApp && this.vueApp.unmount) {
+      if (this.vueApp) {
         this.vueApp.unmount()
         this.vueApp = null
       }
@@ -636,7 +594,7 @@ class ChatSeller {
     })
   }
 
-  // ✅ MÉTHODES PUBLIQUES EXISTANTES
+  // ✅ MÉTHODES PUBLIQUES
   async sendMessage(message: string, conversationId?: string | null, options?: any): Promise<any> {
     try {
       const payload = {
@@ -689,7 +647,7 @@ class ChatSeller {
   destroy() {
     this.cleanupExistingWidgets()
     if (this.modalElement) {
-      if (this.vueApp && this.vueApp.unmount) {
+      if (this.vueApp) {
         this.vueApp.unmount()
       }
       this.modalElement.remove()
@@ -703,11 +661,11 @@ class ChatSeller {
   }
 
   get version(): string {
-    return '1.2.1'
+    return '1.2.2'
   }
 }
 
-// ✅ EXPORT
+// ✅ EXPORT ET AUTO-INIT
 const chatSeller = new ChatSeller()
 
 // ✅ AUTO-INIT SÉCURISÉ

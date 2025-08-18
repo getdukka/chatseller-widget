@@ -14,25 +14,29 @@ export default defineConfig({
     })
   ],
 
-  // ✅ BUILD SINGLE ENTRY (EMBED ONLY)
+  // ✅ BUILD CONFIGURATION POUR WIDGET EMBEDDABLE
   build: {
     target: 'es2018',
     
     rollupOptions: {
-      // ✅ UN SEUL ENTRY POINT
+      // ✅ POINT D'ENTRÉE UNIQUE AVEC VUE INTÉGRÉ
       input: resolve(__dirname, 'src/embed.ts'),
       output: {
+        // ✅ FORMAT IIFE POUR COMPATIBILITÉ MAXIMALE
         format: 'iife',
-        name: 'ChatSeller',
+        name: 'ChatSellerWidget',
         entryFileNames: 'embed.js',
         chunkFileNames: 'chunk-[name].js',
         assetFileNames: (assetInfo) => {
           if (assetInfo.name?.endsWith('.css')) {
-            return 'style.css'
+            return 'widget.css'
           }
           return '[name].[ext]'
-        }
+        },
+        // ✅ GLOBALS POUR ÉVITER L'EXTERNAL DES DÉPENDANCES
+        globals: {}
       },
+      // ✅ AUCUNE DÉPENDANCE EXTERNE - TOUT BUNDLÉ
       external: []
     },
 
@@ -41,7 +45,7 @@ export default defineConfig({
     outDir: 'dist',
     emptyOutDir: true,
     
-    // ✅ CSS INTÉGRÉ (pas de code-splitting)
+    // ✅ CSS INTÉGRÉ DANS LE JS
     cssCodeSplit: false
   },
 

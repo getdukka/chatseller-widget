@@ -8,14 +8,14 @@
         :class="{ 'cs-mobile': isMobile }"
         @click.self="closeChatOnOverlay"
       >
-        <!-- ✅ INTERFACE DESKTOP - Large et moderne -->
+        <!-- ✅ INTERFACE DESKTOP -->
         <div 
           v-if="!isMobile"
           class="cs-chat-container-desktop"
           :style="containerStyles"
         >
           
-          <!-- ✅ HEADER DESKTOP avec avatar, nom, titre -->
+          <!-- ✅ HEADER DESKTOP -->
           <div class="cs-desktop-header" :style="headerStyles">
             <div class="cs-agent-info">
               <div class="cs-agent-avatar">
@@ -44,7 +44,7 @@
             </button>
           </div>
 
-          <!-- ✅ SECTION PRODUIT - Nom et prix sans mention "produit consulté" -->
+          <!-- ✅ SECTION PRODUIT -->
           <div
             v-if="productInfo"
             class="cs-product-section"
@@ -58,7 +58,7 @@
             </div>
           </div>
 
-          <!-- ✅ ZONE DE CHAT - Plus grande pour desktop -->
+          <!-- ✅ ZONE DE CHAT -->
           <div ref="messagesContainer" class="cs-messages-area-desktop">
             <div class="cs-messages-list">
               <div
@@ -86,7 +86,7 @@
                     <div class="cs-message-time">{{ formatTime(message.timestamp) }}</div>
                   </div>
                   <div class="cs-user-avatar" :style="{ backgroundColor: primaryColor }">
-                    <span>{{ agentName.charAt(0).toUpperCase() }}</span>
+                    <span>{{ getUserInitial() }}</span>
                   </div>
                 </div>
               </div>
@@ -112,7 +112,7 @@
             </div>
           </div>
 
-          <!-- ✅ RÉPONSES PRÉDÉFINIES - Affichées au début -->
+          <!-- ✅ RÉPONSES PRÉDÉFINIES -->
           <div v-if="showQuickReplies" class="cs-quick-replies-desktop">
             <div class="cs-replies-grid">
               <button
@@ -128,7 +128,7 @@
             </div>
           </div>
 
-          <!-- ✅ FOOTER INPUT avec micro et bouton d'envoi -->
+          <!-- ✅ FOOTER INPUT -->
           <div class="cs-input-section-desktop">
             <div class="cs-input-container">
               <div class="cs-input-wrapper">
@@ -140,7 +140,6 @@
                   :disabled="isTyping || isLoading"
                 />
                 
-                <!-- Bouton micro -->
                 <button class="cs-voice-button" :style="{ color: primaryColor }">
                   <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
@@ -148,7 +147,6 @@
                 </button>
               </div>
               
-              <!-- Bouton d'envoi -->
               <button
                 @click="sendMessage"
                 :disabled="!currentMessage.trim() || isTyping || isLoading"
@@ -164,7 +162,6 @@
               </button>
             </div>
             
-            <!-- Footer info -->
             <div class="cs-footer-info">
               <span>Propulsé par <strong :style="{ color: primaryColor }">ChatSeller</strong></span>
               <span class="cs-security">🔒 Conversation sécurisée</span>
@@ -172,7 +169,7 @@
           </div>
         </div>
 
-        <!-- ✅ INTERFACE MOBILE - Plein écran -->
+        <!-- ✅ INTERFACE MOBILE -->
         <div 
           v-else
           class="cs-chat-container-mobile"
@@ -310,6 +307,44 @@
 import { ref, computed, onMounted, nextTick, watch } from 'vue'
 import { v4 as uuidv4 } from 'uuid'
 
+// ✅ PROPS CORRIGÉES AVEC VALEURS PAR DÉFAUT
+interface Props {
+  config?: {
+    shopId?: string
+    apiUrl?: string
+    agentConfig?: {
+      id?: string
+      name?: string
+      title?: string
+      avatar?: string
+      welcomeMessage?: string
+      fallbackMessage?: string
+      personality?: string
+    }
+    primaryColor?: string
+    buttonText?: string
+    language?: string
+    productId?: string
+    productName?: string
+    productPrice?: number
+    productUrl?: string
+  }
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  config: () => ({
+    shopId: 'demo',
+    apiUrl: 'https://chatseller-api-production.up.railway.app',
+    agentConfig: {
+      name: 'Assistant',
+      title: 'Conseiller commercial'
+    },
+    primaryColor: '#3B82F6',
+    buttonText: 'Parler à un conseiller',
+    language: 'fr'
+  })
+})
+
 interface Message {
   id: string
   role: 'user' | 'assistant'
@@ -323,13 +358,8 @@ interface QuickReply {
   icon: string
 }
 
-// Props
-const props = defineProps<{
-  config: any
-}>()
-
 // State
-const isOpen = ref(true) // ✅ Ouvert par défaut pour le test
+const isOpen = ref(true)
 const messages = ref<Message[]>([])
 const currentMessage = ref('')
 const isTyping = ref(false)
@@ -340,7 +370,9 @@ const mobileMessagesContainer = ref<HTMLElement>()
 const messagesEndRef = ref<HTMLElement>()
 const mobileMessagesEndRef = ref<HTMLElement>()
 
-// Computed
+// ✅ COMPUTED AVEC SÉCURITÉ
+const configData = computed(() => props.config || {})
+
 const isMobile = computed(() => {
   if (typeof window !== 'undefined') {
     return window.innerWidth < 768
@@ -349,34 +381,33 @@ const isMobile = computed(() => {
 })
 
 const agentName = computed(() => {
-  return props.config.agentConfig?.name || 'Assistant'
+  return configData.value.agentConfig?.name || 'Assistant'
 })
 
 const agentTitle = computed(() => {
-  // ✅ CORRECTION: Utiliser le titre personnalisé s'il existe
-  return props.config.agentConfig?.title || 'Conseiller commercial'
+  return configData.value.agentConfig?.title || 'Conseiller commercial'
 })
 
 const agentAvatar = computed(() => {
-  if (props.config.agentConfig?.avatar) {
-    return props.config.agentConfig.avatar
+  if (configData.value.agentConfig?.avatar) {
+    return configData.value.agentConfig.avatar
   }
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(agentName.value)}&background=${primaryColor.value.replace('#', '')}&color=fff&size=128`
 })
 
 const productInfo = computed(() => {
-  if (props.config.productName || props.config.productPrice) {
+  if (configData.value.productName || configData.value.productPrice) {
     return {
-      name: props.config.productName,
-      price: props.config.productPrice,
-      url: props.config.productUrl,
-      id: props.config.productId
+      name: configData.value.productName,
+      price: configData.value.productPrice,
+      url: configData.value.productUrl,
+      id: configData.value.productId
     }
   }
   return null
 })
 
-const primaryColor = computed(() => props.config.primaryColor || '#3B82F6')
+const primaryColor = computed(() => configData.value.primaryColor || '#3B82F6')
 
 const showQuickReplies = computed(() => {
   return messages.value.length <= 1 && !isTyping.value
@@ -429,17 +460,16 @@ const sendButtonStyles = computed(() => ({
   background: `linear-gradient(135deg, ${primaryColor.value} 0%, ${adjustColor(primaryColor.value, -15)} 100%)`
 }))
 
-// Methods
+// ✅ MÉTHODE AMÉLIORÉE : Envoi du message d'accueil
 const sendWelcomeMessage = async () => {
   try {
-    // ✅ GÉNÉRER MESSAGE D'ACCUEIL CONTEXTUEL AUTOMATIQUE (SANS RÉPÉTITION)
     let welcomeMessage = ''
     
-    // ✅ CORRECTION: Utiliser directement le welcomeMessage de la config si disponible
-    if (props.config.agentConfig?.welcomeMessage) {
-      welcomeMessage = props.config.agentConfig.welcomeMessage
+    // ✅ UTILISER LE WELCOMEMESSAGE DE LA CONFIG
+    if (configData.value.agentConfig?.welcomeMessage) {
+      welcomeMessage = configData.value.agentConfig.welcomeMessage
     } else {
-      // ✅ Fallback seulement si pas de welcomeMessage configuré
+      // ✅ GÉNÉRER MESSAGE CONTEXTUEL
       if (productInfo.value?.name) {
         welcomeMessage = `Bonjour ! 👋 Je suis ${agentName.value}, ${agentTitle.value}.
 
@@ -466,6 +496,7 @@ Comment puis-je vous aider aujourd'hui ? 😊`
   }
 }
 
+// ✅ MÉTHODE AMÉLIORÉE : Envoi de message
 const sendMessage = async () => {
   if (!currentMessage.value.trim() || isTyping.value || isLoading.value) return
 
@@ -485,46 +516,27 @@ const sendMessage = async () => {
   scrollToBottom()
 
   try {
-    // ✅ APPEL À L'API RÉELLE AVEC GESTION CORRECTE DU CONTEXT
-    const chatSeller = (window as any).ChatSeller
-    if (chatSeller) {
-      const response = await chatSeller.sendMessage(messageContent, conversationId.value, {
-        productInfo: productInfo.value,
-        // ✅ IMPORTANT: Ne pas renvoyer le welcomeMessage dans le contexte
-        isFollowUp: messages.value.length > 2 // Indique que ce n'est pas le premier échange
-      })
+    // ✅ APPEL API AVEC CONFIG CORRECTE
+    const response = await sendApiMessage(messageContent)
+    
+    if (response.success) {
+      conversationId.value = response.data.conversationId
       
-      if (response.success) {
-        conversationId.value = response.data.conversationId
-        
-        // ✅ VÉRIFICATION: Ne pas ajouter le message si c'est une répétition du welcome
-        let aiMessageContent = response.data.message
-        
-        // ✅ FILTRE ANTI-RÉPÉTITION: Éviter que l'IA répète le message d'accueil
-        const welcomeMsg = props.config.agentConfig?.welcomeMessage || ''
-        if (welcomeMsg && aiMessageContent.includes(welcomeMsg.substring(0, 50))) {
-          console.warn('⚠️ Répétition message d\'accueil détectée, utilisation fallback')
-          aiMessageContent = getIntelligentResponse(messageContent)
-        }
-        
-        const aiMessage: Message = {
-          id: uuidv4(),
-          role: 'assistant',
-          content: aiMessageContent,
-          timestamp: new Date()
-        }
-        messages.value.push(aiMessage)
-      } else {
-        throw new Error('Erreur API')
+      const aiMessage: Message = {
+        id: uuidv4(),
+        role: 'assistant',
+        content: response.data.message,
+        timestamp: new Date()
       }
+      messages.value.push(aiMessage)
     } else {
-      throw new Error('SDK non disponible')
+      throw new Error('Erreur API')
     }
 
   } catch (error: any) {
     console.error('❌ Erreur envoi message:', error)
     
-    // ✅ RÉPONSE SIMULÉE INTELLIGENTE
+    // ✅ RÉPONSE SIMULÉE
     const aiMessage: Message = {
       id: uuidv4(),
       role: 'assistant',
@@ -540,12 +552,41 @@ const sendMessage = async () => {
   }
 }
 
+// ✅ NOUVELLE MÉTHODE : Appel API structuré
+const sendApiMessage = async (message: string) => {
+  const payload = {
+    shopId: configData.value.shopId || 'demo',
+    message,
+    conversationId: conversationId.value,
+    productInfo: productInfo.value ? {
+      id: productInfo.value.id,
+      name: productInfo.value.name,
+      price: productInfo.value.price,
+      url: productInfo.value.url
+    } : null,
+    visitorId: `visitor_${Date.now()}`,
+    isFirstMessage: messages.value.length <= 2
+  }
+
+  const response = await fetch(`${configData.value.apiUrl}/public/chat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+
+  if (!response.ok) {
+    throw new Error(`API Error: ${response.status}`)
+  }
+
+  return await response.json()
+}
+
 const sendQuickReply = (replyText: string) => {
   currentMessage.value = replyText
   sendMessage()
 }
 
-// ✅ RÉPONSE SIMULÉE INTELLIGENTE EN ATTENDANT L'IA
+// ✅ RÉPONSE SIMULÉE INTELLIGENTE
 const getIntelligentResponse = (message: string): string => {
   const msg = message.toLowerCase()
   const productName = productInfo.value?.name || 'ce produit'
@@ -581,7 +622,6 @@ Souhaitez-vous passer commande ? 🛒`
     return `Je vérifie le prix pour vous... Un instant ! ⏳`
   }
   
-  // Réponse générique engageante
   return `Merci pour votre question ! 😊
 
 Je vous mets en relation avec notre équipe pour vous donner les informations les plus précises sur **${productName}**.
@@ -591,7 +631,10 @@ Y a-t-il autre chose que je puisse vous aider en attendant ? 💬`
 
 const closeChat = () => {
   isOpen.value = false
-  // Emit event to parent
+  // ✅ Fermer via le parent si possible
+  if (typeof window !== 'undefined' && (window as any).ChatSeller) {
+    (window as any).ChatSeller.destroy()
+  }
 }
 
 const closeChatOnOverlay = () => {
@@ -621,6 +664,10 @@ const formatPrice = (price: number) => {
     currency: 'XOF',
     minimumFractionDigits: 0
   }).format(price)
+}
+
+const getUserInitial = () => {
+  return 'V' // V pour Visiteur
 }
 
 const handleAvatarError = (event: Event) => {
@@ -663,20 +710,19 @@ watch(messages, () => {
 }, { deep: true })
 
 onMounted(() => {
-  // ✅ ENVOYER MESSAGE D'ACCUEIL AUTOMATIQUEMENT
+  console.log('🎨 Composant Vue monté avec config:', configData.value)
   sendWelcomeMessage()
 })
 </script>
 
 <style scoped>
-/* ✅ BASE STYLES ISOLÉS */
+/* ✅ STYLES CSS IDENTIQUES - Version optimisée */
 .cs-chatseller-widget,
 .cs-chatseller-widget * {
   box-sizing: border-box;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* ✅ MODAL OVERLAY */
 .cs-chat-modal-overlay {
   position: fixed;
   top: 0;
@@ -698,9 +744,8 @@ onMounted(() => {
   justify-content: stretch;
 }
 
-/* ✅ CONTAINER DESKTOP - Plus large */
 .cs-chat-container-desktop {
-  width: 520px; /* ✅ Plus large que 480px */
+  width: 520px;
   height: 680px;
   max-height: 90vh;
   border-radius: 20px;
@@ -712,7 +757,6 @@ onMounted(() => {
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* ✅ HEADER DESKTOP */
 .cs-desktop-header {
   padding: 24px;
   color: white;
@@ -806,7 +850,6 @@ onMounted(() => {
   transform: rotate(90deg);
 }
 
-/* ✅ SECTION PRODUIT */
 .cs-product-section {
   padding: 16px 24px;
   border-bottom: 1px solid #e2e8f0;
@@ -834,7 +877,6 @@ onMounted(() => {
   margin-left: 16px;
 }
 
-/* ✅ ZONE DE CHAT DESKTOP - Plus grande */
 .cs-messages-area-desktop {
   flex: 1;
   background: linear-gradient(to bottom, #f8fafc 0%, #ffffff 100%);
@@ -932,7 +974,6 @@ onMounted(() => {
   padding: 0 4px;
 }
 
-/* ✅ TYPING INDICATOR */
 .cs-typing-content {
   background: white;
   border: 1px solid #e2e8f0;
@@ -965,7 +1006,6 @@ onMounted(() => {
   font-style: italic;
 }
 
-/* ✅ RÉPONSES RAPIDES DESKTOP */
 .cs-quick-replies-desktop {
   padding: 20px 24px;
   border-top: 1px solid #e2e8f0;
@@ -1003,7 +1043,6 @@ onMounted(() => {
   font-size: 16px;
 }
 
-/* ✅ INPUT SECTION DESKTOP */
 .cs-input-section-desktop {
   padding: 20px 24px;
   border-top: 1px solid #e2e8f0;
@@ -1394,7 +1433,6 @@ onMounted(() => {
   to { transform: rotate(360deg); }
 }
 
-/* ✅ TRANSITIONS */
 .cs-modal-enter-active {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -1413,7 +1451,6 @@ onMounted(() => {
   transform: scale(0.95) translateY(-20px);
 }
 
-/* ✅ SCROLLBAR */
 .cs-messages-area-desktop::-webkit-scrollbar,
 .cs-messages-area-mobile::-webkit-scrollbar {
   width: 6px;
@@ -1430,7 +1467,6 @@ onMounted(() => {
   border-radius: 3px;
 }
 
-/* ✅ RESPONSIVE */
 @media (max-width: 640px) {
   .cs-chat-container-desktop {
     width: 100%;
