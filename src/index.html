@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChatSeller Widget CDN</title>
+  <meta name="description" content="Widget ChatSeller - Agent IA Commercial pour e-commerce">
+  <meta name="robots" content="noindex, nofollow">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-align: center;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .container {
+      max-width: 600px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    h1 { font-size: 2.5rem; margin-bottom: 1rem; }
+    p { font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9; }
+    .status { 
+      display: inline-block;
+      background: #10B981;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      margin-bottom: 2rem;
+    }
+    .code {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 20px;
+      border-radius: 10px;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 14px;
+      text-align: left;
+      margin: 20px 0;
+      word-break: break-all;
+    }
+    .footer {
+      margin-top: 2rem;
+      opacity: 0.7;
+      font-size: 0.9rem;
+    }
+    .version {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 5px 10px;
+      border-radius: 15px;
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🤖 ChatSeller Widget CDN</h1>
+    <div class="status">✅ Widget actif</div>
+    <p>Le widget ChatSeller est opérationnel et prêt à être intégré sur votre site e-commerce.</p>
+    
+    <h3>📡 Intégration</h3>
+    <div class="code">
+&lt;script src="https://widget.chatseller.app/embed.js"&gt;&lt;/script&gt;
+    </div>
+    
+    <div class="footer">
+      <p>
+        <strong>Documentation :</strong> <a href="https://docs.chatseller.app" style="color: #fff;">docs.chatseller.app</a><br>
+        <strong>Dashboard :</strong> <a href="https://dashboard.chatseller.app" style="color: #fff;">dashboard.chatseller.app</a>
+      </p>
+    </div>
+  </div>
+
+  <div class="version">v1.0.0</div>
+
+  <script>
+    // Test de chargement du widget
+    console.log('🤖 ChatSeller Widget CDN - Version 1.0.0');
+    console.log('📡 URL:', window.location.href);
+    console.log('🔗 Widget disponible à:', window.location.origin + '/embed.js');
+    
+    // Test de santé
+    fetch('/embed.js')
+      .then(response => {
+        if (response.ok) {
+          console.log('✅ embed.js accessible');
+        } else {
+          console.error('❌ embed.js non accessible');
+        }
+      })
+      .catch(error => {
+        console.error('❌ Erreur test embed.js:', error);
+      });
+  </script>
+</body>
+</html>

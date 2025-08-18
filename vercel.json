@@ -13,16 +13,20 @@
   "routes": [
     {
       "src": "/embed.js",
-      "dest": "/dist/embed.js",
+      "dest": "/embed.js",
       "headers": {
-        "Content-Type": "application/javascript",
+        "Content-Type": "application/javascript; charset=utf-8",
         "Cache-Control": "public, max-age=86400",
         "Access-Control-Allow-Origin": "*"
       }
     },
     {
-      "src": "/dist/(.*)",
-      "dest": "/dist/$1"
+      "src": "/(.*\\.(js|css|json|ico|png|jpg|jpeg|gif|svg))",
+      "dest": "/$1",
+      "headers": {
+        "Cache-Control": "public, max-age=86400",
+        "Access-Control-Allow-Origin": "*"
+      }
     },
     {
       "src": "/(.*)",

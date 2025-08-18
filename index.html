@@ -3,78 +3,1139 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChatSeller Widget - Agent IA Commercial</title>
+  <title>Test ChatSeller Widget - Interface 450px Moderne</title>
+  
+  <!-- Meta tags pour simulation e-commerce -->
+  <meta property="og:title" content="iPhone 15 Pro - Boutique Test ChatSeller">
+  <meta property="og:description" content="Le dernier iPhone avec puce A17 Pro - Test ChatSeller Widget">
+  <meta property="og:price:amount" content="1199">
+  <meta property="og:price:currency" content="EUR">
+  <meta property="og:image" content="https://cdn.chatseller.app/demo/iphone-15-pro.jpg">
+  
+  <!-- Schema.org pour tests -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": "iPhone 15 Pro",
+    "description": "iPhone 15 Pro avec puce A17 Pro révolutionnaire",
+    "sku": "IPHONE15PRO",
+    "brand": {
+      "@type": "Brand",
+      "name": "Apple"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "1199",
+      "priceCurrency": "EUR",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+  </script>
+  
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      line-height: 1.6;
+      color: #333;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
       min-height: 100vh;
+    }
+
+    .header {
+      background: white;
+      padding: 1rem 0;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 2rem;
+      font-weight: bold;
+      background: linear-gradient(135deg, #007AFF, #5856D6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav {
+      display: flex;
+      list-style: none;
+      gap: 2rem;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: #666;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav a:hover {
+      color: #007AFF;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .test-banner {
+      background: linear-gradient(135deg, #007AFF, #5856D6);
+      color: white;
+      padding: 2rem;
+      border-radius: 16px;
+      margin-bottom: 2rem;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(0, 122, 255, 0.3);
+    }
+
+    .test-banner h2 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+
+    .test-banner p {
+      opacity: 0.9;
+      font-size: 1.1rem;
+    }
+
+    .widget-info {
+      background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+      border: 2px solid #007AFF;
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .widget-info h3 {
+      color: #007AFF;
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .widget-info ul {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.5rem;
+      text-align: left;
+    }
+
+    .widget-info li {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #555;
+      font-size: 0.9rem;
+    }
+
+    .widget-info li:before {
+      content: "✅";
+      font-size: 1rem;
+    }
+
+    .product-section {
+      background: white;
+      border-radius: 20px;
+      padding: 3rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .product-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #007AFF, #5856D6, #FF3B30, #FF9500);
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    .product-image {
+      width: 100%;
+      height: 450px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
       display: flex;
       align-items: center;
       justify-content: center;
       color: white;
+      font-size: 1.2rem;
+      font-weight: bold;
       text-align: center;
-      margin: 0;
+      box-shadow: 0 15px 35px rgba(0, 122, 255, 0.3);
+      position: relative;
     }
-    .container {
-      max-width: 600px;
-      padding: 2rem;
+
+    .product-image::after {
+      content: '';
+      position: absolute;
+      top: 20%;
+      left: 20%;
+      width: 60%;
+      height: 60%;
       background: rgba(255, 255, 255, 0.1);
       border-radius: 20px;
       backdrop-filter: blur(10px);
     }
-    h1 { font-size: 2.5rem; margin-bottom: 1rem; }
-    .status { margin: 2rem 0; padding: 1rem; border-radius: 12px; }
-    .success { background: rgba(34, 197, 94, 0.2); border: 1px solid rgba(34, 197, 94, 0.3); }
-    .error { background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.3); }
-    .btn {
-      display: inline-block;
-      padding: 1rem 2rem;
-      background: linear-gradient(45deg, #007AFF, #0051D5);
-      color: white;
-      text-decoration: none;
-      border-radius: 12px;
-      margin: 0.5rem;
-      font-weight: 600;
+
+    .product-info h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      color: #1a1a1a;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
     }
+
+    .product-rating {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stars {
+      display: flex;
+      gap: 2px;
+    }
+
+    .star {
+      color: #fbbf24;
+      font-size: 1.4rem;
+    }
+
+    .rating-text {
+      color: #666;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .price {
+      font-size: 2.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #007AFF, #5856D6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1.5rem;
+    }
+
+    .description {
+      color: #555;
+      line-height: 1.8;
+      margin-bottom: 2rem;
+      font-size: 1.1rem;
+    }
+
+    .features {
+      margin-bottom: 2rem;
+    }
+
+    .features h3 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: #1a1a1a;
+    }
+
+    .features ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .features li {
+      padding: 0.75rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: #555;
+      font-size: 1rem;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .features li:last-child {
+      border-bottom: none;
+    }
+
+    .features li:before {
+      content: "✓";
+      color: #34D399;
+      font-weight: bold;
+      font-size: 1.2rem;
+      width: 24px;
+      height: 24px;
+      background: #ecfdf5;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .product-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .quantity-selector {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .quantity-controls {
+      display: flex;
+      align-items: center;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      overflow: hidden;
+      background: white;
+    }
+
+    .quantity-btn {
+      background: #f8f9fa;
+      border: none;
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      font-size: 1.4rem;
+      font-weight: bold;
+      transition: all 0.3s;
+      color: #007AFF;
+    }
+
+    .quantity-btn:hover {
+      background: #007AFF;
+      color: white;
+    }
+
+    .quantity-input {
+      border: none;
+      padding: 0.75rem;
+      width: 80px;
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: 600;
+      background: #f8f9fa;
+    }
+
+    .btn {
+      padding: 1.2rem 2rem;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.6s;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #1a1a1a, #333);
+      color: white;
+      box-shadow: 0 8px 25px rgba(26, 26, 26, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #333, #1a1a1a);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 35px rgba(26, 26, 26, 0.4);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #007AFF, #5856D6);
+      color: white;
+      box-shadow: 0 8px 25px rgba(0, 122, 255, 0.3);
+    }
+
+    .btn-secondary:hover {
+      background: linear-gradient(135deg, #5856D6, #007AFF);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 35px rgba(0, 122, 255, 0.4);
+    }
+
+    /* ✅ CONTAINER DÉDIÉ POUR WIDGET */
+    .widget-container {
+      margin: 1.5rem 0;
+      position: relative;
+      z-index: 1000;
+    }
+
+    /* ✅ WIDGET DEBUG AREA MODERNISÉE */
+    .widget-debug {
+      background: linear-gradient(135deg, white, #f8fafc);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      border: 1px solid #e2e8f0;
+    }
+
+    .widget-debug h3 {
+      color: #1a1a1a;
+      font-size: 1.4rem;
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+    }
+
+    .debug-controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .debug-btn {
+      padding: 1rem;
+      border: 2px solid #007AFF;
+      background: white;
+      color: #007AFF;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .debug-btn:hover {
+      background: #007AFF;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 122, 255, 0.3);
+    }
+
+    .debug-info {
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      border: 2px solid #dee2e6;
+      border-radius: 12px;
+      padding: 1.5rem;
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      font-size: 0.85rem;
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow-y: auto;
+      color: #495057;
+      line-height: 1.5;
+    }
+
+    .status-indicators {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .status-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border: 1px solid #e2e8f0;
+    }
+
+    .status-card h4 {
+      font-size: 0.8rem;
+      color: #666;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-value {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+
+    .status-value.success {
+      color: #16a34a;
+    }
+
+    .status-value.error {
+      color: #dc2626;
+    }
+
+    .status-value.warning {
+      color: #d97706;
+    }
+
+    @media (max-width: 768px) {
+      .product-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      
+      .product-info h1 {
+        font-size: 2.2rem;
+      }
+      
+      .debug-controls {
+        grid-template-columns: 1fr;
+      }
+
+      .status-indicators {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* ✅ ANIMATIONS MODERNES */
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .container > * {
+      animation: slideIn 0.6s ease-out;
+    }
+
+    .container > *:nth-child(1) { animation-delay: 0.1s; }
+    .container > *:nth-child(2) { animation-delay: 0.2s; }
+    .container > *:nth-child(3) { animation-delay: 0.3s; }
+    .container > *:nth-child(4) { animation-delay: 0.4s; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🚀 ChatSeller Widget</h1>
-    <p>Agent IA Commercial • Performance Optimisée</p>
-    
-    <div id="status" class="status">
-      <p>🔄 Test de connectivité...</p>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">📱 TechStore Pro</div>
+      <nav>
+        <ul class="nav">
+          <li><a href="#accueil">Accueil</a></li>
+          <li><a href="#produits">Produits</a></li>
+          <li><a href="#contact">Contact</a></li>
+          <li><a href="#panier">Panier (0)</a></li>
+        </ul>
+      </nav>
     </div>
-    
-    <div>
-      <a href="https://dashboard.chatseller.app" class="btn">🤖 Dashboard</a>
-      <a href="https://docs.chatseller.app" class="btn">📖 Documentation</a>
+  </header>
+
+  <!-- Container principal -->
+  <div class="container">
+    <!-- Bannière de test -->
+    <div class="test-banner">
+      <h2>🚀 TEST CHATSELLER WIDGET - INTERFACE 450PX MODERNE</h2>
+      <p>Nouvelle interface élargie avec connexion Agent IA + Base de connaissance</p>
+    </div>
+
+    <!-- Informations Widget -->
+    <div class="widget-info">
+      <h3>🎯 Nouvelles Fonctionnalités Testées</h3>
+      <ul>
+        <li>Interface élargie à 450px (vs 384px)</li>
+        <li>Connexion Agent Dashboard → Widget</li>
+        <li>Base de connaissance intégrée</li>
+        <li>Détection automatique produit</li>
+        <li>Design moderne avec gradients</li>
+        <li>Collecte commandes conversationnelle</li>
+        <li>Analytics et tracking améliorés</li>
+        <li>Responsive mobile fullscreen</li>
+      </ul>
+    </div>
+
+    <!-- Status en temps réel -->
+    <div class="status-indicators">
+      <div class="status-card">
+        <h4>Widget Status</h4>
+        <div id="widget-status" class="status-value">Chargement...</div>
+      </div>
+      <div class="status-card">
+        <h4>API Connection</h4>
+        <div id="api-status" class="status-value">Test...</div>
+      </div>
+      <div class="status-card">
+        <h4>Agent Config</h4>
+        <div id="agent-status" class="status-value">Vérification...</div>
+      </div>
+      <div class="status-card">
+        <h4>Interface Size</h4>
+        <div class="status-value success">450px</div>
+      </div>
+    </div>
+
+    <!-- Section produit simulé -->
+    <div class="product-section">
+      <div class="product-grid">
+        <!-- Image produit -->
+        <div class="product-image">
+          📱<br>iPhone 15 Pro<br>(Image Produit Demo)
+        </div>
+
+        <!-- Informations produit -->
+        <div class="product-info">
+          <h1>iPhone 15 Pro</h1>
+          
+          <div class="product-rating">
+            <div class="stars">
+              <span class="star">★</span>
+              <span class="star">★</span>
+              <span class="star">★</span>
+              <span class="star">★</span>
+              <span class="star">★</span>
+            </div>
+            <span class="rating-text">(1,234 avis vérifiés)</span>
+          </div>
+
+          <div class="price">1 199 €</div>
+
+          <div class="description">
+            <p>iPhone 15 Pro avec puce A17 Pro révolutionnaire, système de caméra Pro avancé, boîtier en titane de qualité aérospatiale et bouton Action personnalisable. Conçu pour les pros.</p>
+          </div>
+
+          <div class="features">
+            <h3>Caractéristiques principales :</h3>
+            <ul>
+              <li>Puce A17 Pro avec GPU 6 cœurs pour performances extrêmes</li>
+              <li>Écran Super Retina XDR 6,1" ProMotion 120Hz</li>
+              <li>Système caméra Pro 48 Mpx avec zoom optique 3x</li>
+              <li>Boîtier en titane de qualité aérospatiale</li>
+              <li>USB-C avec support Thunderbolt et USB 3</li>
+              <li>Bouton Action personnalisable pour raccourcis</li>
+            </ul>
+          </div>
+
+          <div class="product-actions">
+            <div class="quantity-selector">
+              <label><strong>Quantité :</strong></label>
+              <div class="quantity-controls">
+                <button class="quantity-btn" onclick="changeQuantity(-1)">−</button>
+                <input type="number" id="quantity" class="quantity-input" value="1" min="1" max="5">
+                <button class="quantity-btn" onclick="changeQuantity(1)">+</button>
+              </div>
+            </div>
+
+            <!-- ✅ CONTAINER DÉDIÉ POUR LE WIDGET ÉLARGI -->
+            <div id="chatseller-widget-container" class="widget-container">
+              <!-- Le widget ChatSeller 450px sera inséré automatiquement ici -->
+              <div id="chatseller-widget" style="width: 100%;"></div>
+            </div>
+
+            <!-- Boutons CTA principaux -->
+            <button id="add-to-cart-btn" class="btn btn-primary" onclick="addToCart()">
+              🛒 Ajouter au panier
+            </button>
+
+            <button id="buy-now-btn" class="btn btn-secondary" onclick="buyNow()">
+              ⚡ Acheter maintenant
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Debug du widget moderne -->
+    <div class="widget-debug">
+      <h3>🔧 Outils de Debug Widget 450px</h3>
+      
+      <div class="debug-controls">
+        <button class="debug-btn" onclick="testWidgetLoad()">
+          🔌 Tester Chargement
+        </button>
+        <button class="debug-btn" onclick="showWidgetDebug()">
+          🐛 Debug Info
+        </button>
+        <button class="debug-btn" onclick="testAgentConnection()">
+          🤖 Test Agent IA
+        </button>
+        <button class="debug-btn" onclick="testProductDetection()">
+          🔍 Détection Produit
+        </button>
+        <button class="debug-btn" onclick="openWidgetChat()">
+          💬 Ouvrir Chat
+        </button>
+        <button class="debug-btn" onclick="testWidgetAPI()">
+          🌐 Test API
+        </button>
+        <button class="debug-btn" onclick="simulateOrder()">
+          🛒 Simuler Commande
+        </button>
+        <button class="debug-btn" onclick="reloadWidget()">
+          🔄 Recharger
+        </button>
+      </div>
+      
+      <div id="debug-output" class="debug-info" style="display: none;">
+        Informations de debug s'afficheront ici...
+      </div>
     </div>
   </div>
 
+  <!-- ✅ WIDGET CHATSELLER - CONFIGURATION COMPLÈTE POUR 450PX -->
   <script>
-    // Test de connectivité
-    async function testWidget() {
-      const statusEl = document.getElementById('status');
-      
-      try {
-        const response = await fetch('/embed.js');
-        if (response.ok) {
-          statusEl.className = 'status success';
-          statusEl.innerHTML = '<p>✅ <strong>Widget opérationnel!</strong></p><p>Prêt pour intégration e-commerce</p>';
-        } else {
-          throw new Error('File not found');
-        }
-      } catch (error) {
-        statusEl.className = 'status error';
-        statusEl.innerHTML = '<p>❌ <strong>Widget en cours de déploiement</strong></p><p>Veuillez patienter quelques minutes</p>';
+    // Configuration globale pour le widget avec agent
+    window.ChatSellerConfig = {
+      shopId: "12345678-1234-1234-1234-123456789abc", // UUID de test
+      apiUrl: "https://chatseller-api-production.up.railway.app", // ✅ URL API Production
+      theme: "modern",
+      primaryColor: "#007AFF",
+      position: "above-cta", // above-cta, below-cta, beside-cta  
+      buttonText: "💬 Parler à un conseiller IA",
+      language: "fr",
+      autoDetectProduct: true,
+      // ✅ Configuration pour forcer le positionnement
+      forceContainer: "chatseller-widget", // ID du container dédié
+      debug: true, // Activer le mode debug
+
+      // ✅ NOUVELLE CONFIG POUR AGENT (sera fusionnée avec API)
+      agentConfig: {
+        name: "Sophie",
+        title: "Conseillère Commercial IA", 
+        welcomeMessage: "Bonjour ! Je suis Sophie, votre conseillère IA spécialisée en iPhone. Comment puis-je vous aider aujourd'hui ?",
+        fallbackMessage: "Je transmets votre question à notre équipe technique, un conseiller vous recontactera rapidement."
+      }
+    };
+
+    console.log('🔧 Configuration widget 450px:', window.ChatSellerConfig);
+    
+    // ✅ STATUS TRACKING EN TEMPS RÉEL
+    function updateStatus(elementId, text, type = 'success') {
+      const element = document.getElementById(elementId);
+      if (element) {
+        element.textContent = text;
+        element.className = `status-value ${type}`;
       }
     }
-    
-    // Test au chargement
-    document.addEventListener('DOMContentLoaded', testWidget);
+
+    // ✅ INITIALISATION STATUS
+    setTimeout(() => {
+      updateStatus('widget-status', 'Initialisé', 'success');
+    }, 1000);
+  </script>
+
+  <!-- ✅ CHARGEMENT MODULE TYPESCRIPT EN DÉVELOPPEMENT -->
+  <script type="module">
+    try {
+      console.log('🚀 Tentative de chargement du widget 450px...');
+      updateStatus('widget-status', 'Chargement...', 'warning');
+      
+      // ✅ Import du module TypeScript en développement
+      const { default: chatSeller } = await import('/src/embed.ts');
+      
+      console.log('✅ Module widget 450px chargé:', chatSeller);
+      updateStatus('widget-status', 'Module chargé', 'success');
+      
+      // ✅ Initialiser immédiatement
+      if (chatSeller && typeof chatSeller.init === 'function') {
+        await chatSeller.init(window.ChatSellerConfig);
+        console.log('✅ Widget 450px initialisé avec succès');
+        updateStatus('widget-status', 'Initialisé 450px', 'success');
+        
+        // ✅ Tester connexion agent
+        if (chatSeller.isConfigLoaded) {
+          updateStatus('agent-status', 'Connecté', 'success');
+        } else {
+          updateStatus('agent-status', 'Config locale', 'warning');
+        }
+      } else {
+        console.error('❌ Module widget invalide');
+        updateStatus('widget-status', 'Erreur module', 'error');
+      }
+      
+    } catch (error) {
+      console.error('❌ Erreur lors du chargement du widget:', error);
+      updateStatus('widget-status', 'Erreur chargement', 'error');
+      
+      // ✅ Fallback : Créer un bouton de test simple
+      setTimeout(() => {
+        createFallbackWidget();
+      }, 1000);
+    }
+
+    // ✅ Test connexion API
+    async function testAPIConnection() {
+      try {
+        updateStatus('api-status', 'Test...', 'warning');
+        const response = await fetch('https://chatseller-api-production.up.railway.app/health');
+        if (response.ok) {
+          updateStatus('api-status', 'Connecté', 'success');
+        } else {
+          updateStatus('api-status', 'Erreur HTTP', 'error');
+        }
+      } catch (error) {
+        updateStatus('api-status', 'Hors ligne', 'error');
+      }
+    }
+
+    testAPIConnection();
+
+    // ✅ Fonction fallback pour créer un widget de test
+    function createFallbackWidget() {
+      const container = document.getElementById('chatseller-widget');
+      if (container && !container.hasChildNodes()) {
+        container.innerHTML = `
+          <button 
+            onclick="alert('Widget ChatSeller 450px de test - Nouvelle interface!')" 
+            style="
+              width: 100%;
+              padding: 16px 24px;
+              background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
+              color: white;
+              border: none;
+              border-radius: 12px;
+              font-size: 15px;
+              font-weight: 600;
+              cursor: pointer;
+              margin: 8px 0;
+              transition: all 0.3s;
+              box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            "
+            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 35px rgba(0, 0, 0, 0.25)'"
+            onmouseout="this.style.transform='translateY(0px)'; this.style.boxShadow='0 8px 25px rgba(0, 0, 0, 0.15)'"
+          >
+            💬 Parler à un conseiller IA (Test 450px)
+          </button>
+        `;
+        console.log('✅ Widget fallback 450px créé');
+        updateStatus('widget-status', 'Fallback 450px', 'warning');
+      }
+    }
+  </script>
+
+  <!-- Scripts de la page de test -->
+  <script>
+    let currentQuantity = 1;
+
+    // Fonctions de la boutique simulée
+    function changeQuantity(delta) {
+      const input = document.getElementById('quantity');
+      const newValue = parseInt(input.value) + delta;
+      if (newValue >= 1 && newValue <= 5) {
+        input.value = newValue;
+        currentQuantity = newValue;
+      }
+    }
+
+    function addToCart() {
+      showMessage(`${currentQuantity} x iPhone 15 Pro ajouté au panier !`, 'success');
+      
+      // Notifier le widget
+      if (window.ChatSeller) {
+        window.ChatSeller.track('add_to_cart', {
+          productName: 'iPhone 15 Pro',
+          quantity: currentQuantity,
+          price: 1199
+        });
+      }
+    }
+
+    function buyNow() {
+      showMessage(`Redirection vers le checkout pour ${currentQuantity} iPhone(s)`, 'info');
+      
+      // Notifier le widget
+      if (window.ChatSeller) {
+        window.ChatSeller.track('buy_now_clicked', {
+          productName: 'iPhone 15 Pro',
+          quantity: currentQuantity,
+          price: 1199
+        });
+      }
+    }
+
+    function showMessage(message, type = 'info') {
+      // Remove existing message
+      const existing = document.querySelector('.toast-message');
+      if (existing) existing.remove();
+
+      // Create new message
+      const toast = document.createElement('div');
+      toast.className = 'toast-message';
+      toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        color: white;
+        font-weight: 600;
+        z-index: 10000;
+        animation: slideIn 0.3s ease-out;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        background: ${type === 'success' ? 'linear-gradient(135deg, #10B981, #059669)' : 
+                    type === 'error' ? 'linear-gradient(135deg, #EF4444, #DC2626)' : 
+                    'linear-gradient(135deg, #007AFF, #0051D5)'};
+      `;
+      toast.textContent = message;
+
+      document.body.appendChild(toast);
+
+      // Auto remove
+      setTimeout(() => {
+        toast.style.animation = 'slideOut 0.3s ease-in';
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    // ✅ FONCTIONS DE DEBUG ÉTENDUES POUR 450PX
+    function testWidgetLoad() {
+      const debugOutput = document.getElementById('debug-output');
+      debugOutput.style.display = 'block';
+      
+      const container = document.getElementById('chatseller-widget');
+      const hasWidget = container && container.hasChildNodes();
+      
+      if (window.ChatSeller) {
+        const debugInfo = window.ChatSeller.getDebugInfo();
+        debugOutput.textContent = `✅ Widget 450px chargé avec succès !
+
+🔧 Informations Techniques:
+Version: ${window.ChatSeller.version || 'N/A'}
+Interface: 450px moderne (vs 384px ancien)
+État: ${window.ChatSeller.isReady ? 'Prêt' : 'En cours de chargement'}
+Agent configuré: ${debugInfo.agentConfig ? 'Oui' : 'Non'}
+Base de connaissance: ${debugInfo.agentConfig?.hasKnowledgeBase ? 'Intégrée' : 'Non'}
+
+🎨 Configuration Interface:
+Largeur: 450px (élargie)
+Hauteur: 650px (optimisée)
+Thème: ${debugInfo.config?.theme || 'modern'}
+Couleur primaire: ${debugInfo.config?.primaryColor || '#007AFF'}
+Position: ${debugInfo.config?.position || 'above-cta'}
+
+🤖 Agent IA:
+Nom: ${debugInfo.agentConfig?.name || 'Assistant'}
+ID: ${debugInfo.agentConfig?.id || 'N/A'}
+Messages count: ${debugInfo.messagesCount || 0}
+Conversation ID: ${debugInfo.conversationId || 'Aucune'}
+
+📊 État Container:
+Widget présent: ${hasWidget ? 'Oui' : 'Non'}
+Container ID: chatseller-widget
+Auto-détection produit: ${debugInfo.config?.autoDetectProduct ? 'Activée' : 'Désactivée'}
+
+${JSON.stringify(debugInfo, null, 2)}`;
+      } else {
+        debugOutput.textContent = `❌ Module principal non chargé
+
+🔍 Diagnostics:
+Container: ${hasWidget ? 'Widget fallback présent' : 'Aucun widget'}
+Interface cible: 450px moderne
+Config: ${JSON.stringify(window.ChatSellerConfig, null, 2)}
+
+🛠️ Vérifications nécessaires:
+1. Serveur de développement actif ? (npm run dev)
+2. Console pour erreurs ? (F12)
+3. Fichier embed.ts accessible ? (/src/embed.ts)
+4. Configuration API correcte ?
+
+📝 Configuration attendue:
+- Shop ID: ${window.ChatSellerConfig?.shopId}
+- API URL: ${window.ChatSellerConfig?.apiUrl}
+- Theme: ${window.ChatSellerConfig?.theme}`;
+      }
+    }
+
+    function showWidgetDebug() {
+      const debugOutput = document.getElementById('debug-output');
+      debugOutput.style.display = debugOutput.style.display === 'none' ? 'block' : 'none';
+      
+      if (window.ChatSeller && debugOutput.style.display === 'block') {
+        const debugInfo = window.ChatSeller.getDebugInfo ? window.ChatSeller.getDebugInfo() : {};
+        debugOutput.textContent = `🔧 Debug Info Widget 450px:\n\n${JSON.stringify(debugInfo, null, 2)}`;
+      }
+    }
+
+    function testAgentConnection() {
+      if (window.ChatSeller) {
+        const debugInfo = window.ChatSeller.getDebugInfo();
+        showMessage(
+          debugInfo.agentConfig ? 
+          `✅ Agent "${debugInfo.agentConfig.name}" connecté` : 
+          '⚠️ Agent en configuration locale', 
+          debugInfo.agentConfig ? 'success' : 'warning'
+        );
+      } else {
+        showMessage('❌ Widget non disponible', 'error');
+      }
+    }
+
+    function testProductDetection() {
+      if (window.ChatSeller) {
+        const config = window.ChatSeller.currentConfig;
+        if (config.productName || config.productId) {
+          showMessage(`🔍 Produit détecté: ${config.productName || config.productId}`, 'success');
+        } else {
+          showMessage('⚠️ Aucun produit détecté', 'warning');
+        }
+      } else {
+        showMessage('❌ Widget non disponible', 'error');
+      }
+    }
+
+    function simulateOrder() {
+      if (window.ChatSeller) {
+        window.ChatSeller.track('simulate_order_intent', {
+          productName: 'iPhone 15 Pro',
+          quantity: currentQuantity,
+          price: 1199,
+          testMode: true
+        });
+        showMessage('🛒 Simulation commande envoyée', 'success');
+      } else {
+        showMessage('❌ Widget non disponible', 'error');
+      }
+    }
+
+    function openWidgetChat() {
+      // ✅ Recherche améliorée du bouton widget
+      const selectors = [
+        '.cs-chat-trigger-button',
+        '[data-chatseller-trigger]',
+        '#chatseller-widget button',
+        '.chatseller-button'
+      ];
+      
+      let button = null;
+      for (const selector of selectors) {
+        button = document.querySelector(selector);
+        if (button) break;
+      }
+      
+      if (button) {
+        button.click();
+        showMessage('✅ Chat 450px ouvert', 'success');
+      } else {
+        // ✅ Forcer l'ouverture via API si disponible
+        if (window.ChatSeller && window.ChatSeller.show) {
+          window.ChatSeller.show();
+          showMessage('✅ Chat ouvert via API', 'success');
+        } else {
+          showMessage('❌ Bouton widget non trouvé', 'error');
+          console.log('🔍 Boutons disponibles:', document.querySelectorAll('button'));
+        }
+      }
+    }
+
+    async function testWidgetAPI() {
+      try {
+        updateStatus('api-status', 'Test...', 'warning');
+        const response = await fetch('https://chatseller-api-production.up.railway.app/health');
+        if (response.ok) {
+          const data = await response.json();
+          showMessage('✅ API ChatSeller accessible', 'success');
+          updateStatus('api-status', 'Connecté', 'success');
+          console.log('API Health:', data);
+        } else {
+          showMessage('⚠️ API répond avec erreur', 'error');
+          updateStatus('api-status', 'Erreur', 'error');
+        }
+      } catch (error) {
+        showMessage('❌ API inaccessible', 'error');
+        updateStatus('api-status', 'Hors ligne', 'error');
+        console.error('API Error:', error);
+      }
+    }
+
+    function reloadWidget() {
+      if (window.ChatSeller && window.ChatSeller.destroy) {
+        window.ChatSeller.destroy();
+      }
+      location.reload();
+    }
+
+    // ✅ INITIALISATION AUTOMATIQUE
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('🚀 Page de test ChatSeller 450px chargée');
+      console.log('🆔 Shop ID de test:', window.ChatSellerConfig?.shopId);
+      
+      // Ajouter styles d'animation
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes slideIn {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+          from { transform: translateX(0); opacity: 1; }
+          to { transform: translateX(100%); opacity: 0; }
+        }
+      `;
+      document.head.appendChild(style);
+      
+      // ✅ Debug automatique après chargement
+      setTimeout(() => {
+        testWidgetLoad();
+      }, 3000);
+    });
+
+    // ✅ Exposer les fonctions pour debug global
+    window.testChatSeller = {
+      load: testWidgetLoad,
+      debug: showWidgetDebug,
+      api: testWidgetAPI,
+      agent: testAgentConnection,
+      product: testProductDetection,
+      track: simulateOrder,
+      open: openWidgetChat,
+      reload: reloadWidget
+    };
   </script>
 </body>
 </html>
