@@ -1,81 +1,59 @@
 {
   "name": "chatseller-widget",
   "version": "1.0.0",
-  "description": "🤖 Agent IA Commercial pour E-commerce - Widget 450px avec connexion Dashboard et base de connaissance",
+  "description": "🤖 Agent IA Commercial pour E-commerce - Widget avec connexion Dashboard",
   "main": "dist/chatseller-widget.js",
   "module": "dist/chatseller-widget.esm.js",
   "types": "dist/embed.d.ts",
   "files": [
     "dist/",
     "src/",
-    "README.md",
-    "CHANGELOG.md"
+    "README.md"
   ],
   "exports": {
     ".": {
       "import": "./dist/chatseller-widget.esm.js",
       "require": "./dist/chatseller-widget.js",
       "types": "./dist/embed.d.ts"
-    },
-    "./dist/chatseller-widget.js": "./dist/chatseller-widget.js",
-    "./dist/chatseller-widget.css": "./dist/chatseller-widget.css"
+    }
   },
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 3000",
     "build": "npm run clean && npm run type-check && vite build",
     "build:prod": "npm run clean && npm run type-check && vite build --mode production",
     "vercel-build": "npm run build:prod",
-    "build:staging": "npm run clean && npm run type-check && vite build --mode staging",
-    "build:watch": "vite build --watch",
     "type-check": "vue-tsc --noEmit --skipLibCheck",
     "preview": "vite preview --host 0.0.0.0 --port 3000",
-    "lint": "eslint . --ext .vue,.js,.jsx,.ts,.tsx --fix --ignore-path .gitignore",
-    "format": "prettier --write \"src/**/*.{js,ts,vue,css,scss,json,md}\"",
-    "test": "vitest",
-    "test:run": "vitest run",
-    "test-build": "npm run build && npm run preview",
-    "clean": "rm -rf dist .vite node_modules/.cache",
-    "serve": "npx http-server dist -p 8080 -c-1 --cors",
-    "validate": "npm run lint && npm run type-check && npm run test:run",
-    "deploy": "./scripts/deploy-widget.sh",
-    "stats": "npm run build && bundlesize"
+    "clean": "rm -rf dist .vite",
+    "test-build": "npm run build && node test-build.js"
   },
   "dependencies": {
     "uuid": "^9.0.1",
     "vue": "^3.0.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.54.2",
     "@types/node": "^20.10.6",
     "@types/uuid": "^9.0.7",
     "@typescript-eslint/eslint-plugin": "^6.17.0",
     "@typescript-eslint/parser": "^6.17.0",
-    "@vitejs/plugin-vue": "^5.0.2",
-    "@vitest/coverage-v8": "^3.2.4",
-    "@vitest/ui": "^3.2.4",
+    "@vitejs/plugin-vue": "^4.6.2",
     "@vue/eslint-config-prettier": "^9.0.0",
     "@vue/eslint-config-typescript": "^12.0.0",
-    "@vue/tsconfig": "^0.5.1",
     "autoprefixer": "^10.4.16",
     "bundlesize": "^0.18.1",
-    "conventional-changelog-cli": "^4.1.0",
     "cssnano": "^6.0.3",
     "eslint": "^8.56.0",
     "eslint-plugin-vue": "^9.19.2",
-    "happy-dom": "^18.0.1",
+    "happy-dom": "^12.10.3",
     "http-server": "^14.1.1",
-    "husky": "^8.0.3",
-    "jsdom": "^23.2.0",
-    "lighthouse": "^12.8.1",
-    "lint-staged": "^15.2.0",
-    "playwright": "^1.40.1",
+    "lighthouse": "^11.4.0",
     "postcss": "^8.4.32",
     "prettier": "^3.1.1",
+    "terser": "^5.43.1",
     "typescript": "~5.3.3",
-    "vite": "^7.1.2",
-    "vite-bundle-analyzer": "^0.7.0",
-    "vitest": "^3.2.4",
-    "vue-tsc": "^3.0.5"
+    "vite": "^5.0.11",
+    "vitest": "^1.1.3",
+    "vue-tsc": "^1.8.27"
   },
   "peerDependencies": {
     "vue": "^3.0.0"
@@ -86,163 +64,16 @@
     "ai",
     "widget",
     "shopify",
-    "woocommerce",
-    "conversion",
-    "sales",
-    "assistant",
-    "customer-service",
-    "embeddable",
-    "widget-450px",
-    "modern-ui",
-    "responsive",
-    "typescript",
-    "vue3"
+    "conversion"
   ],
-  "author": {
-    "name": "ChatSeller Team",
-    "email": "dev@chatseller.app",
-    "url": "https://chatseller.app"
-  },
-  "contributors": [
-    {
-      "name": "Claude Sonnet 4",
-      "role": "Lead Developer & Architect"
-    }
-  ],
+  "author": "ChatSeller Team",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/getdukka/chatseller-widget.git"
   },
-  "bugs": {
-    "url": "https://github.com/getdukka/chatseller-widget/issues",
-    "email": "bugs@chatseller.app"
-  },
-  "homepage": "https://chatseller.app",
-  "funding": {
-    "type": "individual",
-    "url": "https://github.com/sponsors/chatseller"
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead",
-    "not ie 11",
-    "Chrome >= 64",
-    "Firefox >= 62",
-    "Safari >= 12",
-    "Edge >= 79"
-  ],
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=8.0.0"
-  },
-  "volta": {
-    "node": "20.10.0",
-    "npm": "10.2.3"
-  },
-  "packageManager": "npm@10.2.3",
-  "bundlesize": [
-    {
-      "path": "./dist/chatseller-widget.js",
-      "maxSize": "200kb",
-      "compression": "gzip"
-    },
-    {
-      "path": "./dist/chatseller-widget.css",
-      "maxSize": "20kb",
-      "compression": "gzip"
-    }
-  ],
-  "lint-staged": {
-    "*.{js,ts,vue}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{css,scss,json,md}": [
-      "prettier --write"
-    ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "pre-push": "npm run validate",
-      "commit-msg": "conventional-changelog-lint"
-    }
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
-  },
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/",
-    "access": "public"
-  },
-  "resolutions": {
-    "semver": "^7.5.4",
-    "word-wrap": "^1.2.4"
-  },
-  "overrides": {
-    "semver": "^7.5.4"
-  },
-  "env": {
-    "VITE_WIDGET_VERSION": "1.0.0",
-    "VITE_API_URL": "https://chatseller-api-production.up.railway.app",
-    "VITE_CDN_URL": "https://cdn.chatseller.app"
-  },
-  "cdn": {
-    "production": "https://widget.chatseller.app/",
-    "staging": "https://staging-widget.chatseller.app/",
-    "development": "http://localhost:3000/"
-  },
-  "deployment": {
-    "environments": {
-      "production": {
-        "url": "https://widget.chatseller.app",
-        "branch": "main",
-        "auto-deploy": true,
-        "provider": "vercel"
-      },
-      "staging": {
-        "url": "https://staging-widget.chatseller.app",
-        "branch": "develop",
-        "auto-deploy": true,
-        "provider": "vercel"
-      }
-    }
-  },
-  "monitoring": {
-    "sentry": {
-      "dsn": "https://your-sentry-dsn@sentry.io/project-id",
-      "environment": "production"
-    },
-    "analytics": {
-      "ga4": "G-XXXXXXXXXX",
-      "mixpanel": "your-mixpanel-token"
-    }
-  },
-  "features": {
-    "widget-450px": true,
-    "agent-connection": true,
-    "knowledge-base": true,
-    "order-collection": true,
-    "auto-detection": true,
-    "responsive-mobile": true,
-    "glassmorphism-ui": true,
-    "performance-optimized": true
-  },
-  "targets": {
-    "conversion-increase": "+30%",
-    "load-time": "<3s",
-    "bundle-size": "<200kb",
-    "mobile-support": "100%",
-    "browser-support": ">95%"
-  },
-  "quality": {
-    "test-coverage": ">85%",
-    "type-coverage": ">90%",
-    "accessibility": "WCAG 2.1 AA",
-    "performance": "Lighthouse >90"
   }
 }

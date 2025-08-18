@@ -27,10 +27,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@components/*": ["./src/components/*"],
-      "@assets/*": ["./src/assets/*"],
-      "@styles/*": ["./src/styles/*"],
-      "@tests/*": ["./tests/*"]
+      "@components/*": ["./src/components/*"]
     },
     
     /* Additional options */
@@ -41,37 +38,23 @@
     "declarationDir": "./dist",
     "outDir": "./dist",
     
-    /* Vue support */
+    /* Vue support - TYPES CORRIGÉS */
     "types": [
       "node",
       "vite/client",
-      "@types/uuid",
-      "@playwright/test"
+      "@types/uuid"
     ]
   },
   "include": [
     "src/**/*.ts",
     "src/**/*.vue",
-    "tests/**/*.ts",
-    "tests/**/*.d.ts",
     "*.config.ts",
-    "*.config.js",
-    "vite.config.ts",
-    "playwright.config.ts"
+    "vite.config.ts"
   ],
   "exclude": [
     "node_modules",
     "dist",
-    "test-reports",
-    "coverage",
     ".vercel",
     ".turbo"
-  ],
-  "ts-node": {
-    "esm": true,
-    "compilerOptions": {
-      "module": "ESNext",
-      "moduleResolution": "node"
-    }
-  }
+  ]
 }

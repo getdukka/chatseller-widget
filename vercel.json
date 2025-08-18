@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "chatseller-widget",
   "builds": [
     {
       "src": "package.json",
@@ -15,15 +14,7 @@
       "src": "/embed.js",
       "dest": "/embed.js",
       "headers": {
-        "Content-Type": "application/javascript; charset=utf-8",
-        "Cache-Control": "public, max-age=86400",
-        "Access-Control-Allow-Origin": "*"
-      }
-    },
-    {
-      "src": "/(.*\\.(js|css|json|ico|png|jpg|jpeg|gif|svg))",
-      "dest": "/$1",
-      "headers": {
+        "Content-Type": "application/javascript",
         "Cache-Control": "public, max-age=86400",
         "Access-Control-Allow-Origin": "*"
       }
@@ -31,17 +22,6 @@
     {
       "src": "/(.*)",
       "dest": "/index.html"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        }
-      ]
     }
   ]
 }
