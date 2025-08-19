@@ -1,4 +1,4 @@
-// src/embed.ts
+// src/embed.ts - ChatSeller Widget Embed Code
 import { createApp, App as VueApp } from 'vue'
 import ChatSellerWidget from './ChatSellerWidget.vue'
 
