@@ -1,38 +1,43 @@
-/* style.css - STYLES ISOLÉS POUR WIDGET CHATSELLER 450PX MODERNE */
+/* ✅ CHATSELLER WIDGET - CSS TOTALEMENT ISOLÉ POUR SHOPIFY */
 
-/* ✅ RESET GLOBAL POUR LE WIDGET SEULEMENT */
-#chatseller-widget,
-#chatseller-widget *,
-#chatseller-widget *::before,
-#chatseller-widget *::after {
+/* 🔥 RESET ABSOLU - ISOLE COMPLÈTEMENT DU CSS SHOPIFY */
+.cs-chatseller-widget,
+.cs-chatseller-widget *,
+.cs-chatseller-widget *::before,
+.cs-chatseller-widget *::after {
   all: unset !important;
   box-sizing: border-box !important;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif !important;
+  line-height: normal !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
 }
 
-/* ✅ STYLES DE BASE POUR LE WIDGET */
-#chatseller-widget {
+/* 🎯 CONTAINER PRINCIPAL WIDGET */
+.cs-chatseller-widget {
   position: relative !important;
   z-index: 2147483647 !important;
   pointer-events: auto !important;
   font-size: 14px !important;
   line-height: 1.5 !important;
   color: #374151 !important;
-  -webkit-font-smoothing: antialiased !important;
-  -moz-osx-font-smoothing: grayscale !important;
+  display: block !important;
+  margin: 8px 0 !important;
+  width: 100% !important;
 }
 
-/* ✅ ISOLER LES CONFLITS CSS COURANTS */
-#chatseller-widget div,
-#chatseller-widget span,
-#chatseller-widget button,
-#chatseller-widget input,
-#chatseller-widget p,
-#chatseller-widget h1,
-#chatseller-widget h2,
-#chatseller-widget h3,
-#chatseller-widget img,
-#chatseller-widget svg {
+/* 🔥 FORCE RÉINITIALISATION ÉLÉMENTS */
+.cs-chatseller-widget div,
+.cs-chatseller-widget span,
+.cs-chatseller-widget button,
+.cs-chatseller-widget input,
+.cs-chatseller-widget p,
+.cs-chatseller-widget h1,
+.cs-chatseller-widget h2,
+.cs-chatseller-widget h3,
+.cs-chatseller-widget h4,
+.cs-chatseller-widget img,
+.cs-chatseller-widget svg {
   display: block !important;
   margin: 0 !important;
   padding: 0 !important;
@@ -43,46 +48,24 @@
   color: inherit !important;
   text-decoration: none !important;
   vertical-align: baseline !important;
-}
-
-#chatseller-widget button {
-  cursor: pointer !important;
-  background: none !important;
-  border: none !important;
+  box-shadow: none !important;
   outline: none !important;
+  transform: none !important;
+  transition: none !important;
 }
 
-#chatseller-widget input {
-  display: block !important;
-  width: 100% !important;
-  outline: none !important;
-  border: none !important;
-  background: white !important;
-}
-
-#chatseller-widget img {
-  display: block !important;
-  max-width: 100% !important;
-  height: auto !important;
-}
-
-#chatseller-widget svg {
-  display: inline-block !important;
-  fill: currentColor !important;
-}
-
-/* ✅ BOUTON TRIGGER MODERNE - STYLES PRINCIPAUX */
+/* 🎯 BOUTON WIDGET PRINCIPAL */
 .cs-chat-trigger-button {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   width: 100% !important;
   padding: 16px 24px !important;
-  margin: 8px 0 !important;
+  margin: 0 !important;
   background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%) !important;
   color: white !important;
   border: none !important;
-  border-radius: 12px !important;
+  border-radius: 8px !important; /* Valeur par défaut, sera override par JS */
   font-size: 15px !important;
   font-weight: 600 !important;
   line-height: 1.5 !important;
@@ -93,27 +76,22 @@
   position: relative !important;
   overflow: hidden !important;
   transform: translateY(0) !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  text-shadow: none !important;
+  min-height: auto !important;
+  max-height: none !important;
+  min-width: auto !important;
+  max-width: none !important;
 }
 
-.cs-chat-trigger-button::before {
-  content: '' !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: -100% !important;
-  width: 100% !important;
-  height: 100% !important;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent) !important;
-  transition: left 0.6s !important;
-}
-
-.cs-chat-trigger-button:hover::before {
-  left: 100% !important;
-}
-
+/* 🎯 EFFET HOVER BOUTON */
 .cs-chat-trigger-button:hover {
   transform: translateY(-2px) !important;
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25) !important;
   opacity: 0.95 !important;
+  filter: none !important;
 }
 
 .cs-chat-trigger-button:active {
@@ -121,6 +99,7 @@
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2) !important;
 }
 
+/* 🎯 ICÔNE SVG DANS LE BOUTON */
 .cs-chat-trigger-button svg {
   display: inline-block !important;
   width: 20px !important;
@@ -130,30 +109,28 @@
   stroke: currentColor !important;
   stroke-width: 2 !important;
   transition: transform 0.2s !important;
+  vertical-align: middle !important;
+  flex-shrink: 0 !important;
 }
 
 .cs-chat-trigger-button:hover svg {
   transform: scale(1.1) !important;
 }
 
-/* ✅ VARIATIONS DE THÈME POUR LE BOUTON */
-.cs-theme-minimal .cs-chat-trigger-button {
-  border-radius: 8px !important;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
-  padding: 12px 20px !important;
-  font-size: 14px !important;
-  background: linear-gradient(135deg, var(--primary-color, #007AFF) 0%, var(--primary-dark, #0051D5) 100%) !important;
+/* 🎯 TEXTE DU BOUTON */
+.cs-chat-trigger-button span {
+  display: inline !important;
+  color: inherit !important;
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  line-height: inherit !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
-.cs-theme-brand-adaptive .cs-chat-trigger-button {
-  border-radius: 16px !important;
-  padding: 18px 32px !important;
-  font-size: 16px !important;
-  font-weight: 700 !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
-}
-
-/* ✅ MODAL OVERLAY - BACKDROP MODERNE */
+/* 🔥 MODAL CHAT OVERLAY */
 .cs-chat-modal-overlay {
   position: fixed !important;
   top: 0 !important;
@@ -168,8 +145,10 @@
   align-items: center !important;
   justify-content: center !important;
   padding: 16px !important;
-  opacity: 0 !important;
-  animation: cs-fadeIn 0.3s ease-out forwards !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
 
 .cs-chat-modal-overlay.cs-mobile {
@@ -178,29 +157,426 @@
   justify-content: stretch !important;
 }
 
-/* ✅ CONTAINER CHAT PRINCIPAL - ÉLARGI À 450PX */
-.cs-chat-container {
-  width: 450px !important; /* ✅ ÉLARGI DE 384px À 450px */
-  height: 650px !important; /* ✅ LÉGÈREMENT PLUS HAUT AUSSI */
+/* 🔥 CONTAINER CHAT PRINCIPAL */
+.cs-chat-container-desktop {
+  width: 520px !important;
+  height: 680px !important;
   max-height: 90vh !important;
   background: white !important;
-  border-radius: 16px !important;
+  border-radius: 20px !important;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
   display: flex !important;
   flex-direction: column !important;
   overflow: hidden !important;
   position: relative !important;
-  opacity: 0 !important;
-  transform: scale(0.95) translateY(20px) !important;
-  animation: cs-slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s forwards !important;
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
 }
 
-/* ✅ RESPONSIVE MOBILE */
+.cs-chat-container-mobile {
+  width: 100% !important;
+  height: 100% !important;
+  background: white !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* 🔥 HEADER CHAT */
+.cs-desktop-header,
+.cs-mobile-header {
+  padding: 24px !important;
+  color: white !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-shrink: 0 !important;
+  background: linear-gradient(135deg, #E91E63 0%, #C2185B 100%) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.cs-mobile-header {
+  padding: 16px 20px !important;
+}
+
+/* 🔥 AGENT INFO */
+.cs-agent-info,
+.cs-mobile-agent-info {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.cs-agent-avatar,
+.cs-mobile-avatar {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 50% !important;
+  position: relative !important;
+  overflow: hidden !important;
+  border: 3px solid rgba(255, 255, 255, 0.3) !important;
+  flex-shrink: 0 !important;
+}
+
+.cs-mobile-avatar {
+  width: 40px !important;
+  height: 40px !important;
+}
+
+.cs-avatar-image,
+.cs-mobile-avatar img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
+.cs-agent-details,
+.cs-mobile-details {
+  min-width: 0 !important;
+  flex: 1 !important;
+}
+
+.cs-agent-name,
+.cs-mobile-name {
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  color: white !important;
+  margin: 0 !important;
+  display: block !important;
+  line-height: 1.2 !important;
+}
+
+.cs-mobile-name {
+  font-size: 16px !important;
+}
+
+.cs-agent-title,
+.cs-mobile-title {
+  font-size: 13px !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+  margin: 4px 0 0 0 !important;
+  display: block !important;
+  line-height: 1.2 !important;
+}
+
+/* 🔥 SECTION PRODUIT */
+.cs-product-section,
+.cs-mobile-product {
+  padding: 16px 20px !important;
+  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%) !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  flex-shrink: 0 !important;
+}
+
+.cs-product-name,
+.cs-mobile-product-name {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #111827 !important;
+  margin: 0 0 4px 0 !important;
+  display: block !important;
+}
+
+.cs-product-price,
+.cs-mobile-product-price {
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  margin: 0 !important;
+  display: block !important;
+}
+
+/* 🔥 AREA MESSAGES */
+.cs-messages-area-desktop {
+  flex: 1 !important;
+  background: linear-gradient(to bottom, #f8fafc 0%, #ffffff 100%) !important;
+  overflow-y: auto !important;
+  padding: 24px !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.cs-messages-area-mobile {
+  flex: 1 !important;
+  background: #f5f5f5 !important;
+  overflow-y: auto !important;
+  padding: 20px !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* 🔥 LISTE DES MESSAGES */
+.cs-messages-list,
+.cs-mobile-messages-list {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 20px !important;
+  min-height: 100% !important;
+  flex: 1 !important;
+}
+
+/* 🔥 MESSAGE ITEMS */
+.cs-message-item,
+.cs-mobile-message {
+  display: flex !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.cs-assistant-message,
+.cs-mobile-assistant {
+  justify-content: flex-start !important;
+}
+
+.cs-user-message,
+.cs-mobile-user {
+  justify-content: flex-end !important;
+}
+
+/* 🔥 BULLES DE MESSAGE */
+.cs-assistant-bubble,
+.cs-mobile-assistant-bubble {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 12px !important;
+  max-width: 85% !important;
+}
+
+.cs-user-bubble,
+.cs-mobile-user-bubble {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 12px !important;
+  max-width: 85% !important;
+  flex-direction: row-reverse !important;
+}
+
+/* 🔥 AVATARS DANS MESSAGES */
+.cs-message-avatar,
+.cs-mobile-message-avatar {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
+  border: 2px solid #f3f4f6 !important;
+}
+
+.cs-message-avatar img,
+.cs-mobile-message-avatar img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
+.cs-user-avatar {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  background: #E91E63 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: white !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
+  flex-shrink: 0 !important;
+}
+
+/* 🔥 CONTENU DES MESSAGES */
+.cs-message-content,
+.cs-mobile-bubble-content {
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+.cs-message-text,
+.cs-mobile-message-text {
+  background: white !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 16px !important;
+  padding: 16px !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+  word-wrap: break-word !important;
+  margin-bottom: 4px !important;
+  color: #374151 !important;
+  display: block !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.cs-user-message .cs-message-text,
+.cs-mobile-user .cs-mobile-message-text {
+  background: linear-gradient(135deg, #E91E63 0%, #C2185B 100%) !important;
+  color: white !important;
+  border: none !important;
+}
+
+.cs-message-time,
+.cs-mobile-message-time {
+  font-size: 11px !important;
+  color: #9ca3af !important;
+  padding: 0 4px !important;
+  display: block !important;
+}
+
+/* 🔥 INPUT SECTION */
+.cs-input-section-desktop,
+.cs-mobile-input-section {
+  padding: 20px !important;
+  border-top: 1px solid #e2e8f0 !important;
+  background: white !important;
+  flex-shrink: 0 !important;
+}
+
+.cs-input-container,
+.cs-mobile-input-container {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin-bottom: 12px !important;
+}
+
+.cs-input-wrapper {
+  flex: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  background: #f8fafc !important;
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  padding: 0 16px !important;
+  transition: all 0.2s !important;
+}
+
+.cs-input-wrapper:focus-within {
+  background: white !important;
+  border-color: #E91E63 !important;
+  box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.1) !important;
+}
+
+.cs-message-input,
+.cs-mobile-message-input {
+  flex: 1 !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  padding: 14px 0 !important;
+  font-size: 14px !important;
+  color: #374151 !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  line-height: 1.5 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+  resize: none !important;
+}
+
+.cs-message-input::placeholder,
+.cs-mobile-message-input::placeholder {
+  color: #9ca3af !important;
+  opacity: 1 !important;
+}
+
+/* 🔥 BOUTONS SEND */
+.cs-send-button,
+.cs-mobile-send {
+  width: 48px !important;
+  height: 48px !important;
+  background: linear-gradient(135deg, #E91E63 0%, #C2185B 100%) !important;
+  border: none !important;
+  border-radius: 12px !important;
+  color: white !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  transform: translateY(0) !important;
+}
+
+.cs-send-button:hover:not(:disabled),
+.cs-mobile-send:hover:not(:disabled) {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25) !important;
+}
+
+.cs-send-button:disabled,
+.cs-mobile-send:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+.cs-send-button svg,
+.cs-mobile-send svg {
+  width: 24px !important;
+  height: 24px !important;
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 2 !important;
+}
+
+/* 🔥 BOUTON CLOSE */
+.cs-close-button,
+.cs-mobile-close {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: none !important;
+  color: white !important;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s !important;
+}
+
+.cs-close-button:hover,
+.cs-mobile-close:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  transform: rotate(90deg) !important;
+}
+
+.cs-close-button svg,
+.cs-mobile-close svg {
+  width: 20px !important;
+  height: 20px !important;
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 2 !important;
+}
+
+/* 🔥 SCROLLBAR CUSTOM */
+.cs-messages-area-desktop::-webkit-scrollbar,
+.cs-messages-area-mobile::-webkit-scrollbar {
+  width: 6px !important;
+}
+
+.cs-messages-area-desktop::-webkit-scrollbar-track,
+.cs-messages-area-mobile::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1) !important;
+}
+
+.cs-messages-area-desktop::-webkit-scrollbar-thumb,
+.cs-messages-area-mobile::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border-radius: 3px !important;
+}
+
+/* 🔥 RESPONSIVE MOBILE */
 @media (max-width: 767px) {
-  .cs-chat-container {
+  .cs-chat-container-desktop {
     width: 100% !important;
     height: 100% !important;
     max-height: 100vh !important;
@@ -213,473 +589,10 @@
   }
 }
 
-/* ✅ RESPONSIVE TABLETTE */
-@media (min-width: 768px) and (max-width: 1024px) {
-  .cs-chat-container {
-    width: 420px !important;
-    height: 600px !important;
-  }
-}
-
-/* ✅ HEADER CHAT MODERNE */
-.cs-chat-header {
-  padding: 20px !important;
-  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%) !important;
-  color: white !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-  flex-shrink: 0 !important;
-  position: relative !important;
-  overflow: hidden !important;
-}
-
-.cs-chat-header::before {
-  content: '' !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%) !important;
-  pointer-events: none !important;
-}
-
-.cs-chat-header h3 {
-  font-size: 18px !important;
-  font-weight: 600 !important;
-  color: white !important;
-  margin: 0 !important;
-  letter-spacing: -0.025em !important;
-}
-
-.cs-chat-header p {
-  font-size: 13px !important;
-  color: rgba(255, 255, 255, 0.9) !important;
-  margin: 4px 0 0 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-}
-
-.cs-chat-header img {
-  width: 48px !important;
-  height: 48px !important;
-  border-radius: 50% !important;
-  border: 3px solid rgba(255, 255, 255, 0.3) !important;
-  margin-right: 12px !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-}
-
-.cs-chat-header button {
-  width: 40px !important;
-  height: 40px !important;
-  border-radius: 50% !important;
-  background: rgba(255, 255, 255, 0.1) !important;
-  color: rgba(255, 255, 255, 0.8) !important;
-  transition: all 0.2s !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  position: relative !important;
-}
-
-.cs-chat-header button:hover {
-  background: rgba(255, 255, 255, 0.2) !important;
-  color: white !important;
-  transform: rotate(90deg) !important;
-}
-
-.cs-chat-header button svg {
-  width: 20px !important;
-  height: 20px !important;
-  transition: transform 0.2s !important;
-}
-
-/* ✅ CONTEXTE PRODUIT MODERNE */
-.cs-product-context {
-  padding: 16px 20px !important;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
-  border-bottom: 1px solid #e2e8f0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  flex-shrink: 0 !important;
-  position: relative !important;
-}
-
-.cs-product-context p {
-  font-size: 14px !important;
-  margin: 0 !important;
-  color: #374151 !important;
-}
-
-.cs-product-context p:first-child {
-  font-weight: 600 !important;
-  color: #111827 !important;
-}
-
-/* ✅ CONTAINER MESSAGES MODERNE */
-.cs-messages-container {
-  flex: 1 !important;
-  padding: 24px !important; /* ✅ PLUS D'ESPACE AVEC 450PX */
-  background: linear-gradient(to bottom, #f8fafc 0%, #ffffff 100%) !important;
-  overflow-y: auto !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 24px !important; /* ✅ PLUS D'ESPACE ENTRE MESSAGES */
-  scrollbar-width: thin !important;
-  scrollbar-color: #cbd5e0 #f7fafc !important;
-}
-
-.cs-messages-container::-webkit-scrollbar {
-  width: 6px !important;
-}
-
-.cs-messages-container::-webkit-scrollbar-track {
-  background: #f7fafc !important;
-  border-radius: 3px !important;
-}
-
-.cs-messages-container::-webkit-scrollbar-thumb {
-  background: linear-gradient(to bottom, #cbd5e0, #9ca3af) !important;
-  border-radius: 3px !important;
-}
-
-.cs-messages-container::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to bottom, #9ca3af, #6b7280) !important;
-}
-
-/* ✅ MESSAGES MODERNES */
-.cs-message {
-  display: flex !important;
-  align-items: flex-start !important;
-  gap: 12px !important;
-  max-width: 100% !important;
-}
-
-.cs-message.cs-user-message {
-  flex-direction: row-reverse !important;
-  justify-content: flex-start !important;
-}
-
-.cs-message img {
-  width: 40px !important; /* ✅ PLUS GROS AVATARS */
-  height: 40px !important;
-  border-radius: 50% !important;
-  flex-shrink: 0 !important;
-  border: 2px solid #f3f4f6 !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-}
-
-.cs-message-content {
-  max-width: 320px !important; /* ✅ PLUS DE LARGEUR POUR CONTENU */
-  word-wrap: break-word !important;
-}
-
-.cs-message-bubble {
-  padding: 16px !important; /* ✅ PLUS DE PADDING */
-  border-radius: 16px !important;
-  font-size: 14px !important;
-  line-height: 1.6 !important; /* ✅ MEILLEURE LISIBILITÉ */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-  word-wrap: break-word !important;
-  overflow-wrap: break-word !important;
-  position: relative !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
-}
-
-.cs-message-bubble::before {
-  content: '' !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  border-radius: inherit !important;
-  padding: 1px !important;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1)) !important;
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0) !important;
-  -webkit-mask-composite: exclude !important;
-  pointer-events: none !important;
-}
-
-/* Bulles assistant modernes */
-.cs-assistant-message .cs-message-bubble {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
-  color: #374151 !important;
-  border-top-left-radius: 6px !important;
-  border: 1px solid #e2e8f0 !important;
-}
-
-/* Bulles utilisateur modernes */
-.cs-user-message .cs-message-bubble {
-  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%) !important;
-  color: white !important;
-  border-top-right-radius: 6px !important;
-}
-
-.cs-user-message .cs-message-content {
-  text-align: right !important;
-}
-
-/* ✅ INDICATEUR DE FRAPPE MODERNE */
-.cs-typing-indicator {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
-  padding: 16px !important;
-  border-radius: 16px !important;
-  border-top-left-radius: 6px !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  border: 1px solid #e2e8f0 !important;
-  position: relative !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
-}
-
-.cs-typing-indicator div {
-  width: 8px !important;
-  height: 8px !important;
-  background: #9ca3af !important;
-  border-radius: 50% !important;
-  animation: cs-bounce 1.4s infinite !important;
-}
-
-.cs-typing-indicator div:nth-child(1) {
-  animation-delay: 0s !important;
-}
-
-.cs-typing-indicator div:nth-child(2) {
-  animation-delay: 0.2s !important;
-}
-
-.cs-typing-indicator div:nth-child(3) {
-  animation-delay: 0.4s !important;
-}
-
-/* ✅ ACTIONS RAPIDES MODERNES */
-.cs-quick-actions {
-  padding: 20px !important;
-  border-top: 1px solid #e2e8f0 !important;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
-  flex-shrink: 0 !important;
-}
-
-.cs-quick-actions button {
-  width: 100% !important;
-  padding: 16px 20px !important; /* ✅ PLUS DE PADDING */
-  border-radius: 12px !important;
-  font-size: 14px !important;
-  font-weight: 600 !important;
-  text-align: center !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  margin-bottom: 12px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-  transform: translateY(0) !important;
-}
-
-.cs-quick-actions button:last-child {
-  margin-bottom: 0 !important;
-}
-
-.cs-quick-actions .cs-primary-action {
-  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%) !important;
-  color: white !important;
-}
-
-.cs-quick-actions .cs-secondary-action {
-  background: white !important;
-  color: #007AFF !important;
-  border: 2px solid #007AFF !important;
-}
-
-.cs-quick-actions button:hover {
-  opacity: 0.95 !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
-}
-
-.cs-quick-actions button svg {
-  width: 20px !important;
-  height: 20px !important;
-  margin-right: 8px !important;
-}
-
-/* ✅ FORMULAIRE DE COMMANDE MODERNE */
-.cs-order-form {
-  padding: 20px !important;
-  border-top: 1px solid #e2e8f0 !important;
-  background: linear-gradient(135deg, #fef7ff 0%, #f3e8ff 100%) !important;
-  flex-shrink: 0 !important;
-}
-
-.cs-order-form button {
-  padding: 16px 24px !important;
-  border-radius: 12px !important;
-  font-size: 14px !important;
-  font-weight: 600 !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-  transform: translateY(0) !important;
-}
-
-.cs-order-form .cs-confirm-btn {
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
-  color: white !important;
-}
-
-.cs-order-form .cs-cancel-btn {
-  background: white !important;
-  color: #6b7280 !important;
-  border: 2px solid #d1d5db !important;
-}
-
-.cs-order-form button:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
-}
-
-/* ✅ INPUT MESSAGE MODERNE */
-.cs-message-input {
-  padding: 20px !important;
-  border-top: 1px solid #e2e8f0 !important;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
-  flex-shrink: 0 !important;
-}
-
-.cs-message-input-container {
-  display: flex !important;
-  align-items: flex-end !important;
-  gap: 12px !important;
-}
-
-.cs-message-input input {
-  flex: 1 !important;
-  padding: 16px 20px !important; /* ✅ PLUS DE PADDING */
-  border: 2px solid rgba(226, 232, 240, 0.8) !important;
-  border-radius: 12px !important;
-  font-size: 14px !important;
-  line-height: 1.5 !important;
-  background: rgba(255, 255, 255, 0.8) !important;
-  color: #374151 !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  resize: none !important;
-  outline: none !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
-}
-
-.cs-message-input input:focus {
-  background: rgba(255, 255, 255, 0.95) !important;
-  border-color: #007AFF !important;
-  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1) !important;
-}
-
-.cs-message-input input:disabled {
-  background: #f9fafb !important;
-  color: #9ca3af !important;
-  cursor: not-allowed !important;
-}
-
-.cs-message-input button {
-  width: 56px !important; /* ✅ PLUS GROS BOUTON */
-  height: 56px !important;
-  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%) !important;
-  color: white !important;
-  border: none !important;
-  border-radius: 12px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  flex-shrink: 0 !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-  transform: translateY(0) !important;
-}
-
-.cs-message-input button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #0051D5 0%, #003d99 100%) !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25) !important;
-}
-
-.cs-message-input button:disabled {
-  opacity: 0.5 !important;
-  cursor: not-allowed !important;
-}
-
-.cs-message-input button svg {
-  width: 24px !important; /* ✅ PLUS GROS ICÔNE */
-  height: 24px !important;
-}
-
-/* ✅ FOOTER INFO MODERNE */
-.cs-widget-footer {
-  text-align: center !important;
-  margin-top: 12px !important;
-  font-size: 12px !important;
-  color: #9ca3af !important;
-  background: #f9fafb !important;
-  padding: 8px 16px !important;
-  border-radius: 8px !important;
-  display: inline-block !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-}
-
-/* ✅ MESSAGE D'ERREUR MODERNE */
-.cs-error-message {
-  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%) !important;
-  border: 1px solid #fecaca !important;
-  border-radius: 16px !important;
-  padding: 16px !important;
-  margin: 12px 0 !important;
-  max-width: 360px !important; /* ✅ PLUS LARGE */
-  margin-left: auto !important;
-  margin-right: auto !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-}
-
-.cs-error-message p {
-  font-size: 14px !important;
-  color: #991b1b !important;
-  margin: 0 !important;
-  font-weight: 500 !important;
-}
-
-.cs-error-message button {
-  font-size: 12px !important;
-  color: #dc2626 !important;
-  text-decoration: underline !important;
-  margin-top: 8px !important;
-  background: none !important;
-  border: none !important;
-  cursor: pointer !important;
-  font-weight: 500 !important;
-}
-
-.cs-error-message button:hover {
-  color: #991b1b !important;
-}
-
-/* ✅ ANIMATIONS MODERNES */
+/* 🔥 ANIMATIONS */
 @keyframes cs-fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes cs-slideIn {
@@ -693,367 +606,57 @@
   }
 }
 
-@keyframes cs-bounce {
-  0%, 60%, 100% {
-    transform: translateY(0);
-  }
-  30% {
-    transform: translateY(-6px);
-  }
-}
-
-@keyframes cs-pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-@keyframes cs-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes cs-shimmer {
-  0% {
-    left: -100%;
-  }
-  100% {
-    left: 100%;
-  }
-}
-
-/* ✅ CLASSES UTILITAIRES AVEC ANIMATIONS */
-.cs-animate-bounce {
-  animation: cs-bounce 1.4s infinite !important;
-}
-
-.cs-animate-pulse {
-  animation: cs-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
-}
-
-.cs-animate-spin {
-  animation: cs-spin 1s linear infinite !important;
-}
-
-/* ✅ TRANSITIONS Vue.js MODERNES */
-.cs-fade-enter-active,
-.cs-fade-leave-active {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-.cs-fade-enter-from,
-.cs-fade-leave-to {
-  opacity: 0 !important;
-  transform: translateY(8px) !important;
-}
-
 .cs-modal-enter-active {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  animation: cs-fadeIn 0.3s ease-out;
 }
 
 .cs-modal-leave-active {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  animation: cs-fadeIn 0.3s ease-out reverse;
 }
 
-.cs-modal-enter-from {
-  opacity: 0 !important;
-  transform: scale(0.95) translateY(20px) !important;
+.cs-chat-container-desktop {
+  animation: cs-slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.cs-modal-leave-to {
-  opacity: 0 !important;
-  transform: scale(0.95) translateY(-20px) !important;
+/* 🔥 FORCE OVERRIDE DES STYLES SHOPIFY COURANTS */
+.shopify-section .cs-chatseller-widget,
+.product-form .cs-chatseller-widget,
+.product-single .cs-chatseller-widget {
+  position: relative !important;
+  width: 100% !important;
+  margin: 8px 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+  z-index: 1 !important;
 }
 
-/* ✅ ACCESSIBILITÉ MODERNE */
-.cs-chat-trigger-button:focus,
-.cs-message-input input:focus,
-.cs-message-input button:focus,
-.cs-quick-actions button:focus,
-.cs-order-form button:focus {
+/* 🔥 RESET SPÉCIFIQUE AUX THÈMES SHOPIFY POPULAIRES */
+.cs-chatseller-widget * {
+  box-sizing: border-box !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  text-shadow: none !important;
+}
+
+/* 🔥 HIDE FOCUS OUTLINES SAUF POUR ACCESSIBILITÉ */
+.cs-chatseller-widget *:focus:not(:focus-visible) {
+  outline: none !important;
+}
+
+.cs-chatseller-widget *:focus-visible {
   outline: 2px solid #007AFF !important;
   outline-offset: 2px !important;
 }
 
-/* ✅ DARK MODE SUPPORT MODERNE */
-@media (prefers-color-scheme: dark) {
-  #chatseller-widget {
-    color: #f3f4f6 !important;
-  }
-  
-  .cs-chat-container {
-    background: #1f2937 !important;
-    border-color: #374151 !important;
-  }
-  
-  .cs-messages-container {
-    background: linear-gradient(to bottom, #111827 0%, #1f2937 100%) !important;
-  }
-  
-  .cs-assistant-message .cs-message-bubble {
-    background: linear-gradient(135deg, #374151 0%, #4b5563 100%) !important;
-    color: #f3f4f6 !important;
-    border-color: #4b5563 !important;
-  }
-  
-  .cs-message-input {
-    background: linear-gradient(135deg, #1f2937 0%, #111827 100%) !important;
-    border-top-color: #374151 !important;
-  }
-  
-  .cs-message-input input {
-    background: rgba(55, 65, 81, 0.8) !important;
-    color: #f3f4f6 !important;
-    border-color: #4b5563 !important;
-  }
-  
-  .cs-quick-actions {
-    background: linear-gradient(135deg, #1f2937 0%, #111827 100%) !important;
-    border-top-color: #374151 !important;
-  }
-  
-  .cs-product-context {
-    background: linear-gradient(135deg, #374151 0%, #4b5563 100%) !important;
-    border-bottom-color: #4b5563 !important;
-  }
-}
-
-/* ✅ COMPATIBILITÉ AVEC LES SITES E-COMMERCE POPULAIRES */
-
-/* Shopify reset conflicts */
-body.shopify #chatseller-widget * {
-  box-sizing: border-box !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-}
-
-/* WooCommerce reset conflicts */
-.woocommerce #chatseller-widget *,
-.woocommerce-page #chatseller-widget * {
-  box-sizing: border-box !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-}
-
-/* Bootstrap reset conflicts */
-.container #chatseller-widget,
-.row #chatseller-widget,
-.col-* #chatseller-widget {
-  position: relative !important;
-  width: auto !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  flex: none !important;
-}
-
-/* PrestaShop reset conflicts */
-.prestashop #chatseller-widget * {
-  box-sizing: border-box !important;
-}
-
-/* Prevent common conflicts */
-#chatseller-widget * {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-  box-sizing: border-box !important;
-  text-transform: none !important;
-  letter-spacing: normal !important;
-}
-
-/* Force specific resets for problematic elements */
-#chatseller-widget button,
-#chatseller-widget input,
-#chatseller-widget div,
-#chatseller-widget span {
-  all: unset !important;
-  box-sizing: border-box !important;
-  font-family: inherit !important;
-}
-
-/* Re-apply our styles after reset */
-#chatseller-widget button {
-  cursor: pointer !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-#chatseller-widget input {
-  display: block !important;
-  width: 100% !important;
-}
-
-/* ✅ RESPONSIVE FINE-TUNING POUR 450PX */
-@media (max-width: 480px) {
-  .cs-message-content {
-    max-width: calc(100vw - 140px) !important; /* ✅ PLUS D'ESPACE MOBILE */
-  }
-  
-  .cs-chat-trigger-button {
-    font-size: 14px !important;
-    padding: 14px 20px !important;
-  }
-  
-  .cs-message-input input {
-    padding: 14px 16px !important;
-  }
-  
-  .cs-message-input button {
-    width: 48px !important;
-    height: 48px !important;
-  }
-  
-  .cs-message-input button svg {
-    width: 20px !important;
-    height: 20px !important;
-  }
-}
-
-@media (min-width: 768px) and (max-width: 1024px) {
-  .cs-chat-container {
-    width: 420px !important;
-    height: 600px !important;
-  }
-  
-  .cs-messages-container {
-    padding: 20px !important;
-    gap: 20px !important;
-  }
-  
-  .cs-message-content {
-    max-width: 300px !important;
-  }
-}
-
-@media (min-width: 1025px) {
-  .cs-chat-container {
-    width: 450px !important; /* ✅ PLEINE LARGEUR SUR DESKTOP */
-    height: 650px !important;
-  }
-  
-  .cs-messages-container {
-    padding: 24px !important;
-    gap: 24px !important;
-  }
-  
-  .cs-message-content {
-    max-width: 320px !important;
-  }
-}
-
-/* ✅ PRINT MEDIA - CACHER LE WIDGET */
-@media print {
-  #chatseller-widget {
-    display: none !important;
-  }
-}
-
-/* ✅ HIGH CONTRAST MODE SUPPORT */
-@media (prefers-contrast: high) {
-  .cs-chat-trigger-button {
-    border: 2px solid white !important;
-  }
-  
-  .cs-message-bubble {
-    border: 2px solid currentColor !important;
-  }
-  
-  .cs-chat-container {
-    border: 3px solid #000 !important;
-  }
-}
-
-/* ✅ REDUCED MOTION SUPPORT */
-@media (prefers-reduced-motion: reduce) {
-  .cs-chat-trigger-button,
-  .cs-message-input button,
-  .cs-chat-container,
-  .cs-chat-modal-overlay,
-  .cs-quick-actions button,
-  .cs-order-form button {
-    transition: none !important;
-    animation: none !important;
-  }
-  
-  .cs-animate-bounce,
-  .cs-animate-pulse,
-  .cs-animate-spin {
-    animation: none !important;
-  }
-  
-  .cs-chat-trigger-button::before {
-    display: none !important;
-  }
-}
-
-/* ✅ STATES HOVER/FOCUS AMÉLIORÉS */
-.cs-chat-trigger-button:focus-visible {
-  outline: 3px solid rgba(0, 122, 255, 0.5) !important;
-  outline-offset: 2px !important;
-}
-
-.cs-message-input button:focus-visible {
-  outline: 3px solid rgba(0, 122, 255, 0.5) !important;
-  outline-offset: 2px !important;
-}
-
-/* ✅ LOADING STATES */
-.cs-loading {
-  opacity: 0.6 !important;
-  pointer-events: none !important;
-}
-
-.cs-loading::after {
-  content: '' !important;
-  position: absolute !important;
-  top: 50% !important;
-  left: 50% !important;
-  width: 20px !important;
-  height: 20px !important;
-  margin: -10px 0 0 -10px !important;
-  border: 2px solid #f3f3f3 !important;
-  border-top: 2px solid #007AFF !important;
-  border-radius: 50% !important;
-  animation: cs-spin 1s linear infinite !important;
-}
-
-/* ✅ MICRO-INTERACTIONS AVANCÉES */
-.cs-message-bubble:hover {
-  transform: translateY(-1px) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-.cs-chat-header img:hover {
-  transform: scale(1.05) !important;
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-/* ✅ GLASSMORPHISM EFFECTS */
-.cs-glassmorphism {
-  background: rgba(255, 255, 255, 0.1) !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-}
-
-/* ✅ MODERN GRADIENTS */
-.cs-gradient-primary {
-  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%) !important;
-}
-
-.cs-gradient-secondary {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
-}
-
-.cs-gradient-success {
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
-}
-
-.cs-gradient-error {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+/* 🔥 FINAL FALLBACK - FORCE ABSOLUTE POSITIONING IF NEEDED */
+.cs-chatseller-widget-fallback {
+  position: fixed !important;
+  bottom: 20px !important;
+  right: 20px !important;
+  z-index: 2147483647 !important;
+  max-width: 300px !important;
 }
