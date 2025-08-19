@@ -42,11 +42,11 @@ class ChatSeller {
       primaryColor: '#3B82F6',
       position: 'above-cta',
       buttonText: 'Parler à un conseiller',
-      borderRadius: 'md', // ✅ AJOUT VALEUR PAR DÉFAUT
+      borderRadius: 'full',
       language: 'fr',
       autoDetectProduct: true,
       debug: false,
-      disableFallback: false // ✅ CHANGÉ À FALSE POUR SHOPIFY
+      disableFallback: false 
     }
   }
 

@@ -568,7 +568,7 @@ const sendApiMessage = async (message: string) => {
     isFirstMessage: messages.value.length <= 2
   }
 
-  const response = await fetch(`${configData.value.apiUrl}/public/chat`, {
+  const response = await fetch(`${configData.value.apiUrl}/api/v1/public/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
@@ -716,6 +716,70 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* ✅ FORCE ABSOLUE POUR SHOPIFY - À AJOUTER AU DÉBUT DU <style> */
+.cs-chatseller-widget,
+.cs-chatseller-widget *,
+.cs-chatseller-widget *::before,
+.cs-chatseller-widget *::after {
+  all: unset !important;
+  box-sizing: border-box !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  line-height: normal !important;
+  color: inherit !important;
+  background: transparent !important;
+  border: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-decoration: none !important;
+  outline: none !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* ✅ FORCE OVERLAY MODAL */
+.cs-chat-modal-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: rgba(0, 0, 0, 0.6) !important;
+  backdrop-filter: blur(8px) !important;
+  z-index: 2147483647 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 16px !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+}
+
+/* ✅ FORCE CONTAINER CHAT */
+.cs-chat-container-desktop {
+  width: 520px !important;
+  height: 680px !important;
+  max-height: 90vh !important;
+  background: white !important;
+  border-radius: 20px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  position: relative !important;
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  font-family: inherit !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  color: #374151 !important;
+}
+
 /* ✅ RESET ET ISOLATION ABSOLUE POUR SHOPIFY */
 .cs-chatseller-widget,
 .cs-chatseller-widget *,
