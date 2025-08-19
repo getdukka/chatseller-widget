@@ -336,11 +336,11 @@ const props = withDefaults(defineProps<Props>(), {
     shopId: 'demo',
     apiUrl: 'https://chatseller-api-production.up.railway.app',
     agentConfig: {
-      name: 'Assistant',
-      title: 'Conseiller commercial'
+      name: 'Rose',
+      title: 'Spécialiste produit'
     },
-    primaryColor: '#3B82F6',
-    buttonText: 'Parler à un conseiller',
+    primaryColor: '#EF4444',
+    buttonText: 'Parler à la vendeuse',
     language: 'fr'
   })
 })
@@ -381,18 +381,18 @@ const isMobile = computed(() => {
 })
 
 const agentName = computed(() => {
-  return configData.value.agentConfig?.name || 'Assistant'
+  return configData.value.agentConfig?.name || 'Rose'
 })
 
 const agentTitle = computed(() => {
-  return configData.value.agentConfig?.title || 'Conseiller commercial'
+  return configData.value.agentConfig?.title || 'Spécialiste produit'
 })
 
 const agentAvatar = computed(() => {
   if (configData.value.agentConfig?.avatar) {
     return configData.value.agentConfig.avatar
   }
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(agentName.value)}&background=${primaryColor.value.replace('#', '')}&color=fff&size=128`
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(agentName.value)}&background=EF4444&color=fff&size=128`
 })
 
 const productInfo = computed(() => {
@@ -407,7 +407,7 @@ const productInfo = computed(() => {
   return null
 })
 
-const primaryColor = computed(() => configData.value.primaryColor || '#3B82F6')
+const primaryColor = computed(() => configData.value.primaryColor || '#EF4444')
 
 const showQuickReplies = computed(() => {
   return messages.value.length <= 1 && !isTyping.value
@@ -496,7 +496,7 @@ Comment puis-je vous aider aujourd'hui ? 😊`
   }
 }
 
-// ✅ MÉTHODE CORRIGÉE : Envoi de message avec logs détaillés
+// ✅ MÉTHODE CORRIGÉE : Envoi de message avec API publique
 const sendMessage = async () => {
   if (!currentMessage.value.trim() || isTyping.value || isLoading.value) return
 
@@ -516,7 +516,7 @@ const sendMessage = async () => {
   scrollToBottom()
 
   try {
-    console.log('📤 [WIDGET] Envoi message à l\'API...')
+    console.log('📤 [WIDGET] Envoi message à l\'API publique...')
     const response = await sendApiMessage(messageContent)
     
     console.log('📥 [WIDGET] Réponse API reçue:', response)
@@ -556,9 +556,11 @@ const sendMessage = async () => {
   }
 }
 
-// ✅ MÉTHODE CORRIGÉE : Appel API avec logs détaillés
+// ✅ MÉTHODE CORRIGÉE : Appel API publique (SANS AUTH)
 const sendApiMessage = async (message: string) => {
   const apiUrl = configData.value.apiUrl || 'https://chatseller-api-production.up.railway.app'
+  
+  // ✅ CORRECTION CRITIQUE : URL API PUBLIQUE
   const endpoint = `${apiUrl}/api/v1/public/chat`
   
   const payload = {
@@ -583,12 +585,12 @@ const sendApiMessage = async (message: string) => {
     headers: { 
       'Content-Type': 'application/json',
       'Accept': 'application/json'
+      // ✅ PAS DE TOKEN D'AUTH POUR L'API PUBLIQUE
     },
     body: JSON.stringify(payload)
   })
 
   console.log('📥 [API CALL] Status:', response.status)
-  console.log('📥 [API CALL] Headers:', Object.fromEntries(response.headers.entries()))
 
   if (!response.ok) {
     const errorText = await response.text()
@@ -693,7 +695,7 @@ const getUserInitial = () => {
 
 const handleAvatarError = (event: Event) => {
   const img = event.target as HTMLImageElement
-  img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(agentName.value)}&background=${primaryColor.value.replace('#', '')}&color=fff&size=128`
+  img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(agentName.value)}&background=EF4444&color=fff&size=128`
 }
 
 const adjustColor = (color: string, percent: number): string => {
