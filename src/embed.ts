@@ -845,24 +845,15 @@ class ChatSeller {
   }
 
   private updateWidgetWithConfig(): void {
-    if (!this.widgetElement || !this.shopConfig) return
+  if (!this.widgetElement || !this.shopConfig) return
 
-    const triggerBtn = this.widgetElement.querySelector('#chatseller-trigger-btn') as HTMLElement
-    if (triggerBtn) {
-      const primaryColor = this.config.primaryColor || '#EF4444'
-      const borderRadius = this.getBorderRadiusValue(this.config.borderRadius || 'full')
-      
-      triggerBtn.style.background = `linear-gradient(135deg, ${primaryColor} 0%, ${this.adjustColor(primaryColor, -15)} 100%)`
-      triggerBtn.style.borderRadius = borderRadius
-      
-      const textSpan = triggerBtn.querySelector('span')
-      if (textSpan && this.config.buttonText) {
-        textSpan.textContent = this.config.buttonText
-      }
-      
-      console.log(`🎨 Widget mis à jour: couleur=${primaryColor}, borderRadius=${borderRadius}`)
-    }
+  const triggerBtn = this.widgetElement.querySelector('#chatseller-trigger-btn') as HTMLElement
+  if (triggerBtn) {
+    const primaryColor = this.shopConfig.widget_config?.primaryColor || this.config.primaryColor || '#3B82F6'
+    
+    triggerBtn.style.background = `linear-gradient(135deg, ${primaryColor} 0%, ${this.adjustColor(primaryColor, -15)} 100%)`
   }
+}
 
   private getBorderRadiusValue(radius: string): string {
     const radiusMap = {

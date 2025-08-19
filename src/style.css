@@ -1,165 +1,29 @@
-/* 🔥 CHATSELLER WIDGET - CSS ISOLÉ SHOPIFY READY */
-/* Version: 1.2.4 - Isolation renforcée pour Shopify */
+/* 🎨 CHATSELLER WIDGET - CSS MODERNE ET MINIMALISTE */
 
-/* 🛡️ RESET ABSOLU - PRIORITÉ MAXIMALE */
+/* ✅ RESET ET ISOLATION */
 .cs-chatseller-widget,
 .cs-chatseller-widget *,
 .cs-chatseller-widget *::before,
 .cs-chatseller-widget *::after {
   all: unset !important;
   box-sizing: border-box !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Inter', sans-serif !important;
   line-height: normal !important;
   -webkit-font-smoothing: antialiased !important;
   -moz-osx-font-smoothing: grayscale !important;
-  font-weight: normal !important;
-  font-style: normal !important;
-  text-decoration: none !important;
-  text-transform: none !important;
-  letter-spacing: normal !important;
 }
 
-/* 🎯 CONTAINER PRINCIPAL - SHOPIFY SAFE */
 .cs-chatseller-widget {
   position: relative !important;
   z-index: 999999 !important;
-  pointer-events: auto !important;
-  font-size: 14px !important;
-  line-height: 1.5 !important;
-  color: #374151 !important;
   display: block !important;
   margin: 8px 0 !important;
   width: 100% !important;
-  max-width: 100% !important;
-  min-width: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  padding: 0 !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  contain: layout style !important;
+  isolation: isolate !important;
 }
 
-/* 🔥 RESET SPÉCIFIQUE SHOPIFY */
-.cs-chatseller-widget div,
-.cs-chatseller-widget span,
-.cs-chatseller-widget button,
-.cs-chatseller-widget input,
-.cs-chatseller-widget textarea,
-.cs-chatseller-widget p,
-.cs-chatseller-widget h1, .cs-chatseller-widget h2, .cs-chatseller-widget h3,
-.cs-chatseller-widget h4, .cs-chatseller-widget h5, .cs-chatseller-widget h6,
-.cs-chatseller-widget img, .cs-chatseller-widget svg, .cs-chatseller-widget a {
-  all: unset !important;
-  box-sizing: border-box !important;
-  font-family: inherit !important;
-  font-size: inherit !important;
-  line-height: inherit !important;
-  color: inherit !important;
-  background: transparent !important;
-  border: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  text-decoration: none !important;
-  outline: none !important;
-  transform: none !important;
-  transition: none !important;
-  animation: none !important;
-  list-style: none !important;
-  appearance: none !important;
-  -webkit-appearance: none !important;
-  -moz-appearance: none !important;
-  text-shadow: none !important;
-  box-shadow: none !important;
-  float: none !important;
-  clear: none !important;
-  position: static !important;
-  top: auto !important;
-  left: auto !important;
-  right: auto !important;
-  bottom: auto !important;
-}
-
-/* 🎯 BOUTON PRINCIPAL WIDGET - ANTI-SHOPIFY */
-.cs-chat-trigger-button {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 100% !important;
-  padding: 16px 24px !important;
-  margin: 0 !important;
-  background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%) !important;
-  color: white !important;
-  border: none !important;
-  border-radius: 12px !important;
-  font-size: 15px !important;
-  font-weight: 600 !important;
-  line-height: 1.5 !important;
-  cursor: pointer !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
-  text-align: center !important;
-  position: relative !important;
-  overflow: hidden !important;
-  transform: translateY(0) !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-  text-transform: none !important;
-  letter-spacing: normal !important;
-  text-shadow: none !important;
-  min-height: 56px !important;
-  white-space: nowrap !important;
-  text-decoration: none !important;
-  vertical-align: baseline !important;
-  user-select: none !important;
-  -webkit-user-select: none !important;
-  -moz-user-select: none !important;
-  -ms-user-select: none !important;
-}
-
-/* 🎯 STATES BOUTON */
-.cs-chat-trigger-button:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25) !important;
-  opacity: 0.95 !important;
-  filter: brightness(1.05) !important;
-}
-
-.cs-chat-trigger-button:active {
-  transform: translateY(-1px) !important;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2) !important;
-}
-
-.cs-chat-trigger-button:focus {
-  outline: 2px solid rgba(59, 130, 246, 0.5) !important;
-  outline-offset: 2px !important;
-}
-
-/* 🎯 CONTENU BOUTON */
-.cs-chat-trigger-button svg {
-  display: inline-block !important;
-  width: 20px !important;
-  height: 20px !important;
-  margin-right: 8px !important;
-  fill: none !important;
-  stroke: currentColor !important;
-  stroke-width: 2 !important;
-  vertical-align: middle !important;
-  flex-shrink: 0 !important;
-}
-
-.cs-chat-trigger-button span {
-  display: inline !important;
-  color: inherit !important;
-  font-size: inherit !important;
-  font-weight: inherit !important;
-  line-height: inherit !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  white-space: nowrap !important;
-  text-decoration: none !important;
-  background: transparent !important;
-  border: none !important;
-}
-
-/* 🔥 MODAL OVERLAY - ANTI-SHOPIFY */
+/* ✅ MODAL OVERLAY - DESIGN MODERNE */
 .cs-chat-modal-overlay {
   position: fixed !important;
   top: 0 !important;
@@ -167,46 +31,37 @@
   right: 0 !important;
   bottom: 0 !important;
   background: rgba(0, 0, 0, 0.6) !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
   z-index: 2147483647 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  padding: 16px !important;
+  padding: 20px !important;
   opacity: 1 !important;
   visibility: visible !important;
   pointer-events: auto !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-  font-size: 14px !important;
-  line-height: 1.5 !important;
-  color: #374151 !important;
-  margin: 0 !important;
-  border: none !important;
-  outline: none !important;
-  text-decoration: none !important;
-  transform: none !important;
-  box-shadow: none !important;
-  text-shadow: none !important;
+  font-family: inherit !important;
 }
 
-/* 🔥 VERSION MOBILE */
 .cs-chat-modal-overlay.cs-mobile {
   padding: 0 !important;
   align-items: stretch !important;
   justify-content: stretch !important;
 }
 
-/* 🔥 CONTAINER CHAT DESKTOP */
+/* ✅ CONTAINER DESKTOP - MODERNE ET ÉPURÉ */
 .cs-chat-container-desktop {
-  width: 520px !important;
-  height: 680px !important;
-  max-height: 90vh !important;
+  width: 420px !important;
+  height: 600px !important;
+  max-height: 85vh !important;
   max-width: 95vw !important;
   background: white !important;
   border-radius: 20px !important;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
   display: flex !important;
   flex-direction: column !important;
   overflow: hidden !important;
@@ -217,17 +72,9 @@
   font-family: inherit !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  text-decoration: none !important;
-  outline: none !important;
-  font-size: 14px !important;
-  line-height: 1.5 !important;
-  color: #374151 !important;
-  z-index: 1 !important;
 }
 
-/* 🔥 CONTAINER MOBILE */
+/* ✅ CONTAINER MOBILE - PLEIN ÉCRAN */
 .cs-chat-container-mobile {
   width: 100% !important;
   height: 100% !important;
@@ -239,38 +86,20 @@
   opacity: 1 !important;
   visibility: visible !important;
   font-family: inherit !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: none !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  position: relative !important;
-  z-index: 1 !important;
 }
 
-/* 🔥 HEADER CHAT */
+/* ✅ HEADER - DESIGN MODERNE */
 .cs-desktop-header,
 .cs-mobile-header {
-  padding: 24px !important;
+  padding: 20px !important;
   color: white !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
   flex-shrink: 0 !important;
-  background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%) !important;
   position: relative !important;
   overflow: hidden !important;
   min-height: 80px !important;
-  margin: 0 !important;
-  border: none !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  text-decoration: none !important;
-  outline: none !important;
-  font-family: inherit !important;
-  font-size: inherit !important;
-  line-height: inherit !important;
-  z-index: 1 !important;
 }
 
 .cs-mobile-header {
@@ -278,7 +107,7 @@
   min-height: 70px !important;
 }
 
-/* 🔥 AGENT INFO */
+/* ✅ AGENT INFO - SIMPLIFIÉ */
 .cs-agent-info,
 .cs-mobile-agent-info {
   display: flex !important;
@@ -286,34 +115,23 @@
   gap: 12px !important;
   flex: 1 !important;
   min-width: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  position: relative !important;
-  z-index: 1 !important;
 }
 
 .cs-agent-avatar,
 .cs-mobile-avatar {
-  width: 48px !important;
-  height: 48px !important;
+  width: 44px !important;
+  height: 44px !important;
   border-radius: 50% !important;
   position: relative !important;
   overflow: hidden !important;
-  border: 3px solid rgba(255, 255, 255, 0.3) !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
   flex-shrink: 0 !important;
   background: rgba(255, 255, 255, 0.1) !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  display: block !important;
-  z-index: 1 !important;
 }
 
 .cs-mobile-avatar {
   width: 40px !important;
   height: 40px !important;
-  border: 2px solid rgba(255, 255, 255, 0.3) !important;
 }
 
 .cs-avatar-image,
@@ -322,148 +140,182 @@
   height: 100% !important;
   object-fit: cover !important;
   display: block !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  border-radius: 0 !important;
-  position: relative !important;
-  z-index: 1 !important;
 }
 
 .cs-agent-details,
 .cs-mobile-details {
   min-width: 0 !important;
   flex: 1 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  position: relative !important;
-  z-index: 1 !important;
 }
 
 .cs-agent-name,
 .cs-mobile-name {
-  font-size: 18px !important;
+  font-size: 17px !important;
   font-weight: 600 !important;
   color: white !important;
   margin: 0 0 4px 0 !important;
-  padding: 0 !important;
   display: block !important;
   line-height: 1.2 !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
-  background: transparent !important;
-  border: none !important;
-  text-decoration: none !important;
-  font-family: inherit !important;
-  text-shadow: none !important;
-  position: relative !important;
-  z-index: 1 !important;
 }
 
 .cs-mobile-name {
   font-size: 16px !important;
 }
 
-.cs-agent-title,
-.cs-mobile-title {
+.cs-agent-status,
+.cs-mobile-status-text {
   font-size: 13px !important;
   color: rgba(255, 255, 255, 0.9) !important;
   margin: 0 !important;
-  padding: 0 !important;
-  display: block !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
   line-height: 1.2 !important;
+}
+
+.cs-status-dot {
+  width: 8px !important;
+  height: 8px !important;
+  border-radius: 50% !important;
+  flex-shrink: 0 !important;
+}
+
+/* ✅ STATUS INDICATOR */
+.cs-status-indicator,
+.cs-mobile-status {
+  position: absolute !important;
+  bottom: 2px !important;
+  right: 2px !important;
+  width: 12px !important;
+  height: 12px !important;
+  border-radius: 50% !important;
+  border: 2px solid white !important;
+}
+
+/* ✅ BOUTON CLOSE MODERNE */
+.cs-close-button,
+.cs-mobile-close {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: none !important;
+  color: white !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+  flex-shrink: 0 !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.cs-close-button:hover,
+.cs-mobile-close:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  transform: rotate(90deg) !important;
+}
+
+.cs-close-button svg,
+.cs-mobile-close svg {
+  width: 18px !important;
+  height: 18px !important;
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 2 !important;
+}
+
+/* ✅ SECTION PRODUIT - DISCRÈTE */
+.cs-product-section,
+.cs-mobile-product {
+  padding: 12px 20px !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+  background: #f8fafc !important;
+}
+
+.cs-product-badge,
+.cs-mobile-product-badge {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 8px 12px !important;
+  background: white !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+}
+
+.cs-product-icon {
+  font-size: 16px !important;
+  flex-shrink: 0 !important;
+}
+
+.cs-product-info {
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+.cs-product-name,
+.cs-mobile-product-name {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #1f2937 !important;
+  margin: 0 0 2px 0 !important;
+  display: block !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
-  background: transparent !important;
-  border: none !important;
-  text-decoration: none !important;
-  font-family: inherit !important;
-  font-weight: normal !important;
-  text-shadow: none !important;
-  position: relative !important;
-  z-index: 1 !important;
 }
 
-/* 🔥 ZONE MESSAGES */
+.cs-product-price,
+.cs-mobile-product-price {
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  margin: 0 !important;
+  display: block !important;
+}
+
+/* ✅ ZONE MESSAGES - MODERNE */
 .cs-messages-area-desktop {
   flex: 1 !important;
-  background: linear-gradient(to bottom, #f8fafc 0%, #ffffff 100%) !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  padding: 24px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  min-height: 0 !important;
-  margin: 0 !important;
-  border: none !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  text-decoration: none !important;
-  outline: none !important;
-  font-family: inherit !important;
-  font-size: inherit !important;
-  line-height: inherit !important;
-  color: inherit !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-messages-area-mobile {
-  flex: 1 !important;
-  background: #f5f5f5 !important;
+  background: #fafbfc !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
   padding: 20px !important;
   display: flex !important;
   flex-direction: column !important;
   min-height: 0 !important;
-  margin: 0 !important;
-  border: none !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  text-decoration: none !important;
-  outline: none !important;
-  font-family: inherit !important;
-  font-size: inherit !important;
-  line-height: inherit !important;
-  color: inherit !important;
-  position: relative !important;
-  z-index: 1 !important;
 }
 
-/* 🔥 LISTE MESSAGES */
+.cs-messages-area-mobile {
+  flex: 1 !important;
+  background: #fafbfc !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding: 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+}
+
+/* ✅ LISTE MESSAGES */
 .cs-messages-list,
 .cs-mobile-messages-list {
   display: flex !important;
   flex-direction: column !important;
-  gap: 20px !important;
+  gap: 16px !important;
   min-height: 100% !important;
   flex: 1 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  position: relative !important;
-  z-index: 1 !important;
 }
 
-/* 🔥 ÉLÉMENTS MESSAGES */
+/* ✅ MESSAGES - DESIGN MODERNE */
 .cs-message-item,
 .cs-mobile-message {
   display: flex !important;
   max-width: 100% !important;
-  margin: 0 !important;
-  padding: 0 !important;
   align-items: flex-start !important;
-  background: transparent !important;
-  border: none !important;
-  position: relative !important;
-  z-index: 1 !important;
 }
 
 .cs-assistant-message,
@@ -476,19 +328,13 @@
   justify-content: flex-end !important;
 }
 
-/* 🔥 BULLES MESSAGES */
+/* ✅ BULLES MESSAGES - STYLE MODERNE */
 .cs-assistant-bubble,
 .cs-mobile-assistant-bubble {
   display: flex !important;
   align-items: flex-start !important;
   gap: 12px !important;
   max-width: 85% !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  position: relative !important;
-  z-index: 1 !important;
 }
 
 .cs-user-bubble,
@@ -498,28 +344,18 @@
   gap: 12px !important;
   max-width: 85% !important;
   flex-direction: row-reverse !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  position: relative !important;
-  z-index: 1 !important;
 }
 
-/* 🔥 AVATARS MESSAGES */
+/* ✅ AVATARS MESSAGES */
 .cs-message-avatar,
 .cs-mobile-message-avatar {
-  width: 40px !important;
-  height: 40px !important;
+  width: 32px !important;
+  height: 32px !important;
   border-radius: 50% !important;
   overflow: hidden !important;
   flex-shrink: 0 !important;
   border: 2px solid #f3f4f6 !important;
   background: #f3f4f6 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  position: relative !important;
-  z-index: 1 !important;
 }
 
 .cs-message-avatar img,
@@ -528,80 +364,48 @@
   height: 100% !important;
   object-fit: cover !important;
   display: block !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  position: relative !important;
-  z-index: 1 !important;
 }
 
-.cs-user-avatar {
-  width: 40px !important;
-  height: 40px !important;
-  border-radius: 50% !important;
-  background: #3B82F6 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  color: white !important;
-  font-weight: 600 !important;
-  font-size: 16px !important;
-  flex-shrink: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: none !important;
-  text-decoration: none !important;
-  font-family: inherit !important;
-  line-height: 1 !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-/* 🔥 CONTENU MESSAGES */
+/* ✅ CONTENU MESSAGES */
 .cs-message-content,
 .cs-mobile-bubble-content {
   flex: 1 !important;
   min-width: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  position: relative !important;
-  z-index: 1 !important;
 }
 
+/* ✅ TEXTE MESSAGES - MODERNE */
 .cs-message-text,
 .cs-mobile-message-text {
-  background: white !important;
-  border: 1px solid #e2e8f0 !important;
-  border-radius: 16px !important;
-  padding: 16px !important;
+  border-radius: 18px !important;
+  padding: 12px 16px !important;
   font-size: 14px !important;
-  line-height: 1.6 !important;
+  line-height: 1.5 !important;
   word-wrap: break-word !important;
   word-break: break-word !important;
   margin: 0 0 4px 0 !important;
-  color: #374151 !important;
   display: block !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
   max-width: 100% !important;
   overflow-wrap: break-word !important;
-  font-family: inherit !important;
-  font-weight: normal !important;
-  text-decoration: none !important;
-  outline: none !important;
-  position: relative !important;
-  z-index: 1 !important;
 }
 
-.cs-user-message .cs-message-text,
-.cs-mobile-user .cs-mobile-message-text {
-  background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%) !important;
+/* ✅ STYLES PAR RÔLE */
+.cs-assistant-text,
+.cs-mobile-assistant-text {
+  background: white !important;
+  color: #374151 !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.cs-user-text,
+.cs-mobile-user-text {
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%) !important;
   color: white !important;
   border: none !important;
+  margin-left: auto !important;
 }
 
+/* ✅ TEMPS MESSAGES */
 .cs-message-time,
 .cs-mobile-message-time {
   font-size: 11px !important;
@@ -609,416 +413,15 @@
   padding: 0 4px !important;
   display: block !important;
   margin: 2px 0 0 0 !important;
-  background: transparent !important;
-  border: none !important;
-  text-decoration: none !important;
-  font-family: inherit !important;
-  font-weight: normal !important;
   line-height: 1.2 !important;
-  position: relative !important;
-  z-index: 1 !important;
 }
 
-/* 🔥 SECTION INPUT */
-.cs-input-section-desktop,
-.cs-mobile-input-section {
-  padding: 20px !important;
-  border-top: 1px solid #e2e8f0 !important;
-  background: white !important;
-  flex-shrink: 0 !important;
-  margin: 0 !important;
-  border-left: none !important;
-  border-right: none !important;
-  border-bottom: none !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-input-container,
-.cs-mobile-input-container {
-  display: flex !important;
-  align-items: center !important;
-  gap: 12px !important;
-  margin: 0 0 12px 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-input-wrapper {
-  flex: 1 !important;
-  display: flex !important;
-  align-items: center !important;
-  background: #f8fafc !important;
-  border: 2px solid #e2e8f0 !important;
-  border-radius: 12px !important;
-  padding: 0 16px !important;
-  transition: all 0.2s ease !important;
-  min-height: 48px !important;
-  margin: 0 !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-input-wrapper:focus-within {
-  background: white !important;
-  border-color: #3B82F6 !important;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
-}
-
-.cs-message-input,
-.cs-mobile-message-input {
-  flex: 1 !important;
-  background: transparent !important;
-  border: none !important;
-  outline: none !important;
-  padding: 14px 0 !important;
-  font-size: 14px !important;
-  color: #374151 !important;
-  font-family: inherit !important;
-  line-height: 1.5 !important;
-  margin: 0 !important;
-  box-shadow: none !important;
-  resize: none !important;
-  min-height: 20px !important;
-  text-decoration: none !important;
-  font-weight: normal !important;
-  text-transform: none !important;
-  letter-spacing: normal !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-message-input::placeholder,
-.cs-mobile-message-input::placeholder {
-  color: #9ca3af !important;
-  opacity: 1 !important;
-  font-family: inherit !important;
-  font-size: inherit !important;
-  font-weight: normal !important;
-}
-
-/* 🔥 BOUTONS SEND */
-.cs-send-button,
-.cs-mobile-send {
-  width: 48px !important;
-  height: 48px !important;
-  background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%) !important;
-  border: none !important;
-  border-radius: 12px !important;
-  color: white !important;
-  cursor: pointer !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  transition: all 0.2s ease !important;
-  flex-shrink: 0 !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-  transform: translateY(0) !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  text-decoration: none !important;
-  outline: none !important;
-  font-family: inherit !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-send-button:hover:not(:disabled),
-.cs-mobile-send:hover:not(:disabled) {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25) !important;
-}
-
-.cs-send-button:disabled,
-.cs-mobile-send:disabled {
-  opacity: 0.5 !important;
-  cursor: not-allowed !important;
-}
-
-.cs-send-button svg,
-.cs-mobile-send svg {
-  width: 20px !important;
-  height: 20px !important;
-  fill: none !important;
-  stroke: currentColor !important;
-  stroke-width: 2 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-/* 🔥 BOUTONS CLOSE */
-.cs-close-button,
-.cs-mobile-close {
-  background: rgba(255, 255, 255, 0.1) !important;
-  border: none !important;
-  color: white !important;
-  width: 40px !important;
-  height: 40px !important;
-  border-radius: 50% !important;
-  cursor: pointer !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  transition: all 0.2s ease !important;
-  flex-shrink: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  text-decoration: none !important;
-  outline: none !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-close-button:hover,
-.cs-mobile-close:hover {
-  background: rgba(255, 255, 255, 0.2) !important;
-  transform: rotate(90deg) !important;
-}
-
-.cs-close-button svg,
-.cs-mobile-close svg {
-  width: 20px !important;
-  height: 20px !important;
-  fill: none !important;
-  stroke: currentColor !important;
-  stroke-width: 2 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-/* 🔥 SCROLLBARS PERSONNALISÉES */
-.cs-messages-area-desktop::-webkit-scrollbar,
-.cs-messages-area-mobile::-webkit-scrollbar {
-  width: 6px !important;
-}
-
-.cs-messages-area-desktop::-webkit-scrollbar-track,
-.cs-messages-area-mobile::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05) !important;
-  border-radius: 3px !important;
-}
-
-.cs-messages-area-desktop::-webkit-scrollbar-thumb,
-.cs-messages-area-mobile::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2) !important;
-  border-radius: 3px !important;
-}
-
-.cs-messages-area-desktop::-webkit-scrollbar-thumb:hover,
-.cs-messages-area-mobile::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.3) !important;
-}
-
-/* 🔥 RESPONSIVE SHOPIFY */
-@media (max-width: 767px) {
-  .cs-chat-container-desktop {
-    width: 100% !important;
-    height: 100% !important;
-    max-height: 100vh !important;
-    border-radius: 0 !important;
-    border: none !important;
-  }
-  
-  .cs-chat-modal-overlay {
-    padding: 0 !important;
-  }
-}
-
-/* 🔥 ANIMATIONS PERFORMANCE */
-@keyframes cs-fadeIn {
-  0% { opacity: 0; transform: scale(0.95); }
-  100% { opacity: 1; transform: scale(1); }
-}
-
-@keyframes cs-slideIn {
-  0% {
-    opacity: 0;
-    transform: scale(0.95) translateY(20px);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-.cs-modal-enter-active {
-  animation: cs-fadeIn 0.3s ease-out;
-}
-
-.cs-modal-leave-active {
-  animation: cs-fadeIn 0.3s ease-out reverse;
-}
-
-.cs-chat-container-desktop {
-  animation: cs-slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* 🔥 OVERRIDES SHOPIFY SPÉCIFIQUES */
-.shopify-section .cs-chatseller-widget,
-.product-form .cs-chatseller-widget,
-.product-single .cs-chatseller-widget,
-.product__content .cs-chatseller-widget,
-.product-recommendations .cs-chatseller-widget {
-  position: relative !important;
-  width: 100% !important;
-  margin: 8px 0 !important;
-  z-index: 1 !important;
-  clear: both !important;
-  float: none !important;
-}
-
-/* 🔥 FALLBACK MOBILE */
-.cs-chatseller-widget-fallback {
-  position: fixed !important;
-  bottom: 20px !important;
-  right: 20px !important;
-  z-index: 2147483647 !important;
-  max-width: 300px !important;
-}
-
-/* 🔥 PRINT MEDIA */
-@media print {
-  .cs-chatseller-widget,
-  .cs-chat-modal-overlay {
-    display: none !important;
-  }
-}
-
-/* 🔥 ACCESSIBILITÉ */
-.cs-chatseller-widget *:focus:not(:focus-visible) {
-  outline: none !important;
-}
-
-.cs-chatseller-widget *:focus-visible {
-  outline: 2px solid #3B82F6 !important;
-  outline-offset: 2px !important;
-}
-
-/* 🔥 THÈMES SOMBRES */
-@media (prefers-color-scheme: dark) {
-  .cs-chat-container-desktop,
-  .cs-chat-container-mobile {
-    background: #1f2937 !important;
-  }
-  
-  .cs-messages-area-desktop {
-    background: linear-gradient(to bottom, #374151 0%, #1f2937 100%) !important;
-  }
-  
-  .cs-messages-area-mobile {
-    background: #374151 !important;
-  }
-  
-  .cs-message-text {
-    background: #374151 !important;
-    color: #f9fafb !important;
-    border-color: #4b5563 !important;
-  }
-  
-  .cs-input-section-desktop,
-  .cs-mobile-input-section {
-    background: #1f2937 !important;
-    border-color: #4b5563 !important;
-  }
-  
-  .cs-input-wrapper {
-    background: #374151 !important;
-    border-color: #4b5563 !important;
-  }
-  
-  .cs-message-input,
-  .cs-mobile-message-input {
-    color: #f9fafb !important;
-  }
-}
-
-/* 🔥 PROTECTION CONTRE LES CONFLITS CSS EXTERNES */
-.cs-chatseller-widget {
-  contain: layout style !important;
-  isolation: isolate !important;
-}
-
-/* 🔥 QUICK REPLIES - AJOUT MANQUANT */
-.cs-quick-replies-desktop,
-.cs-quick-replies-mobile {
-  padding: 16px 20px !important;
-  border-top: 1px solid #e2e8f0 !important;
-  background: white !important;
-  margin: 0 !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-replies-grid,
-.cs-mobile-replies-grid {
-  display: flex !important;
-  flex-wrap: wrap !important;
-  gap: 8px !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-}
-
-.cs-quick-reply-btn,
-.cs-mobile-quick-reply {
-  background: white !important;
-  border: 2px solid #e2e8f0 !important;
-  border-radius: 20px !important;
-  padding: 8px 16px !important;
-  font-size: 13px !important;
-  color: #374151 !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-  margin: 0 !important;
-  text-decoration: none !important;
-  font-family: inherit !important;
-  font-weight: normal !important;
-  line-height: 1.2 !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-quick-reply-btn:hover,
-.cs-mobile-quick-reply:hover {
-  border-color: #3B82F6 !important;
-  color: #3B82F6 !important;
-  background: rgba(59, 130, 246, 0.05) !important;
-}
-
-.cs-reply-icon {
-  display: inline !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  font-size: inherit !important;
-}
-
-.cs-reply-text {
-  display: inline !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  font-size: inherit !important;
-  color: inherit !important;
-  font-family: inherit !important;
-  font-weight: inherit !important;
-}
-
-/* 🔥 TYPING INDICATOR */
+/* ✅ INDICATEUR DE FRAPPE MODERNE */
 .cs-typing-content,
 .cs-mobile-typing {
   display: flex !important;
   flex-direction: column !important;
   gap: 4px !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
 }
 
 .cs-typing-indicator,
@@ -1027,20 +430,18 @@
   gap: 4px !important;
   padding: 12px 16px !important;
   background: white !important;
-  border-radius: 16px !important;
-  border: 1px solid #e2e8f0 !important;
-  margin: 0 !important;
+  border-radius: 18px !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
 }
 
 .cs-typing-dot,
 .cs-mobile-dot {
-  width: 8px !important;
-  height: 8px !important;
+  width: 6px !important;
+  height: 6px !important;
   border-radius: 50% !important;
   background: #9ca3af !important;
   animation: cs-typing 1.4s infinite !important;
-  margin: 0 !important;
-  padding: 0 !important;
 }
 
 .cs-typing-dot:nth-child(1),
@@ -1059,54 +460,121 @@
   }
 }
 
-.cs-typing-text {
-  font-size: 11px !important;
-  color: #9ca3af !important;
-  padding: 0 4px !important;
-  margin: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  font-family: inherit !important;
-  font-weight: normal !important;
+/* ✅ SECTION INPUT - MODERNE */
+.cs-input-section-desktop,
+.cs-mobile-input-section {
+  padding: 16px 20px !important;
+  border-top: 1px solid #e5e7eb !important;
+  background: white !important;
+  flex-shrink: 0 !important;
 }
 
-/* 🔥 VOICE BUTTON */
-.cs-voice-button,
-.cs-mobile-voice {
+.cs-input-container,
+.cs-mobile-input-container {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin: 0 0 12px 0 !important;
+}
+
+.cs-input-wrapper {
+  flex: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  background: #f9fafb !important;
+  border: 2px solid #e5e7eb !important;
+  border-radius: 24px !important;
+  padding: 0 18px !important;
+  transition: all 0.2s ease !important;
+  min-height: 48px !important;
+}
+
+.cs-input-wrapper:focus-within {
+  background: white !important;
+  border-color: #3B82F6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+.cs-message-input,
+.cs-mobile-message-input {
+  flex: 1 !important;
   background: transparent !important;
   border: none !important;
+  outline: none !important;
+  padding: 12px 0 !important;
+  font-size: 14px !important;
+  color: #374151 !important;
+  font-family: inherit !important;
+  line-height: 1.5 !important;
+  resize: none !important;
+  min-height: 20px !important;
+}
+
+.cs-message-input::placeholder,
+.cs-mobile-message-input::placeholder {
   color: #9ca3af !important;
+  opacity: 1 !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+}
+
+/* ✅ BOUTON SEND MODERNE */
+.cs-send-button,
+.cs-mobile-send {
+  width: 44px !important;
+  height: 44px !important;
+  background: #3B82F6 !important;
+  border: none !important;
+  border-radius: 50% !important;
+  color: white !important;
   cursor: pointer !important;
-  padding: 8px !important;
-  margin: 0 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  border-radius: 6px !important;
-  transition: color 0.2s ease !important;
-  outline: none !important;
-  text-decoration: none !important;
-  position: relative !important;
-  z-index: 1 !important;
+  transition: all 0.2s ease !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
+  transform: translateY(0) !important;
 }
 
-.cs-voice-button:hover,
-.cs-mobile-voice:hover {
-  color: #3B82F6 !important;
+.cs-send-button:hover:not(:disabled),
+.cs-mobile-send:hover:not(:disabled) {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4) !important;
 }
 
-.cs-voice-button svg,
-.cs-mobile-voice svg {
-  width: 20px !important;
-  height: 20px !important;
+.cs-send-button:disabled,
+.cs-mobile-send:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+.cs-send-button svg,
+.cs-mobile-send svg {
+  width: 18px !important;
+  height: 18px !important;
   fill: none !important;
   stroke: currentColor !important;
   stroke-width: 2 !important;
-  margin: 0 !important;
-  padding: 0 !important;
 }
 
-/* 🔥 FOOTER INFO */
+/* ✅ LOADING SPINNER */
+.cs-loading-spinner,
+.cs-mobile-loading-spinner {
+  width: 18px !important;
+  height: 18px !important;
+  border: 2px solid transparent !important;
+  border-top: 2px solid currentColor !important;
+  border-radius: 50% !important;
+  animation: cs-spin 1s linear infinite !important;
+}
+
+@keyframes cs-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ✅ FOOTER - DISCRET */
 .cs-footer-info,
 .cs-mobile-footer {
   display: flex !important;
@@ -1114,15 +582,7 @@
   align-items: center !important;
   font-size: 11px !important;
   color: #9ca3af !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  font-family: inherit !important;
-  font-weight: normal !important;
-  line-height: 1.2 !important;
-  position: relative !important;
-  z-index: 1 !important;
+  gap: 12px !important;
 }
 
 .cs-mobile-footer {
@@ -1130,123 +590,92 @@
   text-align: center !important;
 }
 
-.cs-security {
-  display: inline !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  font-size: inherit !important;
-  color: inherit !important;
-  font-family: inherit !important;
-  font-weight: inherit !important;
-}
-
-/* 🔥 PRODUCT SECTION */
-.cs-product-section,
-.cs-mobile-product {
-  padding: 16px 20px !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
-  margin: 0 !important;
-  background: rgba(255, 255, 255, 0.1) !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-product-details {
-  margin: 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-}
-
-.cs-product-name,
-.cs-mobile-product-name {
-  font-size: 14px !important;
-  font-weight: 600 !important;
-  color: white !important;
-  margin: 0 0 4px 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  text-decoration: none !important;
-  font-family: inherit !important;
-  line-height: 1.3 !important;
-  display: block !important;
-}
-
-.cs-product-price,
-.cs-mobile-product-price {
-  font-size: 13px !important;
-  font-weight: 500 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  text-decoration: none !important;
-  font-family: inherit !important;
-  line-height: 1.2 !important;
-  display: block !important;
-}
-
-/* 🔥 STATUS INDICATORS */
-.cs-status-indicator,
-.cs-mobile-status {
-  position: absolute !important;
-  bottom: 2px !important;
-  right: 2px !important;
-  width: 12px !important;
-  height: 12px !important;
-  border-radius: 50% !important;
-  border: 2px solid white !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  z-index: 2 !important;
-}
-
-.cs-status-badge {
+.cs-powered-by {
   display: flex !important;
   align-items: center !important;
-  gap: 6px !important;
-  margin: 4px 0 0 0 !important;
-  padding: 0 !important;
+  gap: 4px !important;
+}
+
+.cs-security {
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+/* ✅ SCROLLBARS PERSONNALISÉES */
+.cs-messages-area-desktop::-webkit-scrollbar,
+.cs-messages-area-mobile::-webkit-scrollbar {
+  width: 4px !important;
+}
+
+.cs-messages-area-desktop::-webkit-scrollbar-track,
+.cs-messages-area-mobile::-webkit-scrollbar-track {
   background: transparent !important;
-  border: none !important;
-  font-size: 11px !important;
-  color: rgba(255, 255, 255, 0.9) !important;
-  font-family: inherit !important;
-  font-weight: normal !important;
-  line-height: 1.2 !important;
 }
 
-.cs-status-dot {
-  width: 6px !important;
-  height: 6px !important;
-  border-radius: 50% !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  flex-shrink: 0 !important;
+.cs-messages-area-desktop::-webkit-scrollbar-thumb,
+.cs-messages-area-mobile::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1) !important;
+  border-radius: 2px !important;
 }
 
-/* 🔥 PERFORMANCE OPTIMIZATIONS */
-.cs-chatseller-widget * {
-  will-change: auto !important;
-  backface-visibility: hidden !important;
-  -webkit-backface-visibility: hidden !important;
+.cs-messages-area-desktop::-webkit-scrollbar-thumb:hover,
+.cs-messages-area-mobile::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2) !important;
 }
 
-.cs-chat-modal-overlay {
-  will-change: opacity !important;
+/* ✅ RESPONSIVE */
+@media (max-width: 767px) {
+  .cs-chat-container-desktop {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
+    border: none !important;
+  }
+  
+  .cs-chat-modal-overlay {
+    padding: 0 !important;
+  }
 }
 
-.cs-chat-container-desktop,
-.cs-chat-container-mobile {
-  will-change: transform !important;
+/* ✅ ANIMATIONS */
+@keyframes cs-fadeIn {
+  0% { opacity: 0; transform: scale(0.96); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
-/* 🔥 FINAL ISOLATION SAFETY */
-.cs-chatseller-widget,
-.cs-chat-modal-overlay {
-  unicode-bidi: isolate !important;
-  direction: ltr !important;
-  writing-mode: horizontal-tb !important;
-  text-orientation: mixed !important;
+.cs-modal-enter-active {
+  animation: cs-fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cs-chat-container-desktop {
+  animation: cs-fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ✅ FORMATAGE MESSAGE */
+.cs-message-text strong,
+.cs-mobile-message-text strong {
+  font-weight: 600 !important;
+  color: inherit !important;
+}
+
+.cs-message-text em,
+.cs-mobile-message-text em {
+  font-style: italic !important;
+  color: inherit !important;
+}
+
+/* ✅ PROTECTION CSS */
+.cs-chatseller-widget {
+  contain: layout style !important;
+  isolation: isolate !important;
+}
+
+/* ✅ PRINT MEDIA */
+@media print {
+  .cs-chatseller-widget,
+  .cs-chat-modal-overlay {
+    display: none !important;
+  }
 }
