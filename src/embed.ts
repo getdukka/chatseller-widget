@@ -109,7 +109,7 @@ class ChatSeller {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 10000)
       
-      const response = await fetch(`${this.config.apiUrl}/public/shops/${this.config.shopId}/agent`, {
+      const response = await fetch(`${this.config.apiUrl}/public/shops/${this.config.shopId}/config`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         signal: controller.signal
