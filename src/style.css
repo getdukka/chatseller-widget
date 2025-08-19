@@ -1,6 +1,7 @@
-/* ✅ CHATSELLER WIDGET - CSS TOTALEMENT ISOLÉ POUR SHOPIFY */
+/* ✅ CHATSELLER WIDGET - CSS GLOBAL MULTI-PLATEFORMES */
+/* Compatible : Shopify, WordPress, WooCommerce, Sites personnalisés */
 
-/* 🔥 RESET ABSOLU - ISOLE COMPLÈTEMENT DU CSS SHOPIFY */
+/* 🔥 RESET ABSOLU - ISOLATION TOTALE */
 .cs-chatseller-widget,
 .cs-chatseller-widget *,
 .cs-chatseller-widget *::before,
@@ -13,10 +14,10 @@
   -moz-osx-font-smoothing: grayscale !important;
 }
 
-/* 🎯 CONTAINER PRINCIPAL WIDGET */
+/* 🎯 CONTAINER PRINCIPAL */
 .cs-chatseller-widget {
   position: relative !important;
-  z-index: 2147483647 !important;
+  z-index: 999999 !important;
   pointer-events: auto !important;
   font-size: 14px !important;
   line-height: 1.5 !important;
@@ -24,37 +25,48 @@
   display: block !important;
   margin: 8px 0 !important;
   width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
 }
 
-/* 🔥 FORCE RÉINITIALISATION ÉLÉMENTS */
+/* 🔥 RESET ÉLÉMENTS SPÉCIFIQUES */
 .cs-chatseller-widget div,
 .cs-chatseller-widget span,
 .cs-chatseller-widget button,
 .cs-chatseller-widget input,
+.cs-chatseller-widget textarea,
 .cs-chatseller-widget p,
 .cs-chatseller-widget h1,
 .cs-chatseller-widget h2,
 .cs-chatseller-widget h3,
 .cs-chatseller-widget h4,
+.cs-chatseller-widget h5,
+.cs-chatseller-widget h6,
 .cs-chatseller-widget img,
-.cs-chatseller-widget svg {
-  display: block !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
+.cs-chatseller-widget svg,
+.cs-chatseller-widget a {
+  all: unset !important;
+  box-sizing: border-box !important;
+  font-family: inherit !important;
   font-size: inherit !important;
   line-height: inherit !important;
   color: inherit !important;
+  background: transparent !important;
+  border: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
   text-decoration: none !important;
-  vertical-align: baseline !important;
-  box-shadow: none !important;
   outline: none !important;
   transform: none !important;
   transition: none !important;
+  animation: none !important;
+  list-style: none !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
 }
 
-/* 🎯 BOUTON WIDGET PRINCIPAL */
+/* 🎯 BOUTON PRINCIPAL WIDGET */
 .cs-chat-trigger-button {
   display: flex !important;
   align-items: center !important;
@@ -62,10 +74,10 @@
   width: 100% !important;
   padding: 16px 24px !important;
   margin: 0 !important;
-  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%) !important;
+  background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%) !important;
   color: white !important;
   border: none !important;
-  border-radius: 8px !important; /* Valeur par défaut, sera override par JS */
+  border-radius: 12px !important;
   font-size: 15px !important;
   font-weight: 600 !important;
   line-height: 1.5 !important;
@@ -76,22 +88,20 @@
   position: relative !important;
   overflow: hidden !important;
   transform: translateY(0) !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-family: inherit !important;
   text-transform: none !important;
   letter-spacing: normal !important;
   text-shadow: none !important;
-  min-height: auto !important;
-  max-height: none !important;
-  min-width: auto !important;
-  max-width: none !important;
+  min-height: 56px !important;
+  white-space: nowrap !important;
 }
 
-/* 🎯 EFFET HOVER BOUTON */
+/* 🎯 BOUTON HOVER/ACTIVE */
 .cs-chat-trigger-button:hover {
   transform: translateY(-2px) !important;
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25) !important;
   opacity: 0.95 !important;
-  filter: none !important;
+  filter: brightness(1.05) !important;
 }
 
 .cs-chat-trigger-button:active {
@@ -99,7 +109,12 @@
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2) !important;
 }
 
-/* 🎯 ICÔNE SVG DANS LE BOUTON */
+.cs-chat-trigger-button:focus {
+  outline: 2px solid rgba(59, 130, 246, 0.5) !important;
+  outline-offset: 2px !important;
+}
+
+/* 🎯 ICÔNE ET TEXTE BOUTON */
 .cs-chat-trigger-button svg {
   display: inline-block !important;
   width: 20px !important;
@@ -108,29 +123,22 @@
   fill: none !important;
   stroke: currentColor !important;
   stroke-width: 2 !important;
-  transition: transform 0.2s !important;
   vertical-align: middle !important;
   flex-shrink: 0 !important;
 }
 
-.cs-chat-trigger-button:hover svg {
-  transform: scale(1.1) !important;
-}
-
-/* 🎯 TEXTE DU BOUTON */
 .cs-chat-trigger-button span {
   display: inline !important;
   color: inherit !important;
   font-size: inherit !important;
   font-weight: inherit !important;
   line-height: inherit !important;
-  text-transform: none !important;
-  letter-spacing: normal !important;
   margin: 0 !important;
   padding: 0 !important;
+  white-space: nowrap !important;
 }
 
-/* 🔥 MODAL CHAT OVERLAY */
+/* 🔥 MODAL OVERLAY UNIVERSEL */
 .cs-chat-modal-overlay {
   position: fixed !important;
   top: 0 !important;
@@ -148,20 +156,25 @@
   opacity: 1 !important;
   visibility: visible !important;
   pointer-events: auto !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-family: inherit !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  color: #374151 !important;
 }
 
+/* 🔥 MODAL MOBILE */
 .cs-chat-modal-overlay.cs-mobile {
   padding: 0 !important;
   align-items: stretch !important;
   justify-content: stretch !important;
 }
 
-/* 🔥 CONTAINER CHAT PRINCIPAL */
+/* 🔥 CONTAINER CHAT DESKTOP */
 .cs-chat-container-desktop {
   width: 520px !important;
   height: 680px !important;
   max-height: 90vh !important;
+  max-width: 95vw !important;
   background: white !important;
   border-radius: 20px !important;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
@@ -173,10 +186,12 @@
   transform: none !important;
   opacity: 1 !important;
   visibility: visible !important;
+  font-family: inherit !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
 }
 
+/* 🔥 CONTAINER CHAT MOBILE */
 .cs-chat-container-mobile {
   width: 100% !important;
   height: 100% !important;
@@ -187,6 +202,7 @@
   transform: none !important;
   opacity: 1 !important;
   visibility: visible !important;
+  font-family: inherit !important;
 }
 
 /* 🔥 HEADER CHAT */
@@ -198,13 +214,15 @@
   align-items: center !important;
   justify-content: space-between !important;
   flex-shrink: 0 !important;
-  background: linear-gradient(135deg, #E91E63 0%, #C2185B 100%) !important;
+  background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%) !important;
   position: relative !important;
   overflow: hidden !important;
+  min-height: 80px !important;
 }
 
 .cs-mobile-header {
   padding: 16px 20px !important;
+  min-height: 70px !important;
 }
 
 /* 🔥 AGENT INFO */
@@ -213,6 +231,8 @@
   display: flex !important;
   align-items: center !important;
   gap: 12px !important;
+  flex: 1 !important;
+  min-width: 0 !important;
 }
 
 .cs-agent-avatar,
@@ -224,6 +244,7 @@
   overflow: hidden !important;
   border: 3px solid rgba(255, 255, 255, 0.3) !important;
   flex-shrink: 0 !important;
+  background: rgba(255, 255, 255, 0.1) !important;
 }
 
 .cs-mobile-avatar {
@@ -250,9 +271,12 @@
   font-size: 18px !important;
   font-weight: 600 !important;
   color: white !important;
-  margin: 0 !important;
+  margin: 0 0 4px 0 !important;
   display: block !important;
   line-height: 1.2 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
 }
 
 .cs-mobile-name {
@@ -263,57 +287,38 @@
 .cs-mobile-title {
   font-size: 13px !important;
   color: rgba(255, 255, 255, 0.9) !important;
-  margin: 4px 0 0 0 !important;
-  display: block !important;
-  line-height: 1.2 !important;
-}
-
-/* 🔥 SECTION PRODUIT */
-.cs-product-section,
-.cs-mobile-product {
-  padding: 16px 20px !important;
-  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%) !important;
-  border-bottom: 1px solid #e2e8f0 !important;
-  flex-shrink: 0 !important;
-}
-
-.cs-product-name,
-.cs-mobile-product-name {
-  font-size: 14px !important;
-  font-weight: 600 !important;
-  color: #111827 !important;
-  margin: 0 0 4px 0 !important;
-  display: block !important;
-}
-
-.cs-product-price,
-.cs-mobile-product-price {
-  font-size: 13px !important;
-  font-weight: 500 !important;
   margin: 0 !important;
   display: block !important;
+  line-height: 1.2 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
 }
 
-/* 🔥 AREA MESSAGES */
+/* 🔥 MESSAGES AREA */
 .cs-messages-area-desktop {
   flex: 1 !important;
   background: linear-gradient(to bottom, #f8fafc 0%, #ffffff 100%) !important;
   overflow-y: auto !important;
+  overflow-x: hidden !important;
   padding: 24px !important;
   display: flex !important;
   flex-direction: column !important;
+  min-height: 0 !important;
 }
 
 .cs-messages-area-mobile {
   flex: 1 !important;
   background: #f5f5f5 !important;
   overflow-y: auto !important;
+  overflow-x: hidden !important;
   padding: 20px !important;
   display: flex !important;
   flex-direction: column !important;
+  min-height: 0 !important;
 }
 
-/* 🔥 LISTE DES MESSAGES */
+/* 🔥 LISTE MESSAGES */
 .cs-messages-list,
 .cs-mobile-messages-list {
   display: flex !important;
@@ -330,6 +335,7 @@
   max-width: 100% !important;
   margin: 0 !important;
   padding: 0 !important;
+  align-items: flex-start !important;
 }
 
 .cs-assistant-message,
@@ -342,7 +348,7 @@
   justify-content: flex-end !important;
 }
 
-/* 🔥 BULLES DE MESSAGE */
+/* 🔥 BULLES MESSAGES */
 .cs-assistant-bubble,
 .cs-mobile-assistant-bubble {
   display: flex !important;
@@ -360,7 +366,7 @@
   flex-direction: row-reverse !important;
 }
 
-/* 🔥 AVATARS DANS MESSAGES */
+/* 🔥 AVATARS MESSAGES */
 .cs-message-avatar,
 .cs-mobile-message-avatar {
   width: 40px !important;
@@ -369,6 +375,7 @@
   overflow: hidden !important;
   flex-shrink: 0 !important;
   border: 2px solid #f3f4f6 !important;
+  background: #f3f4f6 !important;
 }
 
 .cs-message-avatar img,
@@ -383,7 +390,7 @@
   width: 40px !important;
   height: 40px !important;
   border-radius: 50% !important;
-  background: #E91E63 !important;
+  background: #3B82F6 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -393,7 +400,7 @@
   flex-shrink: 0 !important;
 }
 
-/* 🔥 CONTENU DES MESSAGES */
+/* 🔥 CONTENU MESSAGES */
 .cs-message-content,
 .cs-mobile-bubble-content {
   flex: 1 !important;
@@ -409,15 +416,18 @@
   font-size: 14px !important;
   line-height: 1.6 !important;
   word-wrap: break-word !important;
+  word-break: break-word !important;
   margin-bottom: 4px !important;
   color: #374151 !important;
   display: block !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  max-width: 100% !important;
+  overflow-wrap: break-word !important;
 }
 
 .cs-user-message .cs-message-text,
 .cs-mobile-user .cs-mobile-message-text {
-  background: linear-gradient(135deg, #E91E63 0%, #C2185B 100%) !important;
+  background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%) !important;
   color: white !important;
   border: none !important;
 }
@@ -428,6 +438,7 @@
   color: #9ca3af !important;
   padding: 0 4px !important;
   display: block !important;
+  margin-top: 2px !important;
 }
 
 /* 🔥 INPUT SECTION */
@@ -455,13 +466,14 @@
   border: 2px solid #e2e8f0 !important;
   border-radius: 12px !important;
   padding: 0 16px !important;
-  transition: all 0.2s !important;
+  transition: all 0.2s ease !important;
+  min-height: 48px !important;
 }
 
 .cs-input-wrapper:focus-within {
   background: white !important;
-  border-color: #E91E63 !important;
-  box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.1) !important;
+  border-color: #3B82F6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
 }
 
 .cs-message-input,
@@ -473,11 +485,12 @@
   padding: 14px 0 !important;
   font-size: 14px !important;
   color: #374151 !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-family: inherit !important;
   line-height: 1.5 !important;
   margin: 0 !important;
   box-shadow: none !important;
   resize: none !important;
+  min-height: 20px !important;
 }
 
 .cs-message-input::placeholder,
@@ -491,7 +504,7 @@
 .cs-mobile-send {
   width: 48px !important;
   height: 48px !important;
-  background: linear-gradient(135deg, #E91E63 0%, #C2185B 100%) !important;
+  background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%) !important;
   border: none !important;
   border-radius: 12px !important;
   color: white !important;
@@ -499,7 +512,7 @@
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  transition: all 0.2s !important;
+  transition: all 0.2s ease !important;
   flex-shrink: 0 !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
   transform: translateY(0) !important;
@@ -519,8 +532,8 @@
 
 .cs-send-button svg,
 .cs-mobile-send svg {
-  width: 24px !important;
-  height: 24px !important;
+  width: 20px !important;
+  height: 20px !important;
   fill: none !important;
   stroke: currentColor !important;
   stroke-width: 2 !important;
@@ -539,7 +552,8 @@
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  transition: all 0.2s !important;
+  transition: all 0.2s ease !important;
+  flex-shrink: 0 !important;
 }
 
 .cs-close-button:hover,
@@ -557,7 +571,7 @@
   stroke-width: 2 !important;
 }
 
-/* 🔥 SCROLLBAR CUSTOM */
+/* 🔥 SCROLLBAR PERSONNALISÉ */
 .cs-messages-area-desktop::-webkit-scrollbar,
 .cs-messages-area-mobile::-webkit-scrollbar {
   width: 6px !important;
@@ -565,16 +579,22 @@
 
 .cs-messages-area-desktop::-webkit-scrollbar-track,
 .cs-messages-area-mobile::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.1) !important;
+  background: rgba(0, 0, 0, 0.05) !important;
+  border-radius: 3px !important;
 }
 
 .cs-messages-area-desktop::-webkit-scrollbar-thumb,
 .cs-messages-area-mobile::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.3) !important;
+  background: rgba(0, 0, 0, 0.2) !important;
   border-radius: 3px !important;
 }
 
-/* 🔥 RESPONSIVE MOBILE */
+.cs-messages-area-desktop::-webkit-scrollbar-thumb:hover,
+.cs-messages-area-mobile::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3) !important;
+}
+
+/* 🔥 RESPONSIVE */
 @media (max-width: 767px) {
   .cs-chat-container-desktop {
     width: 100% !important;
@@ -591,8 +611,8 @@
 
 /* 🔥 ANIMATIONS */
 @keyframes cs-fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 @keyframes cs-slideIn {
@@ -618,45 +638,50 @@
   animation: cs-slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 🔥 FORCE OVERRIDE DES STYLES SHOPIFY COURANTS */
+/* 🔥 OVERRIDES SPÉCIFIQUES PAR PLATEFORME */
+
+/* Shopify */
 .shopify-section .cs-chatseller-widget,
 .product-form .cs-chatseller-widget,
 .product-single .cs-chatseller-widget {
   position: relative !important;
   width: 100% !important;
   margin: 8px 0 !important;
-  padding: 0 !important;
-  border: none !important;
-  background: none !important;
-  box-shadow: none !important;
-  transform: none !important;
   z-index: 1 !important;
 }
 
-/* 🔥 RESET SPÉCIFIQUE AUX THÈMES SHOPIFY POPULAIRES */
-.cs-chatseller-widget * {
-  box-sizing: border-box !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-  text-transform: none !important;
-  letter-spacing: normal !important;
-  text-shadow: none !important;
+/* WordPress/WooCommerce */
+.woocommerce .cs-chatseller-widget,
+.single-product .cs-chatseller-widget,
+.wp-block .cs-chatseller-widget {
+  position: relative !important;
+  width: 100% !important;
+  margin: 8px 0 !important;
+  z-index: 1 !important;
 }
 
-/* 🔥 HIDE FOCUS OUTLINES SAUF POUR ACCESSIBILITÉ */
-.cs-chatseller-widget *:focus:not(:focus-visible) {
-  outline: none !important;
-}
-
-.cs-chatseller-widget *:focus-visible {
-  outline: 2px solid #007AFF !important;
-  outline-offset: 2px !important;
-}
-
-/* 🔥 FINAL FALLBACK - FORCE ABSOLUTE POSITIONING IF NEEDED */
+/* Sites personnalisés - Fallback */
 .cs-chatseller-widget-fallback {
   position: fixed !important;
   bottom: 20px !important;
   right: 20px !important;
   z-index: 2147483647 !important;
   max-width: 300px !important;
+}
+
+/* 🔥 ACCESSIBILITÉ */
+.cs-chatseller-widget *:focus:not(:focus-visible) {
+  outline: none !important;
+}
+
+.cs-chatseller-widget *:focus-visible {
+  outline: 2px solid #3B82F6 !important;
+  outline-offset: 2px !important;
+}
+
+/* 🔥 PRINT MEDIA */
+@media print {
+  .cs-chatseller-widget {
+    display: none !important;
+  }
 }

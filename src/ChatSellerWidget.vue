@@ -716,458 +716,41 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* ✅ FORCE ABSOLUE POUR SHOPIFY - À AJOUTER AU DÉBUT DU <style> */
-.cs-chatseller-widget,
-.cs-chatseller-widget *,
-.cs-chatseller-widget *::before,
-.cs-chatseller-widget *::after {
-  all: unset !important;
-  box-sizing: border-box !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-  line-height: normal !important;
-  color: inherit !important;
-  background: transparent !important;
-  border: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  text-decoration: none !important;
-  outline: none !important;
-  -webkit-font-smoothing: antialiased !important;
-  -moz-osx-font-smoothing: grayscale !important;
-}
+/* ✅ CSS MINIMAL - COMPLÉMENTAIRE AU CSS GLOBAL */
+/* Le CSS principal est dans src/style.css */
 
-/* ✅ FORCE OVERLAY MODAL */
-.cs-chat-modal-overlay {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  background: rgba(0, 0, 0, 0.6) !important;
-  backdrop-filter: blur(8px) !important;
-  z-index: 2147483647 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 16px !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  pointer-events: auto !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-  font-size: 14px !important;
-  line-height: 1.5 !important;
-}
-
-/* ✅ FORCE CONTAINER CHAT */
-.cs-chat-container-desktop {
-  width: 520px !important;
-  height: 680px !important;
-  max-height: 90vh !important;
-  background: white !important;
-  border-radius: 20px !important;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  display: flex !important;
-  flex-direction: column !important;
-  overflow: hidden !important;
-  position: relative !important;
-  transform: none !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  font-family: inherit !important;
-  font-size: 14px !important;
-  line-height: 1.5 !important;
-  color: #374151 !important;
-}
-
-/* ✅ RESET ET ISOLATION ABSOLUE POUR SHOPIFY */
-.cs-chatseller-widget,
-.cs-chatseller-widget *,
-.cs-chatseller-widget *::before,
-.cs-chatseller-widget *::after {
-  all: unset !important;
-  box-sizing: border-box !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-  line-height: normal !important;
-}
-
-/* ✅ CONTENEUR PRINCIPAL */
+/* Corrections spécifiques Vue uniquement */
 .cs-chatseller-widget {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  z-index: 2147483647 !important;
-  font-size: 14px !important;
-  color: #374151 !important;
-  font-weight: normal !important;
-  text-align: left !important;
+  font-family: inherit;
+  position: relative;
 }
 
-/* ✅ OVERLAY MODAL */
-.cs-chat-modal-overlay {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  background: rgba(0, 0, 0, 0.6) !important;
-  backdrop-filter: blur(8px) !important;
-  z-index: 2147483647 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 16px !important;
+/* Animation spécifique Vue */
+.cs-modal-enter-active, .cs-modal-leave-active {
+  transition: opacity 0.3s ease;
 }
 
-.cs-chat-modal-overlay.cs-mobile {
-  padding: 0 !important;
-  align-items: stretch !important;
-  justify-content: stretch !important;
+.cs-modal-enter-from, .cs-modal-leave-to {
+  opacity: 0;
 }
 
-/* ✅ CONTAINER DESKTOP */
-.cs-chat-container-desktop {
-  width: 520px !important;
-  height: 680px !important;
-  max-height: 90vh !important;
-  background: white !important;
-  border-radius: 20px !important;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  display: flex !important;
-  flex-direction: column !important;
-  overflow: hidden !important;
-  position: relative !important;
+/* Message formatting spécifique Vue */
+.message-formatted {
+  line-height: 1.6 !important;
+  word-break: break-word !important;
 }
 
-/* ✅ CONTAINER MOBILE */
-.cs-chat-container-mobile {
-  width: 100% !important;
-  height: 100% !important;
-  background: white !important;
-  display: flex !important;
-  flex-direction: column !important;
-  overflow: hidden !important;
-}
-
-/* ✅ HEADER DESKTOP */
-.cs-desktop-header {
-  padding: 24px !important;
-  color: white !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  flex-shrink: 0 !important;
-  background: linear-gradient(135deg, #E91E63 0%, #C2185B 100%) !important;
-}
-
-.cs-mobile-header {
-  padding: 16px 20px !important;
-  color: white !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  flex-shrink: 0 !important;
-  background: linear-gradient(135deg, #E91E63 0%, #C2185B 100%) !important;
-}
-
-/* ✅ SECTION PRODUIT */
-.cs-product-section,
-.cs-mobile-product {
-  padding: 16px 20px !important;
-  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%) !important;
-  border-bottom: 1px solid #e2e8f0 !important;
-  flex-shrink: 0 !important;
-}
-
-/* ✅ AREA MESSAGES */
-.cs-messages-area-desktop {
-  flex: 1 !important;
-  background: linear-gradient(to bottom, #f8fafc 0%, #ffffff 100%) !important;
-  overflow-y: auto !important;
-  padding: 24px !important;
-}
-
-.cs-messages-area-mobile {
-  flex: 1 !important;
-  background: #f5f5f5 !important;
-  overflow-y: auto !important;
-  padding: 20px !important;
-}
-
-/* ✅ LISTE DES MESSAGES */
-.cs-messages-list,
-.cs-mobile-messages-list {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 20px !important;
-  min-height: 100% !important;
-}
-
-/* ✅ MESSAGE ITEMS */
-.cs-message-item,
-.cs-mobile-message {
-  display: flex !important;
-  max-width: 100% !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-.cs-assistant-message,
-.cs-mobile-assistant {
-  justify-content: flex-start !important;
-}
-
-.cs-user-message,
-.cs-mobile-user {
-  justify-content: flex-end !important;
-}
-
-/* ✅ BULLES DE MESSAGE */
-.cs-assistant-bubble,
-.cs-mobile-assistant-bubble {
-  display: flex !important;
-  align-items: flex-start !important;
-  gap: 12px !important;
-  max-width: 85% !important;
-}
-
-.cs-user-bubble,
-.cs-mobile-user-bubble {
-  display: flex !important;
-  align-items: flex-start !important;
-  gap: 12px !important;
-  max-width: 85% !important;
-  flex-direction: row-reverse !important;
-}
-
-/* ✅ AVATARS */
-.cs-message-avatar,
-.cs-mobile-message-avatar {
-  width: 40px !important;
-  height: 40px !important;
-  border-radius: 50% !important;
-  overflow: hidden !important;
-  flex-shrink: 0 !important;
-}
-
-.cs-message-avatar img,
-.cs-mobile-message-avatar img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-}
-
-.cs-user-avatar {
-  width: 40px !important;
-  height: 40px !important;
-  border-radius: 50% !important;
-  background: #E91E63 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  color: white !important;
+.message-formatted strong {
   font-weight: 600 !important;
-  font-size: 16px !important;
-  flex-shrink: 0 !important;
+  color: #1f2937 !important;
 }
 
-/* ✅ CONTENU DES MESSAGES */
-.cs-message-content,
-.cs-mobile-bubble-content {
-  flex: 1 !important;
-  min-width: 0 !important;
+.message-formatted em {
+  font-style: italic !important;
+  color: #4b5563 !important;
 }
 
-.cs-message-text,
-.cs-mobile-message-text {
-  background: white !important;
-  border: 1px solid #e2e8f0 !important;
-  border-radius: 16px !important;
-  padding: 12px 16px !important;
-  font-size: 14px !important;
-  line-height: 1.5 !important;
-  word-wrap: break-word !important;
-  margin-bottom: 4px !important;
-  color: #374151 !important;
-}
-
-.cs-user-message .cs-message-text,
-.cs-mobile-user .cs-mobile-message-text {
-  background: linear-gradient(135deg, #E91E63 0%, #C2185B 100%) !important;
-  color: white !important;
-  border: none !important;
-}
-
-.cs-message-time,
-.cs-mobile-message-time {
-  font-size: 11px !important;
-  color: #9ca3af !important;
-  padding: 0 4px !important;
-}
-
-/* ✅ TYPING INDICATOR */
-.cs-typing-content,
-.cs-mobile-typing {
-  background: white !important;
-  border: 1px solid #e2e8f0 !important;
-  border-radius: 16px !important;
-  padding: 12px 16px !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-}
-
-.cs-typing-indicator,
-.cs-mobile-typing-dots {
-  display: flex !important;
-  gap: 4px !important;
-}
-
-.cs-typing-dot,
-.cs-mobile-dot {
-  width: 8px !important;
-  height: 8px !important;
-  background: #E91E63 !important;
-  border-radius: 50% !important;
-  animation: typing 1.4s infinite !important;
-}
-
-.cs-typing-dot:nth-child(1) { animation-delay: 0s !important; }
-.cs-typing-dot:nth-child(2) { animation-delay: 0.2s !important; }
-.cs-typing-dot:nth-child(3) { animation-delay: 0.4s !important; }
-
-/* ✅ SECTION INPUT */
-.cs-input-section-desktop,
-.cs-mobile-input-section {
-  padding: 20px !important;
-  border-top: 1px solid #e2e8f0 !important;
-  background: white !important;
-  flex-shrink: 0 !important;
-}
-
-.cs-input-container,
-.cs-mobile-input-container {
-  display: flex !important;
-  align-items: center !important;
-  gap: 12px !important;
-  margin-bottom: 12px !important;
-}
-
-.cs-input-wrapper {
-  flex: 1 !important;
-  display: flex !important;
-  align-items: center !important;
-  background: #f8fafc !important;
-  border: 2px solid #e2e8f0 !important;
-  border-radius: 12px !important;
-  padding: 0 16px !important;
-  transition: all 0.2s !important;
-}
-
-.cs-input-wrapper:focus-within {
-  background: white !important;
-  border-color: #E91E63 !important;
-  box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.1) !important;
-}
-
-.cs-message-input,
-.cs-mobile-message-input {
-  flex: 1 !important;
-  background: transparent !important;
-  border: none !important;
-  outline: none !important;
-  padding: 14px 0 !important;
-  font-size: 14px !important;
-  color: #374151 !important;
-  font-family: inherit !important;
-}
-
-.cs-send-button,
-.cs-mobile-send {
-  width: 48px !important;
-  height: 48px !important;
-  background: linear-gradient(135deg, #E91E63 0%, #C2185B 100%) !important;
-  border: none !important;
-  border-radius: 12px !important;
-  color: white !important;
-  cursor: pointer !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  transition: all 0.2s !important;
-  flex-shrink: 0 !important;
-}
-
-.cs-send-button:hover:not(:disabled),
-.cs-mobile-send:hover:not(:disabled) {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25) !important;
-}
-
-.cs-send-button:disabled,
-.cs-mobile-send:disabled {
-  opacity: 0.5 !important;
-  cursor: not-allowed !important;
-}
-
-/* ✅ BOUTON CLOSE */
-.cs-close-button,
-.cs-mobile-close {
-  background: rgba(255, 255, 255, 0.1) !important;
-  border: none !important;
-  color: white !important;
-  width: 40px !important;
-  height: 40px !important;
-  border-radius: 50% !important;
-  cursor: pointer !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  transition: all 0.2s !important;
-}
-
-.cs-close-button:hover,
-.cs-mobile-close:hover {
-  background: rgba(255, 255, 255, 0.2) !important;
-  transform: rotate(90deg) !important;
-}
-
-/* ✅ SCROLLBAR */
-.cs-messages-area-desktop::-webkit-scrollbar,
-.cs-messages-area-mobile::-webkit-scrollbar {
-  width: 6px !important;
-}
-
-.cs-messages-area-desktop::-webkit-scrollbar-track,
-.cs-messages-area-mobile::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.1) !important;
-}
-
-.cs-messages-area-desktop::-webkit-scrollbar-thumb,
-.cs-messages-area-mobile::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.3) !important;
-  border-radius: 3px !important;
-}
-
-/* ✅ RESPONSIVE */
-@media (max-width: 767px) {
-  .cs-chat-container-desktop {
-    width: 100% !important;
-    height: 100% !important;
-    max-height: 100vh !important;
-    border-radius: 0 !important;
-    border: none !important;
-  }
-  
-  .cs-chat-modal-overlay {
-    padding: 0 !important;
-  }
-}
-
-/* ✅ ANIMATIONS */
+/* Loading animation spécifique Vue */
 @keyframes typing {
   0%, 60%, 100% {
     transform: translateY(0);
@@ -1177,21 +760,11 @@ onMounted(() => {
   }
 }
 
-.cs-modal-enter-active {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+.cs-typing-dot {
+  animation: typing 1.4s infinite;
 }
 
-.cs-modal-leave-active {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.cs-modal-enter-from {
-  opacity: 0;
-  transform: scale(0.95) translateY(20px);
-}
-
-.cs-modal-leave-to {
-  opacity: 0;
-  transform: scale(0.95) translateY(-20px);
-}
+.cs-typing-dot:nth-child(1) { animation-delay: 0s; }
+.cs-typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.cs-typing-dot:nth-child(3) { animation-delay: 0.4s; }
 </style>
