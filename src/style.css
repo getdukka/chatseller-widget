@@ -1,7 +1,7 @@
-/* ✅ CHATSELLER WIDGET - CSS GLOBAL MULTI-PLATEFORMES */
-/* Compatible : Shopify, WordPress, WooCommerce, Sites personnalisés */
+/* 🔥 CHATSELLER WIDGET - CSS ISOLÉ SHOPIFY READY */
+/* Version: 1.2.4 - Isolation renforcée pour Shopify */
 
-/* 🔥 RESET ABSOLU - ISOLATION TOTALE */
+/* 🛡️ RESET ABSOLU - PRIORITÉ MAXIMALE */
 .cs-chatseller-widget,
 .cs-chatseller-widget *,
 .cs-chatseller-widget *::before,
@@ -12,9 +12,14 @@
   line-height: normal !important;
   -webkit-font-smoothing: antialiased !important;
   -moz-osx-font-smoothing: grayscale !important;
+  font-weight: normal !important;
+  font-style: normal !important;
+  text-decoration: none !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
 }
 
-/* 🎯 CONTAINER PRINCIPAL */
+/* 🎯 CONTAINER PRINCIPAL - SHOPIFY SAFE */
 .cs-chatseller-widget {
   position: relative !important;
   z-index: 999999 !important;
@@ -27,24 +32,22 @@
   width: 100% !important;
   max-width: 100% !important;
   min-width: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
 
-/* 🔥 RESET ÉLÉMENTS SPÉCIFIQUES */
+/* 🔥 RESET SPÉCIFIQUE SHOPIFY */
 .cs-chatseller-widget div,
 .cs-chatseller-widget span,
 .cs-chatseller-widget button,
 .cs-chatseller-widget input,
 .cs-chatseller-widget textarea,
 .cs-chatseller-widget p,
-.cs-chatseller-widget h1,
-.cs-chatseller-widget h2,
-.cs-chatseller-widget h3,
-.cs-chatseller-widget h4,
-.cs-chatseller-widget h5,
-.cs-chatseller-widget h6,
-.cs-chatseller-widget img,
-.cs-chatseller-widget svg,
-.cs-chatseller-widget a {
+.cs-chatseller-widget h1, .cs-chatseller-widget h2, .cs-chatseller-widget h3,
+.cs-chatseller-widget h4, .cs-chatseller-widget h5, .cs-chatseller-widget h6,
+.cs-chatseller-widget img, .cs-chatseller-widget svg, .cs-chatseller-widget a {
   all: unset !important;
   box-sizing: border-box !important;
   font-family: inherit !important;
@@ -64,9 +67,18 @@
   appearance: none !important;
   -webkit-appearance: none !important;
   -moz-appearance: none !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+  float: none !important;
+  clear: none !important;
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
 }
 
-/* 🎯 BOUTON PRINCIPAL WIDGET */
+/* 🎯 BOUTON PRINCIPAL WIDGET - ANTI-SHOPIFY */
 .cs-chat-trigger-button {
   display: flex !important;
   align-items: center !important;
@@ -88,15 +100,21 @@
   position: relative !important;
   overflow: hidden !important;
   transform: translateY(0) !important;
-  font-family: inherit !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
   text-transform: none !important;
   letter-spacing: normal !important;
   text-shadow: none !important;
   min-height: 56px !important;
   white-space: nowrap !important;
+  text-decoration: none !important;
+  vertical-align: baseline !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
 }
 
-/* 🎯 BOUTON HOVER/ACTIVE */
+/* 🎯 STATES BOUTON */
 .cs-chat-trigger-button:hover {
   transform: translateY(-2px) !important;
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25) !important;
@@ -114,7 +132,7 @@
   outline-offset: 2px !important;
 }
 
-/* 🎯 ICÔNE ET TEXTE BOUTON */
+/* 🎯 CONTENU BOUTON */
 .cs-chat-trigger-button svg {
   display: inline-block !important;
   width: 20px !important;
@@ -136,9 +154,12 @@
   margin: 0 !important;
   padding: 0 !important;
   white-space: nowrap !important;
+  text-decoration: none !important;
+  background: transparent !important;
+  border: none !important;
 }
 
-/* 🔥 MODAL OVERLAY UNIVERSEL */
+/* 🔥 MODAL OVERLAY - ANTI-SHOPIFY */
 .cs-chat-modal-overlay {
   position: fixed !important;
   top: 0 !important;
@@ -156,13 +177,20 @@
   opacity: 1 !important;
   visibility: visible !important;
   pointer-events: auto !important;
-  font-family: inherit !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
   font-size: 14px !important;
   line-height: 1.5 !important;
   color: #374151 !important;
+  margin: 0 !important;
+  border: none !important;
+  outline: none !important;
+  text-decoration: none !important;
+  transform: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
 }
 
-/* 🔥 MODAL MOBILE */
+/* 🔥 VERSION MOBILE */
 .cs-chat-modal-overlay.cs-mobile {
   padding: 0 !important;
   align-items: stretch !important;
@@ -189,9 +217,17 @@
   font-family: inherit !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-decoration: none !important;
+  outline: none !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  color: #374151 !important;
+  z-index: 1 !important;
 }
 
-/* 🔥 CONTAINER CHAT MOBILE */
+/* 🔥 CONTAINER MOBILE */
 .cs-chat-container-mobile {
   width: 100% !important;
   height: 100% !important;
@@ -203,6 +239,13 @@
   opacity: 1 !important;
   visibility: visible !important;
   font-family: inherit !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 /* 🔥 HEADER CHAT */
@@ -218,6 +261,16 @@
   position: relative !important;
   overflow: hidden !important;
   min-height: 80px !important;
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+  outline: none !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  z-index: 1 !important;
 }
 
 .cs-mobile-header {
@@ -233,6 +286,12 @@
   gap: 12px !important;
   flex: 1 !important;
   min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 .cs-agent-avatar,
@@ -245,11 +304,16 @@
   border: 3px solid rgba(255, 255, 255, 0.3) !important;
   flex-shrink: 0 !important;
   background: rgba(255, 255, 255, 0.1) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+  z-index: 1 !important;
 }
 
 .cs-mobile-avatar {
   width: 40px !important;
   height: 40px !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
 }
 
 .cs-avatar-image,
@@ -258,12 +322,25 @@
   height: 100% !important;
   object-fit: cover !important;
   display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 .cs-agent-details,
 .cs-mobile-details {
   min-width: 0 !important;
   flex: 1 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 .cs-agent-name,
@@ -272,11 +349,19 @@
   font-weight: 600 !important;
   color: white !important;
   margin: 0 0 4px 0 !important;
+  padding: 0 !important;
   display: block !important;
   line-height: 1.2 !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
+  background: transparent !important;
+  border: none !important;
+  text-decoration: none !important;
+  font-family: inherit !important;
+  text-shadow: none !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 .cs-mobile-name {
@@ -288,14 +373,23 @@
   font-size: 13px !important;
   color: rgba(255, 255, 255, 0.9) !important;
   margin: 0 !important;
+  padding: 0 !important;
   display: block !important;
   line-height: 1.2 !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
+  background: transparent !important;
+  border: none !important;
+  text-decoration: none !important;
+  font-family: inherit !important;
+  font-weight: normal !important;
+  text-shadow: none !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
-/* 🔥 MESSAGES AREA */
+/* 🔥 ZONE MESSAGES */
 .cs-messages-area-desktop {
   flex: 1 !important;
   background: linear-gradient(to bottom, #f8fafc 0%, #ffffff 100%) !important;
@@ -305,6 +399,18 @@
   display: flex !important;
   flex-direction: column !important;
   min-height: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+  outline: none !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  color: inherit !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 .cs-messages-area-mobile {
@@ -316,6 +422,18 @@
   display: flex !important;
   flex-direction: column !important;
   min-height: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  text-decoration: none !important;
+  outline: none !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  color: inherit !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 /* 🔥 LISTE MESSAGES */
@@ -326,9 +444,15 @@
   gap: 20px !important;
   min-height: 100% !important;
   flex: 1 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
-/* 🔥 MESSAGE ITEMS */
+/* 🔥 ÉLÉMENTS MESSAGES */
 .cs-message-item,
 .cs-mobile-message {
   display: flex !important;
@@ -336,6 +460,10 @@
   margin: 0 !important;
   padding: 0 !important;
   align-items: flex-start !important;
+  background: transparent !important;
+  border: none !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 .cs-assistant-message,
@@ -355,6 +483,12 @@
   align-items: flex-start !important;
   gap: 12px !important;
   max-width: 85% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 .cs-user-bubble,
@@ -364,6 +498,12 @@
   gap: 12px !important;
   max-width: 85% !important;
   flex-direction: row-reverse !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 /* 🔥 AVATARS MESSAGES */
@@ -376,6 +516,10 @@
   flex-shrink: 0 !important;
   border: 2px solid #f3f4f6 !important;
   background: #f3f4f6 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 .cs-message-avatar img,
@@ -384,6 +528,12 @@
   height: 100% !important;
   object-fit: cover !important;
   display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 .cs-user-avatar {
@@ -398,6 +548,14 @@
   font-weight: 600 !important;
   font-size: 16px !important;
   flex-shrink: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  text-decoration: none !important;
+  font-family: inherit !important;
+  line-height: 1 !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 /* 🔥 CONTENU MESSAGES */
@@ -405,6 +563,12 @@
 .cs-mobile-bubble-content {
   flex: 1 !important;
   min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 .cs-message-text,
@@ -417,12 +581,18 @@
   line-height: 1.6 !important;
   word-wrap: break-word !important;
   word-break: break-word !important;
-  margin-bottom: 4px !important;
+  margin: 0 0 4px 0 !important;
   color: #374151 !important;
   display: block !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
   max-width: 100% !important;
   overflow-wrap: break-word !important;
+  font-family: inherit !important;
+  font-weight: normal !important;
+  text-decoration: none !important;
+  outline: none !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 .cs-user-message .cs-message-text,
@@ -438,16 +608,30 @@
   color: #9ca3af !important;
   padding: 0 4px !important;
   display: block !important;
-  margin-top: 2px !important;
+  margin: 2px 0 0 0 !important;
+  background: transparent !important;
+  border: none !important;
+  text-decoration: none !important;
+  font-family: inherit !important;
+  font-weight: normal !important;
+  line-height: 1.2 !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
-/* 🔥 INPUT SECTION */
+/* 🔥 SECTION INPUT */
 .cs-input-section-desktop,
 .cs-mobile-input-section {
   padding: 20px !important;
   border-top: 1px solid #e2e8f0 !important;
   background: white !important;
   flex-shrink: 0 !important;
+  margin: 0 !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-bottom: none !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 .cs-input-container,
@@ -455,7 +639,12 @@
   display: flex !important;
   align-items: center !important;
   gap: 12px !important;
-  margin-bottom: 12px !important;
+  margin: 0 0 12px 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 .cs-input-wrapper {
@@ -468,6 +657,9 @@
   padding: 0 16px !important;
   transition: all 0.2s ease !important;
   min-height: 48px !important;
+  margin: 0 !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 .cs-input-wrapper:focus-within {
@@ -491,12 +683,21 @@
   box-shadow: none !important;
   resize: none !important;
   min-height: 20px !important;
+  text-decoration: none !important;
+  font-weight: normal !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 .cs-message-input::placeholder,
 .cs-mobile-message-input::placeholder {
   color: #9ca3af !important;
   opacity: 1 !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  font-weight: normal !important;
 }
 
 /* 🔥 BOUTONS SEND */
@@ -516,6 +717,13 @@
   flex-shrink: 0 !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
   transform: translateY(0) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-decoration: none !important;
+  outline: none !important;
+  font-family: inherit !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 .cs-send-button:hover:not(:disabled),
@@ -537,9 +745,11 @@
   fill: none !important;
   stroke: currentColor !important;
   stroke-width: 2 !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
-/* 🔥 BOUTON CLOSE */
+/* 🔥 BOUTONS CLOSE */
 .cs-close-button,
 .cs-mobile-close {
   background: rgba(255, 255, 255, 0.1) !important;
@@ -554,6 +764,12 @@
   justify-content: center !important;
   transition: all 0.2s ease !important;
   flex-shrink: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-decoration: none !important;
+  outline: none !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 .cs-close-button:hover,
@@ -569,9 +785,11 @@
   fill: none !important;
   stroke: currentColor !important;
   stroke-width: 2 !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
-/* 🔥 SCROLLBAR PERSONNALISÉ */
+/* 🔥 SCROLLBARS PERSONNALISÉES */
 .cs-messages-area-desktop::-webkit-scrollbar,
 .cs-messages-area-mobile::-webkit-scrollbar {
   width: 6px !important;
@@ -594,7 +812,7 @@
   background: rgba(0, 0, 0, 0.3) !important;
 }
 
-/* 🔥 RESPONSIVE */
+/* 🔥 RESPONSIVE SHOPIFY */
 @media (max-width: 767px) {
   .cs-chat-container-desktop {
     width: 100% !important;
@@ -609,18 +827,18 @@
   }
 }
 
-/* 🔥 ANIMATIONS */
+/* 🔥 ANIMATIONS PERFORMANCE */
 @keyframes cs-fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  0% { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 @keyframes cs-slideIn {
-  from {
+  0% {
     opacity: 0;
     transform: scale(0.95) translateY(20px);
   }
-  to {
+  100% {
     opacity: 1;
     transform: scale(1) translateY(0);
   }
@@ -638,35 +856,35 @@
   animation: cs-slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 🔥 OVERRIDES SPÉCIFIQUES PAR PLATEFORME */
-
-/* Shopify */
+/* 🔥 OVERRIDES SHOPIFY SPÉCIFIQUES */
 .shopify-section .cs-chatseller-widget,
 .product-form .cs-chatseller-widget,
-.product-single .cs-chatseller-widget {
+.product-single .cs-chatseller-widget,
+.product__content .cs-chatseller-widget,
+.product-recommendations .cs-chatseller-widget {
   position: relative !important;
   width: 100% !important;
   margin: 8px 0 !important;
   z-index: 1 !important;
+  clear: both !important;
+  float: none !important;
 }
 
-/* WordPress/WooCommerce */
-.woocommerce .cs-chatseller-widget,
-.single-product .cs-chatseller-widget,
-.wp-block .cs-chatseller-widget {
-  position: relative !important;
-  width: 100% !important;
-  margin: 8px 0 !important;
-  z-index: 1 !important;
-}
-
-/* Sites personnalisés - Fallback */
+/* 🔥 FALLBACK MOBILE */
 .cs-chatseller-widget-fallback {
   position: fixed !important;
   bottom: 20px !important;
   right: 20px !important;
   z-index: 2147483647 !important;
   max-width: 300px !important;
+}
+
+/* 🔥 PRINT MEDIA */
+@media print {
+  .cs-chatseller-widget,
+  .cs-chat-modal-overlay {
+    display: none !important;
+  }
 }
 
 /* 🔥 ACCESSIBILITÉ */
@@ -679,9 +897,356 @@
   outline-offset: 2px !important;
 }
 
-/* 🔥 PRINT MEDIA */
-@media print {
-  .cs-chatseller-widget {
-    display: none !important;
+/* 🔥 THÈMES SOMBRES */
+@media (prefers-color-scheme: dark) {
+  .cs-chat-container-desktop,
+  .cs-chat-container-mobile {
+    background: #1f2937 !important;
   }
+  
+  .cs-messages-area-desktop {
+    background: linear-gradient(to bottom, #374151 0%, #1f2937 100%) !important;
+  }
+  
+  .cs-messages-area-mobile {
+    background: #374151 !important;
+  }
+  
+  .cs-message-text {
+    background: #374151 !important;
+    color: #f9fafb !important;
+    border-color: #4b5563 !important;
+  }
+  
+  .cs-input-section-desktop,
+  .cs-mobile-input-section {
+    background: #1f2937 !important;
+    border-color: #4b5563 !important;
+  }
+  
+  .cs-input-wrapper {
+    background: #374151 !important;
+    border-color: #4b5563 !important;
+  }
+  
+  .cs-message-input,
+  .cs-mobile-message-input {
+    color: #f9fafb !important;
+  }
+}
+
+/* 🔥 PROTECTION CONTRE LES CONFLITS CSS EXTERNES */
+.cs-chatseller-widget {
+  contain: layout style !important;
+  isolation: isolate !important;
+}
+
+/* 🔥 QUICK REPLIES - AJOUT MANQUANT */
+.cs-quick-replies-desktop,
+.cs-quick-replies-mobile {
+  padding: 16px 20px !important;
+  border-top: 1px solid #e2e8f0 !important;
+  background: white !important;
+  margin: 0 !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.cs-replies-grid,
+.cs-mobile-replies-grid {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+.cs-quick-reply-btn,
+.cs-mobile-quick-reply {
+  background: white !important;
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 20px !important;
+  padding: 8px 16px !important;
+  font-size: 13px !important;
+  color: #374151 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin: 0 !important;
+  text-decoration: none !important;
+  font-family: inherit !important;
+  font-weight: normal !important;
+  line-height: 1.2 !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.cs-quick-reply-btn:hover,
+.cs-mobile-quick-reply:hover {
+  border-color: #3B82F6 !important;
+  color: #3B82F6 !important;
+  background: rgba(59, 130, 246, 0.05) !important;
+}
+
+.cs-reply-icon {
+  display: inline !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: inherit !important;
+}
+
+.cs-reply-text {
+  display: inline !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: inherit !important;
+  color: inherit !important;
+  font-family: inherit !important;
+  font-weight: inherit !important;
+}
+
+/* 🔥 TYPING INDICATOR */
+.cs-typing-content,
+.cs-mobile-typing {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+.cs-typing-indicator,
+.cs-mobile-typing-dots {
+  display: flex !important;
+  gap: 4px !important;
+  padding: 12px 16px !important;
+  background: white !important;
+  border-radius: 16px !important;
+  border: 1px solid #e2e8f0 !important;
+  margin: 0 !important;
+}
+
+.cs-typing-dot,
+.cs-mobile-dot {
+  width: 8px !important;
+  height: 8px !important;
+  border-radius: 50% !important;
+  background: #9ca3af !important;
+  animation: cs-typing 1.4s infinite !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.cs-typing-dot:nth-child(1),
+.cs-mobile-dot:nth-child(1) { animation-delay: 0s !important; }
+.cs-typing-dot:nth-child(2),
+.cs-mobile-dot:nth-child(2) { animation-delay: 0.2s !important; }
+.cs-typing-dot:nth-child(3),
+.cs-mobile-dot:nth-child(3) { animation-delay: 0.4s !important; }
+
+@keyframes cs-typing {
+  0%, 60%, 100% {
+    transform: translateY(0) !important;
+  }
+  30% {
+    transform: translateY(-6px) !important;
+  }
+}
+
+.cs-typing-text {
+  font-size: 11px !important;
+  color: #9ca3af !important;
+  padding: 0 4px !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  font-family: inherit !important;
+  font-weight: normal !important;
+}
+
+/* 🔥 VOICE BUTTON */
+.cs-voice-button,
+.cs-mobile-voice {
+  background: transparent !important;
+  border: none !important;
+  color: #9ca3af !important;
+  cursor: pointer !important;
+  padding: 8px !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 6px !important;
+  transition: color 0.2s ease !important;
+  outline: none !important;
+  text-decoration: none !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.cs-voice-button:hover,
+.cs-mobile-voice:hover {
+  color: #3B82F6 !important;
+}
+
+.cs-voice-button svg,
+.cs-mobile-voice svg {
+  width: 20px !important;
+  height: 20px !important;
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 2 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* 🔥 FOOTER INFO */
+.cs-footer-info,
+.cs-mobile-footer {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  font-size: 11px !important;
+  color: #9ca3af !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  font-family: inherit !important;
+  font-weight: normal !important;
+  line-height: 1.2 !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.cs-mobile-footer {
+  justify-content: center !important;
+  text-align: center !important;
+}
+
+.cs-security {
+  display: inline !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: inherit !important;
+  color: inherit !important;
+  font-family: inherit !important;
+  font-weight: inherit !important;
+}
+
+/* 🔥 PRODUCT SECTION */
+.cs-product-section,
+.cs-mobile-product {
+  padding: 16px 20px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+  margin: 0 !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.cs-product-details {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+.cs-product-name,
+.cs-mobile-product-name {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: white !important;
+  margin: 0 0 4px 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  text-decoration: none !important;
+  font-family: inherit !important;
+  line-height: 1.3 !important;
+  display: block !important;
+}
+
+.cs-product-price,
+.cs-mobile-product-price {
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  text-decoration: none !important;
+  font-family: inherit !important;
+  line-height: 1.2 !important;
+  display: block !important;
+}
+
+/* 🔥 STATUS INDICATORS */
+.cs-status-indicator,
+.cs-mobile-status {
+  position: absolute !important;
+  bottom: 2px !important;
+  right: 2px !important;
+  width: 12px !important;
+  height: 12px !important;
+  border-radius: 50% !important;
+  border: 2px solid white !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  z-index: 2 !important;
+}
+
+.cs-status-badge {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin: 4px 0 0 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  font-size: 11px !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-family: inherit !important;
+  font-weight: normal !important;
+  line-height: 1.2 !important;
+}
+
+.cs-status-dot {
+  width: 6px !important;
+  height: 6px !important;
+  border-radius: 50% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  flex-shrink: 0 !important;
+}
+
+/* 🔥 PERFORMANCE OPTIMIZATIONS */
+.cs-chatseller-widget * {
+  will-change: auto !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+}
+
+.cs-chat-modal-overlay {
+  will-change: opacity !important;
+}
+
+.cs-chat-container-desktop,
+.cs-chat-container-mobile {
+  will-change: transform !important;
+}
+
+/* 🔥 FINAL ISOLATION SAFETY */
+.cs-chatseller-widget,
+.cs-chat-modal-overlay {
+  unicode-bidi: isolate !important;
+  direction: ltr !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
 }

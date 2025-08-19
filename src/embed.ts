@@ -1,9 +1,10 @@
-// src/embed.ts - ChatSeller Widget Embed Code
+// src/embed.ts - ChatSeller Widget Embed Code - VERSION PRODUCTION CORRIGÉE
 import { createApp, App as VueApp } from 'vue'
 import ChatSellerWidget from './ChatSellerWidget.vue'
 
 export interface ChatSellerConfig {
   shopId: string
+  agentId?: string
   apiUrl?: string
   productId?: string
   productName?: string
@@ -37,6 +38,7 @@ class ChatSeller {
   constructor() {
     this.config = {
       shopId: '',
+      // ✅ CORRECTION CRITIQUE : URL API PRODUCTION
       apiUrl: 'https://chatseller-api-production.up.railway.app',
       theme: 'modern',
       primaryColor: '#3B82F6',
@@ -91,7 +93,7 @@ class ChatSeller {
     }
   }
 
-  // ✅ NOUVELLE MÉTHODE : Charger CSS isolé
+  // ✅ NOUVELLE MÉTHODE : Charger CSS isolé avec fallback inline
   private async loadIsolatedCSS(): Promise<void> {
     try {
       // Vérifier si CSS déjà chargé
@@ -102,7 +104,7 @@ class ChatSeller {
       const link = document.createElement('link')
       link.id = 'chatseller-isolated-css'
       link.rel = 'stylesheet'
-      link.href = 'https://widget.chatseller.app/widget-isolated.css'
+      link.href = 'https://widget.chatseller.app/widget-isolated.css?v=' + Date.now()
       link.crossOrigin = 'anonymous'
       
       // Promise pour attendre le chargement
@@ -112,18 +114,125 @@ class ChatSeller {
           resolve()
         }
         link.onerror = () => {
-          console.warn('⚠️ Échec chargement CSS isolé, utilisation inline')
+          console.warn('⚠️ Échec chargement CSS isolé, injection inline')
+          this.injectInlineCSS()
           resolve() // Ne pas bloquer
         }
         
         document.head.appendChild(link)
         
         // Timeout de sécurité
-        setTimeout(resolve, 1000)
+        setTimeout(() => {
+          if (!link.sheet) {
+            console.warn('⚠️ Timeout CSS isolé, injection inline')
+            this.injectInlineCSS()
+          }
+          resolve()
+        }, 3000)
       })
     } catch (error) {
       console.warn('⚠️ Erreur chargement CSS isolé:', error)
+      this.injectInlineCSS()
     }
+  }
+
+  // ✅ NOUVELLE MÉTHODE : CSS inline de secours
+  private injectInlineCSS(): void {
+    if (document.getElementById('chatseller-inline-css')) return
+
+    const style = document.createElement('style')
+    style.id = 'chatseller-inline-css'
+    style.textContent = `
+/* 🔥 CHATSELLER WIDGET - CSS INLINE MINIMAL */
+.cs-chatseller-widget, .cs-chatseller-widget * {
+  all: unset !important;
+  box-sizing: border-box !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+.cs-chatseller-widget {
+  position: relative !important;
+  z-index: 999999 !important;
+  display: block !important;
+  margin: 8px 0 !important;
+  width: 100% !important;
+}
+
+.cs-chat-trigger-button {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  padding: 16px 24px !important;
+  background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 12px !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+  min-height: 56px !important;
+  font-family: inherit !important;
+}
+
+.cs-chat-trigger-button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25) !important;
+}
+
+.cs-chat-trigger-button svg {
+  width: 20px !important;
+  height: 20px !important;
+  margin-right: 8px !important;
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 2 !important;
+}
+
+.cs-chat-modal-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: rgba(0, 0, 0, 0.6) !important;
+  backdrop-filter: blur(8px) !important;
+  z-index: 2147483647 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 16px !important;
+  font-family: inherit !important;
+}
+
+.cs-chat-container-desktop {
+  width: 520px !important;
+  height: 680px !important;
+  max-height: 90vh !important;
+  background: white !important;
+  border-radius: 20px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  font-family: inherit !important;
+}
+
+@media (max-width: 767px) {
+  .cs-chat-modal-overlay {
+    padding: 0 !important;
+  }
+  .cs-chat-container-desktop {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 0 !important;
+  }
+}
+    `
+    document.head.appendChild(style)
+    console.log('✅ CSS inline ChatSeller injecté')
   }
 
   private cleanupExistingWidgets(): void {
@@ -150,16 +259,24 @@ class ChatSeller {
       const timeoutId = setTimeout(() => controller.abort(), 10000)
       
       // ✅ CORRECTION : URL ROUTE PUBLIQUE CORRIGÉE
-      const response = await fetch(`${this.config.apiUrl}/api/v1/shops/public/${this.config.shopId}/config`, {
+      const url = `${this.config.apiUrl}/api/v1/shops/public/${this.config.shopId}/config`
+      console.log('🔗 URL API appelée:', url)
+      
+      const response = await fetch(url, {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
         signal: controller.signal
       })
 
       clearTimeout(timeoutId)
 
+      console.log('📡 Réponse API status:', response.status)
+
       if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`)
+        throw new Error(`API Error: ${response.status} - ${response.statusText}`)
       }
 
       const data = await response.json()
@@ -176,10 +293,13 @@ class ChatSeller {
           agent: this.agentConfig?.name,
           title: this.agentConfig?.title
         })
+      } else {
+        throw new Error('Configuration API non valide')
       }
       
     } catch (error) {
-      console.warn('⚠️ Configuration par défaut utilisée:', error)
+      console.warn('⚠️ Erreur configuration API:', error)
+      console.log('🔧 Utilisation configuration par défaut')
     }
   }
 
@@ -189,10 +309,10 @@ class ChatSeller {
     const triggerBtn = this.widgetElement.querySelector('#chatseller-trigger-btn') as HTMLElement
     if (triggerBtn) {
       const primaryColor = this.config.primaryColor || '#3B82F6'
-      const borderRadius = this.getBorderRadiusValue(this.config.borderRadius || 'md') // ✅ CORRECTION
+      const borderRadius = this.getBorderRadiusValue(this.config.borderRadius || 'md')
       
       triggerBtn.style.background = `linear-gradient(135deg, ${primaryColor} 0%, ${this.adjustColor(primaryColor, -15)} 100%)`
-      triggerBtn.style.borderRadius = borderRadius // ✅ CORRECTION PRINCIPALE
+      triggerBtn.style.borderRadius = borderRadius
       
       const textSpan = triggerBtn.querySelector('span')
       if (textSpan && this.config.buttonText) {
@@ -203,7 +323,6 @@ class ChatSeller {
     }
   }
 
-  // ✅ CORRECTION : Méthode getBorderRadiusValue corrigée
   private getBorderRadiusValue(radius: string): string {
     const radiusMap = {
       'none': '0px',
@@ -214,13 +333,11 @@ class ChatSeller {
       'full': '50px'
     }
     const value = radiusMap[radius as keyof typeof radiusMap] || '12px'
-    console.log(`🎨 BorderRadius calculé: ${radius} → ${value}`)
     return value
   }
 
   private mergeApiConfiguration(): void {
     if (this.shopConfig) {
-      // ✅ MERGE AVEC PRIORITÉ AUX DONNÉES API
       this.config = {
         ...this.config,
         primaryColor: this.shopConfig.primaryColor || this.config.primaryColor,
@@ -228,7 +345,7 @@ class ChatSeller {
         position: this.shopConfig.position || this.config.position,
         theme: this.shopConfig.theme || this.config.theme,
         language: this.shopConfig.language || this.config.language,
-        borderRadius: this.shopConfig.borderRadius || this.config.borderRadius // ✅ AJOUT
+        borderRadius: this.shopConfig.borderRadius || this.config.borderRadius
       }
     }
 
@@ -337,7 +454,6 @@ class ChatSeller {
     if (!container) {
       container = document.createElement('div')
       container.id = 'chatseller-widget'
-      // ✅ AJOUT CLASSE CSS ISOLÉE
       container.className = 'cs-chatseller-widget'
       container.style.cssText = 'margin: 8px 0; position: relative; z-index: 999999;'
       this.insertWidgetAtPosition(container)
@@ -350,7 +466,6 @@ class ChatSeller {
   private insertWidgetAtPosition(container: HTMLElement): void {
     const position = this.config.position || 'above-cta'
     
-    // ✅ AMÉLIORATION : Sélecteurs Shopify plus complets
     const shopifyCtaSelectors = [
       '.product-form__buttons',
       'form[action*="/cart/add"] button[type="submit"]',
@@ -392,7 +507,6 @@ class ChatSeller {
       }
     }
     
-    // ✅ FALLBACK : Chercher dans le form produit
     const productForm = document.querySelector('form[action*="/cart/add"]') || 
                        document.querySelector('.product-form') ||
                        document.querySelector('.product-single')
@@ -421,13 +535,12 @@ class ChatSeller {
     }
   }
 
-  // ✅ CORRECTION : Renderig avec borderRadius appliqué
   private renderWidget() {
     if (!this.widgetElement) return
 
     const buttonText = this.config.buttonText || 'Parler à un conseiller'
     const primaryColor = this.config.primaryColor || '#3B82F6'
-    const borderRadius = this.getBorderRadiusValue(this.config.borderRadius || 'md') // ✅ CORRECTION
+    const borderRadius = this.getBorderRadiusValue(this.config.borderRadius || 'md')
 
     this.widgetElement.innerHTML = `
       <div style="width: 100%; margin: 8px 0; position: relative;">
@@ -440,7 +553,7 @@ class ChatSeller {
             background: linear-gradient(135deg, ${primaryColor} 0%, ${this.adjustColor(primaryColor, -15)} 100%);
             color: white;
             border: none;
-            border-radius: ${borderRadius}; /* ✅ CORRECTION PRINCIPALE */
+            border-radius: ${borderRadius};
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
@@ -457,6 +570,7 @@ class ChatSeller {
             line-height: 1.5;
             position: relative;
             z-index: 1;
+            min-height: 56px;
           "
           onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 35px rgba(0, 0, 0, 0.25)'"
           onmouseout="this.style.transform='translateY(0px)'; this.style.boxShadow='0 8px 25px rgba(0, 0, 0, 0.15)'"
@@ -481,7 +595,6 @@ class ChatSeller {
     }
   }
 
-  // ✅ AMÉLIORATION : Ouverture chat avec CSS isolé
   private openChat() {
     if (this.isOpen) return
 
@@ -492,13 +605,11 @@ class ChatSeller {
       this.createVueChatModal()
     } catch (error) {
       console.error('❌ Erreur ouverture chat Vue:', error)
-      this.createSimpleChatModal() // Fallback
+      this.createSimpleChatModal()
     }
   }
 
-  // ✅ AMÉLIORATION : Modal Vue avec CSS isolé
   private createVueChatModal() {
-    // ✅ Créer le container modal avec classes CSS isolées
     this.modalElement = document.createElement('div')
     this.modalElement.id = 'chatseller-vue-modal'
     this.modalElement.className = 'cs-chat-modal-overlay'
@@ -508,7 +619,6 @@ class ChatSeller {
       this.modalElement.classList.add('cs-mobile')
     }
     
-    // ✅ STYLES INLINE RENFORCÉS POUR SHOPIFY
     this.modalElement.style.cssText = `
       position: fixed !important;
       top: 0 !important;
@@ -530,10 +640,8 @@ class ChatSeller {
 
     document.body.appendChild(this.modalElement)
 
-    // ✅ INITIALISER VUE AVEC CONFIG COMPLÈTE
     this.initVueWidget()
 
-    // ✅ Fermeture sur clic overlay (desktop seulement)
     if (!isMobile) {
       this.modalElement.addEventListener('click', (e) => {
         if (e.target === this.modalElement) {
@@ -543,7 +651,6 @@ class ChatSeller {
     }
   }
 
-  // ✅ AMÉLIORATION : Init Vue avec config complète
   private initVueWidget(): void {
     try {
       console.log('🎨 Initialisation composant Vue avec CSS isolé...')
@@ -562,7 +669,7 @@ class ChatSeller {
         },
         primaryColor: this.config.primaryColor,
         buttonText: this.config.buttonText,
-        borderRadius: this.config.borderRadius, // ✅ AJOUT
+        borderRadius: this.config.borderRadius,
         language: this.config.language,
         productId: this.config.productId,
         productName: this.config.productName,
@@ -570,12 +677,10 @@ class ChatSeller {
         productUrl: this.config.productUrl
       }
 
-      // ✅ CRÉER APP VUE
       this.vueApp = createApp(ChatSellerWidget, {
         config: widgetConfig
       })
 
-      // ✅ MONTER SUR LE MODAL
       this.vueApp.mount(this.modalElement)
 
       console.log('✅ Composant Vue initialisé avec CSS isolé')
@@ -586,7 +691,6 @@ class ChatSeller {
     }
   }
 
-  // ✅ AMÉLIORATION : Fallback simple avec CSS isolé
   private createSimpleChatModal() {
     const agentName = this.config.agentConfig?.name || 'Assistant'
     const agentTitle = this.config.agentConfig?.title || 'Conseiller commercial'
@@ -645,7 +749,6 @@ class ChatSeller {
       </div>
     `
 
-    // ✅ STYLES INLINE FORCÉS
     this.modalElement.style.cssText = `
       position: fixed !important;
       top: 0 !important;
@@ -674,7 +777,6 @@ class ChatSeller {
   private closeChat() {
     this.isOpen = false
     if (this.modalElement) {
-      // ✅ Nettoyer l'app Vue
       if (this.vueApp) {
         this.vueApp.unmount()
         this.vueApp = null
@@ -712,7 +814,7 @@ class ChatSeller {
     })
   }
 
-  // ✅ MÉTHODES PUBLIQUES
+  // ✅ AMÉLIORATION : API avec URL corrigée
   async sendMessage(message: string, conversationId?: string | null, options?: any): Promise<any> {
     try {
       const payload = {
@@ -729,17 +831,28 @@ class ChatSeller {
         isFirstMessage: options?.isFirstMessage || false
       }
 
-      const response = await fetch(`${this.config.apiUrl}/api/v1/public/chat`, {
+      const url = `${this.config.apiUrl}/api/v1/public/chat`
+      console.log('📤 Envoi message API:', url, payload)
+
+      const response = await fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
         body: JSON.stringify(payload)
       })
 
+      console.log('📥 Réponse API status:', response.status)
+
       if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`)
+        throw new Error(`API Error: ${response.status} - ${response.statusText}`)
       }
 
-      return await response.json()
+      const result = await response.json()
+      console.log('📥 Réponse API data:', result)
+
+      return result
 
     } catch (error) {
       console.error('❌ Erreur API:', error)
@@ -779,7 +892,7 @@ class ChatSeller {
   }
 
   get version(): string {
-    return '1.2.3' // ✅ VERSION MISE À JOUR
+    return '1.2.4'
   }
 }
 

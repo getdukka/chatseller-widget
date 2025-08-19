@@ -471,13 +471,13 @@ const sendWelcomeMessage = async () => {
     } else {
       // ✅ GÉNÉRER MESSAGE CONTEXTUEL
       if (productInfo.value?.name) {
-        welcomeMessage = `Bonjour ! 👋 Je suis ${agentName.value}, ${agentTitle.value}.
+        welcomeMessage = `Salut ! 👋 Je suis ${agentName.value}, ${agentTitle.value} chez VIENS ON S'CONNAÎT.
 
 Je vois que vous vous intéressez à **"${productInfo.value.name}"**. C'est un excellent choix ! ✨
 
 Comment puis-je vous aider ? 😊`
       } else {
-        welcomeMessage = `Bonjour ! 👋 Je suis ${agentName.value}, ${agentTitle.value}.
+        welcomeMessage = `Salut ! 👋 Je suis ${agentName.value}, ${agentTitle.value} chez VIENS ON S'CONNAÎT.
 
 Comment puis-je vous aider aujourd'hui ? 😊`
       }
@@ -496,7 +496,7 @@ Comment puis-je vous aider aujourd'hui ? 😊`
   }
 }
 
-// ✅ MÉTHODE AMÉLIORÉE : Envoi de message
+// ✅ MÉTHODE CORRIGÉE : Envoi de message avec logs détaillés
 const sendMessage = async () => {
   if (!currentMessage.value.trim() || isTyping.value || isLoading.value) return
 
@@ -516,8 +516,10 @@ const sendMessage = async () => {
   scrollToBottom()
 
   try {
-    // ✅ APPEL API AVEC CONFIG CORRECTE
+    console.log('📤 [WIDGET] Envoi message à l\'API...')
     const response = await sendApiMessage(messageContent)
+    
+    console.log('📥 [WIDGET] Réponse API reçue:', response)
     
     if (response.success) {
       conversationId.value = response.data.conversationId
@@ -529,14 +531,16 @@ const sendMessage = async () => {
         timestamp: new Date()
       }
       messages.value.push(aiMessage)
+      
+      console.log('✅ [WIDGET] Message IA ajouté à la liste')
     } else {
-      throw new Error('Erreur API')
+      throw new Error(response.error || 'Erreur API inconnue')
     }
 
   } catch (error: any) {
-    console.error('❌ Erreur envoi message:', error)
+    console.error('❌ [WIDGET] Erreur envoi message:', error)
     
-    // ✅ RÉPONSE SIMULÉE
+    // ✅ RÉPONSE SIMULÉE AMÉLIORÉE
     const aiMessage: Message = {
       id: uuidv4(),
       role: 'assistant',
@@ -552,8 +556,11 @@ const sendMessage = async () => {
   }
 }
 
-// ✅ NOUVELLE MÉTHODE : Appel API structuré
+// ✅ MÉTHODE CORRIGÉE : Appel API avec logs détaillés
 const sendApiMessage = async (message: string) => {
+  const apiUrl = configData.value.apiUrl || 'https://chatseller-api-production.up.railway.app'
+  const endpoint = `${apiUrl}/api/v1/public/chat`
+  
   const payload = {
     shopId: configData.value.shopId || 'demo',
     message,
@@ -568,17 +575,31 @@ const sendApiMessage = async (message: string) => {
     isFirstMessage: messages.value.length <= 2
   }
 
-  const response = await fetch(`${configData.value.apiUrl}/api/v1/public/chat`, {
+  console.log('📤 [API CALL] URL:', endpoint)
+  console.log('📤 [API CALL] Payload:', payload)
+
+  const response = await fetch(endpoint, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
     body: JSON.stringify(payload)
   })
 
+  console.log('📥 [API CALL] Status:', response.status)
+  console.log('📥 [API CALL] Headers:', Object.fromEntries(response.headers.entries()))
+
   if (!response.ok) {
-    throw new Error(`API Error: ${response.status}`)
+    const errorText = await response.text()
+    console.error('❌ [API CALL] Error Body:', errorText)
+    throw new Error(`API Error: ${response.status} - ${errorText}`)
   }
 
-  return await response.json()
+  const result = await response.json()
+  console.log('📥 [API CALL] Success Result:', result)
+
+  return result
 }
 
 const sendQuickReply = (replyText: string) => {
@@ -586,7 +607,7 @@ const sendQuickReply = (replyText: string) => {
   sendMessage()
 }
 
-// ✅ RÉPONSE SIMULÉE INTELLIGENTE
+// ✅ RÉPONSE SIMULÉE INTELLIGENTE AMÉLIORÉE
 const getIntelligentResponse = (message: string): string => {
   const msg = message.toLowerCase()
   const productName = productInfo.value?.name || 'ce produit'
@@ -710,14 +731,14 @@ watch(messages, () => {
 }, { deep: true })
 
 onMounted(() => {
-  console.log('🎨 Composant Vue monté avec config:', configData.value)
+  console.log('🎨 [WIDGET VUE] Composant monté avec config:', configData.value)
   sendWelcomeMessage()
 })
 </script>
 
 <style scoped>
 /* ✅ CSS MINIMAL - COMPLÉMENTAIRE AU CSS GLOBAL */
-/* Le CSS principal est dans src/style.css */
+/* Le CSS principal est dans widget-isolated.css */
 
 /* Corrections spécifiques Vue uniquement */
 .cs-chatseller-widget {
@@ -767,4 +788,14 @@ onMounted(() => {
 .cs-typing-dot:nth-child(1) { animation-delay: 0s; }
 .cs-typing-dot:nth-child(2) { animation-delay: 0.2s; }
 .cs-typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* ✅ ANIMATIONS DE CHARGEMENT */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.cs-loading-icon {
+  animation: spin 1s linear infinite;
+}
 </style>
