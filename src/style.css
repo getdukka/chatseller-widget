@@ -1,4 +1,4 @@
-/* 🎨 CHATSELLER WIDGET - CSS MODERNE ET MINIMALISTE */
+/* 🎨 CHATSELLER WIDGET - CSS MODERNE CONFORME CAPTURES 5 & 6 */
 
 /* ✅ RESET ET ISOLATION */
 .cs-chatseller-widget,
@@ -30,7 +30,7 @@
   left: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
-  background: rgba(0, 0, 0, 0.6) !important;
+  background: rgba(0, 0, 0, 0.75) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
   z-index: 2147483647 !important;
@@ -50,17 +50,17 @@
   justify-content: stretch !important;
 }
 
-/* ✅ CONTAINER DESKTOP - MODERNE ET ÉPURÉ */
+/* ✅ CONTAINER DESKTOP - CONFORME CAPTURE 5 */
 .cs-chat-container-desktop {
-  width: 420px !important;
-  height: 600px !important;
+  width: 450px !important;
+  height: 650px !important;
   max-height: 85vh !important;
   max-width: 95vw !important;
   background: white !important;
-  border-radius: 20px !important;
+  border-radius: 24px !important;
   box-shadow: 
-    0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+    0 20px 25px -5px rgba(0, 0, 0, 0.2),
+    0 10px 10px -5px rgba(0, 0, 0, 0.1) !important;
   border: 1px solid rgba(255, 255, 255, 0.8) !important;
   display: flex !important;
   flex-direction: column !important;
@@ -74,7 +74,7 @@
   -webkit-backdrop-filter: blur(20px) !important;
 }
 
-/* ✅ CONTAINER MOBILE - PLEIN ÉCRAN */
+/* ✅ CONTAINER MOBILE - CONFORME CAPTURE 6 */
 .cs-chat-container-mobile {
   width: 100% !important;
   height: 100% !important;
@@ -88,7 +88,7 @@
   font-family: inherit !important;
 }
 
-/* ✅ HEADER - DESIGN MODERNE */
+/* ✅ HEADER - DESIGN MODERNE CONFORME CAPTURES */
 .cs-desktop-header,
 .cs-mobile-header {
   padding: 20px !important;
@@ -99,39 +99,40 @@
   flex-shrink: 0 !important;
   position: relative !important;
   overflow: hidden !important;
-  min-height: 80px !important;
+  min-height: 85px !important;
 }
 
 .cs-mobile-header {
   padding: 16px 20px !important;
-  min-height: 70px !important;
+  min-height: 75px !important;
 }
 
-/* ✅ AGENT INFO - SIMPLIFIÉ */
+/* ✅ AGENT INFO - DESIGN MODERNE */
 .cs-agent-info,
 .cs-mobile-agent-info {
   display: flex !important;
   align-items: center !important;
-  gap: 12px !important;
+  gap: 14px !important;
   flex: 1 !important;
   min-width: 0 !important;
 }
 
 .cs-agent-avatar,
 .cs-mobile-avatar {
-  width: 44px !important;
-  height: 44px !important;
+  width: 48px !important;
+  height: 48px !important;
   border-radius: 50% !important;
   position: relative !important;
   overflow: hidden !important;
-  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  border: 3px solid rgba(255, 255, 255, 0.3) !important;
   flex-shrink: 0 !important;
   background: rgba(255, 255, 255, 0.1) !important;
 }
 
 .cs-mobile-avatar {
-  width: 40px !important;
-  height: 40px !important;
+  width: 42px !important;
+  height: 42px !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
 }
 
 .cs-avatar-image,
@@ -150,10 +151,10 @@
 
 .cs-agent-name,
 .cs-mobile-name {
-  font-size: 17px !important;
-  font-weight: 600 !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
   color: white !important;
-  margin: 0 0 4px 0 !important;
+  margin: 0 0 6px 0 !important;
   display: block !important;
   line-height: 1.2 !important;
   overflow: hidden !important;
@@ -167,20 +168,32 @@
 
 .cs-agent-status,
 .cs-mobile-status-text {
-  font-size: 13px !important;
-  color: rgba(255, 255, 255, 0.9) !important;
+  font-size: 14px !important;
+  color: rgba(255, 255, 255, 0.95) !important;
   margin: 0 !important;
   display: flex !important;
   align-items: center !important;
   gap: 6px !important;
-  line-height: 1.2 !important;
+  line-height: 1.3 !important;
+  font-weight: 500 !important;
+}
+
+.cs-mobile-status-text {
+  font-size: 13px !important;
 }
 
 .cs-status-dot {
   width: 8px !important;
   height: 8px !important;
   border-radius: 50% !important;
+  background: #00D26A !important;
   flex-shrink: 0 !important;
+  animation: pulse-status 2s infinite !important;
+}
+
+@keyframes pulse-status {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
 
 /* ✅ STATUS INDICATOR */
@@ -189,16 +202,24 @@
   position: absolute !important;
   bottom: 2px !important;
   right: 2px !important;
-  width: 12px !important;
-  height: 12px !important;
+  width: 14px !important;
+  height: 14px !important;
   border-radius: 50% !important;
-  border: 2px solid white !important;
+  background: #00D26A !important;
+  border: 3px solid white !important;
 }
 
-/* ✅ BOUTON CLOSE MODERNE */
-.cs-close-button,
-.cs-mobile-close {
-  background: rgba(255, 255, 255, 0.1) !important;
+/* ✅ HEADER ACTIONS - NOUVEAU */
+.cs-header-actions,
+.cs-mobile-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.cs-action-button,
+.cs-mobile-reset {
+  background: rgba(255, 255, 255, 0.15) !important;
   border: none !important;
   color: white !important;
   width: 36px !important;
@@ -213,77 +234,52 @@
   backdrop-filter: blur(10px) !important;
 }
 
+.cs-action-button:hover,
+.cs-mobile-reset:hover {
+  background: rgba(255, 255, 255, 0.25) !important;
+  transform: scale(1.05) !important;
+}
+
+/* ✅ BOUTON CLOSE MODERNE */
+.cs-close-button,
+.cs-mobile-close {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: none !important;
+  color: white !important;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+  flex-shrink: 0 !important;
+  backdrop-filter: blur(10px) !important;
+}
+
 .cs-close-button:hover,
 .cs-mobile-close:hover {
-  background: rgba(255, 255, 255, 0.2) !important;
+  background: rgba(255, 255, 255, 0.25) !important;
   transform: rotate(90deg) !important;
 }
 
 .cs-close-button svg,
 .cs-mobile-close svg {
-  width: 18px !important;
-  height: 18px !important;
+  width: 20px !important;
+  height: 20px !important;
   fill: none !important;
   stroke: currentColor !important;
   stroke-width: 2 !important;
 }
 
-/* ✅ SECTION PRODUIT - DISCRÈTE */
-.cs-product-section,
-.cs-mobile-product {
-  padding: 12px 20px !important;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
-  background: #f8fafc !important;
-}
-
-.cs-product-badge,
-.cs-mobile-product-badge {
-  display: flex !important;
-  align-items: center !important;
-  gap: 10px !important;
-  padding: 8px 12px !important;
-  background: white !important;
-  border-radius: 12px !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
-}
-
-.cs-product-icon {
-  font-size: 16px !important;
-  flex-shrink: 0 !important;
-}
-
-.cs-product-info {
-  flex: 1 !important;
-  min-width: 0 !important;
-}
-
-.cs-product-name,
-.cs-mobile-product-name {
-  font-size: 14px !important;
-  font-weight: 600 !important;
-  color: #1f2937 !important;
-  margin: 0 0 2px 0 !important;
-  display: block !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  white-space: nowrap !important;
-}
-
-.cs-product-price,
-.cs-mobile-product-price {
-  font-size: 13px !important;
-  font-weight: 500 !important;
-  margin: 0 !important;
-  display: block !important;
-}
-
 /* ✅ ZONE MESSAGES - MODERNE */
 .cs-messages-area-desktop {
   flex: 1 !important;
-  background: #fafbfc !important;
+  background: linear-gradient(to bottom, #fafbfc 0%, #ffffff 100%) !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
-  padding: 20px !important;
+  padding: 24px !important;
   display: flex !important;
   flex-direction: column !important;
   min-height: 0 !important;
@@ -294,7 +290,7 @@
   background: #fafbfc !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
-  padding: 16px !important;
+  padding: 20px !important;
   display: flex !important;
   flex-direction: column !important;
   min-height: 0 !important;
@@ -305,12 +301,12 @@
 .cs-mobile-messages-list {
   display: flex !important;
   flex-direction: column !important;
-  gap: 16px !important;
+  gap: 18px !important;
   min-height: 100% !important;
   flex: 1 !important;
 }
 
-/* ✅ MESSAGES - DESIGN MODERNE */
+/* ✅ MESSAGES - DESIGN MODERNE CONFORME CAPTURES */
 .cs-message-item,
 .cs-mobile-message {
   display: flex !important;
@@ -328,7 +324,7 @@
   justify-content: flex-end !important;
 }
 
-/* ✅ BULLES MESSAGES - STYLE MODERNE */
+/* ✅ BULLES MESSAGES - STYLE MODERNE CONFORME CAPTURES */
 .cs-assistant-bubble,
 .cs-mobile-assistant-bubble {
   display: flex !important;
@@ -346,11 +342,11 @@
   flex-direction: row-reverse !important;
 }
 
-/* ✅ AVATARS MESSAGES */
+/* ✅ AVATARS MESSAGES - CONFORME CAPTURES */
 .cs-message-avatar,
 .cs-mobile-message-avatar {
-  width: 32px !important;
-  height: 32px !important;
+  width: 36px !important;
+  height: 36px !important;
   border-radius: 50% !important;
   overflow: hidden !important;
   flex-shrink: 0 !important;
@@ -366,6 +362,24 @@
   display: block !important;
 }
 
+/* ✅ AVATAR UTILISATEUR - CONFORME CAPTURES */
+.cs-user-avatar,
+.cs-mobile-user-avatar {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: white !important;
+  font-weight: 700 !important;
+  font-size: 16px !important;
+  flex-shrink: 0 !important;
+  text-transform: uppercase !important;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3) !important;
+}
+
 /* ✅ CONTENU MESSAGES */
 .cs-message-content,
 .cs-mobile-bubble-content {
@@ -373,39 +387,41 @@
   min-width: 0 !important;
 }
 
-/* ✅ TEXTE MESSAGES - MODERNE */
+/* ✅ TEXTE MESSAGES - MODERNE CONFORME CAPTURES */
 .cs-message-text,
 .cs-mobile-message-text {
-  border-radius: 18px !important;
-  padding: 12px 16px !important;
+  border-radius: 20px !important;
+  padding: 14px 18px !important;
   font-size: 14px !important;
   line-height: 1.5 !important;
   word-wrap: break-word !important;
   word-break: break-word !important;
-  margin: 0 0 4px 0 !important;
+  margin: 0 0 6px 0 !important;
   display: block !important;
   max-width: 100% !important;
   overflow-wrap: break-word !important;
+  font-weight: 400 !important;
 }
 
-/* ✅ STYLES PAR RÔLE */
+/* ✅ STYLES PAR RÔLE - CONFORME CAPTURES */
 .cs-assistant-text,
 .cs-mobile-assistant-text {
   background: white !important;
-  color: #374151 !important;
-  border: 1px solid #e5e7eb !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  color: #2d3748 !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
 }
 
 .cs-user-text,
 .cs-mobile-user-text {
-  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%) !important;
+  background: linear-gradient(135deg, #EC4899 0%, #BE185D 100%) !important;
   color: white !important;
   border: none !important;
+  box-shadow: 0 2px 8px rgba(236, 72, 153, 0.3) !important;
   margin-left: auto !important;
 }
 
-/* ✅ TEMPS MESSAGES */
+/* ✅ TEMPS MESSAGES - CONFORME CAPTURES */
 .cs-message-time,
 .cs-mobile-message-time {
   font-size: 11px !important;
@@ -413,7 +429,8 @@
   padding: 0 4px !important;
   display: block !important;
   margin: 2px 0 0 0 !important;
-  line-height: 1.2 !important;
+  text-align: right !important;
+  opacity: 0.8 !important;
 }
 
 /* ✅ INDICATEUR DE FRAPPE MODERNE */
@@ -428,11 +445,11 @@
 .cs-mobile-typing-dots {
   display: flex !important;
   gap: 4px !important;
-  padding: 12px 16px !important;
+  padding: 14px 18px !important;
   background: white !important;
-  border-radius: 18px !important;
-  border: 1px solid #e5e7eb !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 20px !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
 }
 
 .cs-typing-dot,
@@ -460,10 +477,10 @@
   }
 }
 
-/* ✅ SECTION INPUT - MODERNE */
+/* ✅ SECTION INPUT - MODERNE CONFORME CAPTURES */
 .cs-input-section-desktop,
 .cs-mobile-input-section {
-  padding: 16px 20px !important;
+  padding: 20px !important;
   border-top: 1px solid #e5e7eb !important;
   background: white !important;
   flex-shrink: 0 !important;
@@ -474,25 +491,25 @@
   display: flex !important;
   align-items: center !important;
   gap: 12px !important;
-  margin: 0 0 12px 0 !important;
+  margin: 0 0 16px 0 !important;
 }
 
 .cs-input-wrapper {
   flex: 1 !important;
   display: flex !important;
   align-items: center !important;
-  background: #f9fafb !important;
-  border: 2px solid #e5e7eb !important;
-  border-radius: 24px !important;
+  background: #f8fafc !important;
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 25px !important;
   padding: 0 18px !important;
   transition: all 0.2s ease !important;
-  min-height: 48px !important;
+  min-height: 52px !important;
 }
 
 .cs-input-wrapper:focus-within {
   background: white !important;
-  border-color: #3B82F6 !important;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+  border-color: #EC4899 !important;
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1) !important;
 }
 
 .cs-message-input,
@@ -501,13 +518,14 @@
   background: transparent !important;
   border: none !important;
   outline: none !important;
-  padding: 12px 0 !important;
+  padding: 14px 0 !important;
   font-size: 14px !important;
   color: #374151 !important;
   font-family: inherit !important;
   line-height: 1.5 !important;
   resize: none !important;
   min-height: 20px !important;
+  font-weight: 400 !important;
 }
 
 .cs-message-input::placeholder,
@@ -516,14 +534,38 @@
   opacity: 1 !important;
   font-family: inherit !important;
   font-size: inherit !important;
+  font-weight: normal !important;
 }
 
-/* ✅ BOUTON SEND MODERNE */
+/* ✅ BOUTON VOICE - NOUVEAU */
+.cs-voice-button,
+.cs-mobile-voice {
+  background: transparent !important;
+  border: none !important;
+  color: #9ca3af !important;
+  cursor: pointer !important;
+  padding: 8px !important;
+  border-radius: 50% !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 36px !important;
+  height: 36px !important;
+}
+
+.cs-voice-button:hover,
+.cs-mobile-voice:hover {
+  color: #6b7280 !important;
+  background: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* ✅ BOUTON SEND MODERNE CONFORME CAPTURES */
 .cs-send-button,
 .cs-mobile-send {
-  width: 44px !important;
-  height: 44px !important;
-  background: #3B82F6 !important;
+  width: 48px !important;
+  height: 48px !important;
+  background: #EC4899 !important;
   border: none !important;
   border-radius: 50% !important;
   color: white !important;
@@ -533,14 +575,14 @@
   justify-content: center !important;
   transition: all 0.2s ease !important;
   flex-shrink: 0 !important;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
+  box-shadow: 0 4px 14px rgba(236, 72, 153, 0.4) !important;
   transform: translateY(0) !important;
 }
 
 .cs-send-button:hover:not(:disabled),
 .cs-mobile-send:hover:not(:disabled) {
   transform: translateY(-1px) !important;
-  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4) !important;
+  box-shadow: 0 6px 18px rgba(236, 72, 153, 0.5) !important;
 }
 
 .cs-send-button:disabled,
@@ -551,8 +593,8 @@
 
 .cs-send-button svg,
 .cs-mobile-send svg {
-  width: 18px !important;
-  height: 18px !important;
+  width: 20px !important;
+  height: 20px !important;
   fill: none !important;
   stroke: currentColor !important;
   stroke-width: 2 !important;
@@ -561,8 +603,8 @@
 /* ✅ LOADING SPINNER */
 .cs-loading-spinner,
 .cs-mobile-loading-spinner {
-  width: 18px !important;
-  height: 18px !important;
+  width: 20px !important;
+  height: 20px !important;
   border: 2px solid transparent !important;
   border-top: 2px solid currentColor !important;
   border-radius: 50% !important;
@@ -574,9 +616,8 @@
   100% { transform: rotate(360deg); }
 }
 
-/* ✅ FOOTER - DISCRET */
-.cs-footer-info,
-.cs-mobile-footer {
+/* ✅ FOOTER - CONFORME CAPTURES 5 & 6 */
+.cs-footer-info {
   display: flex !important;
   justify-content: space-between !important;
   align-items: center !important;
@@ -586,20 +627,50 @@
 }
 
 .cs-mobile-footer {
-  justify-content: center !important;
-  text-align: center !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  font-size: 10px !important;
+  color: #9ca3af !important;
+  margin-top: 12px !important;
 }
 
-.cs-powered-by {
+.cs-powered-by,
+.cs-mobile-powered {
   display: flex !important;
   align-items: center !important;
   gap: 4px !important;
+  font-weight: 500 !important;
 }
 
-.cs-security {
+.cs-security,
+.cs-mobile-security {
   display: flex !important;
   align-items: center !important;
   gap: 4px !important;
+  font-weight: 500 !important;
+}
+
+/* ✅ LIENS CLIQUABLES - NOUVELLE FONCTIONNALITÉ */
+.cs-message-text a,
+.cs-mobile-message-text a {
+  color: #EC4899 !important;
+  text-decoration: underline !important;
+  font-weight: 500 !important;
+  transition: opacity 0.2s ease !important;
+}
+
+.cs-message-text a:hover,
+.cs-mobile-message-text a:hover {
+  opacity: 0.8 !important;
+}
+
+.cs-assistant-text a {
+  color: #EC4899 !important;
+}
+
+.cs-user-text a {
+  color: rgba(255, 255, 255, 0.9) !important;
 }
 
 /* ✅ SCROLLBARS PERSONNALISÉES */
@@ -615,13 +686,13 @@
 
 .cs-messages-area-desktop::-webkit-scrollbar-thumb,
 .cs-messages-area-mobile::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.1) !important;
+  background: rgba(236, 72, 153, 0.3) !important;
   border-radius: 2px !important;
 }
 
 .cs-messages-area-desktop::-webkit-scrollbar-thumb:hover,
 .cs-messages-area-mobile::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.2) !important;
+  background: rgba(236, 72, 153, 0.5) !important;
 }
 
 /* ✅ RESPONSIVE */
@@ -636,6 +707,10 @@
   
   .cs-chat-modal-overlay {
     padding: 0 !important;
+  }
+  
+  .cs-mobile-input-container {
+    margin: 0 0 12px 0 !important;
   }
 }
 
@@ -653,7 +728,7 @@
   animation: cs-fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ✅ FORMATAGE MESSAGE */
+/* ✅ FORMATAGE MESSAGE AMÉLIORÉ */
 .cs-message-text strong,
 .cs-mobile-message-text strong {
   font-weight: 600 !important;
@@ -677,5 +752,51 @@
   .cs-chatseller-widget,
   .cs-chat-modal-overlay {
     display: none !important;
+  }
+}
+
+/* ✅ AMÉLIORATIONS VISUELLES SUPPLÉMENTAIRES */
+
+/* Améliorer les transitions */
+.cs-message-item {
+  opacity: 0 !important;
+  animation: cs-message-appear 0.3s ease-out forwards !important;
+}
+
+@keyframes cs-message-appear {
+  0% { 
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Effet hover sur les messages */
+.cs-message-text:hover {
+  transform: translateY(-1px) !important;
+  transition: transform 0.2s ease !important;
+}
+
+/* Améliorer les ombres */
+.cs-assistant-text {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+.cs-user-text {
+  box-shadow: 0 2px 12px rgba(236, 72, 153, 0.25) !important;
+}
+
+/* État focus amélioré */
+.cs-input-wrapper:focus-within {
+  transform: translateY(-1px) !important;
+}
+
+/* Améliorer le contraste en mode sombre */
+@media (prefers-color-scheme: dark) {
+  .cs-chat-modal-overlay {
+    background: rgba(0, 0, 0, 0.85) !important;
   }
 }

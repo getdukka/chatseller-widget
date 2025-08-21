@@ -1,4 +1,4 @@
-// src/embed.ts - ChatSeller Widget Embed Code - VERSION CORRIGÉE CRITIQUE
+// src/embed.ts
 import { createApp, App as VueApp } from 'vue'
 import ChatSellerWidget from './ChatSellerWidget.vue'
 
@@ -41,9 +41,9 @@ class ChatSeller {
       shopId: '',
       apiUrl: 'https://chatseller-api-production.up.railway.app',
       theme: 'modern',
-      primaryColor: '#3B82F6',
+      primaryColor: '#EC4899', // ✅ Rose par défaut comme dans les captures
       position: 'above-cta',
-      buttonText: 'Parler à un conseiller',
+      buttonText: 'Parler à la vendeuse',
       borderRadius: 'full',
       language: 'fr',
       autoDetectProduct: true,
@@ -93,21 +93,21 @@ class ChatSeller {
     }
   }
 
-  // ✅ NOUVELLE MÉTHODE CRITIQUE : Forcer le chargement CSS avec injection inline immédiate
+  // ✅ INJECTION CSS CRITIQUE MODERNE - CONFORME CAPTURES 5 & 6
   private async forceLoadCSS(): Promise<void> {
     if (this.cssLoaded) return
     
-    console.log('🎨 [CSS CRITIQUE] Injection CSS isolé Shopify...')
+    console.log('🎨 [CSS CRITIQUE] Injection CSS moderne Shopify...')
     
-    // ✅ INJECTION CSS INLINE IMMÉDIATE (sans attendre de fichier externe)
+    // ✅ INJECTION CSS INLINE IMMÉDIATE (moderne et optimisé)
     const style = document.createElement('style')
     style.id = 'chatseller-critical-css'
     style.textContent = `
-/* 🔥 CHATSELLER WIDGET - CSS CRITIQUE SHOPIFY READY */
+/* 🔥 CHATSELLER WIDGET - CSS CRITIQUE MODERNE - CONFORME CAPTURES 5 & 6 */
 .cs-chatseller-widget, .cs-chatseller-widget * {
   all: unset !important;
   box-sizing: border-box !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif !important;
   line-height: normal !important;
   -webkit-font-smoothing: antialiased !important;
   -moz-osx-font-smoothing: grayscale !important;
@@ -123,14 +123,14 @@ class ChatSeller {
   isolation: isolate !important;
 }
 
-/* BOUTON TRIGGER */
+/* BOUTON TRIGGER MODERNE */
 .cs-chat-trigger-button {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   width: 100% !important;
   padding: 16px 24px !important;
-  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%) !important;
+  background: linear-gradient(135deg, #EC4899 0%, #BE185D 100%) !important;
   color: white !important;
   border: none !important;
   border-radius: 50px !important;
@@ -138,7 +138,7 @@ class ChatSeller {
   font-weight: 600 !important;
   cursor: pointer !important;
   transition: all 0.3s ease !important;
-  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3) !important;
+  box-shadow: 0 8px 25px rgba(236, 72, 153, 0.3) !important;
   min-height: 56px !important;
   font-family: inherit !important;
   text-decoration: none !important;
@@ -150,8 +150,8 @@ class ChatSeller {
 
 .cs-chat-trigger-button:hover {
   transform: translateY(-2px) !important;
-  box-shadow: 0 12px 35px rgba(239, 68, 68, 0.4) !important;
-  background: linear-gradient(135deg, #F87171 0%, #EF4444 100%) !important;
+  box-shadow: 0 12px 35px rgba(236, 72, 153, 0.4) !important;
+  background: linear-gradient(135deg, #F472B6 0%, #EC4899 100%) !important;
 }
 
 .cs-chat-trigger-button svg {
@@ -181,18 +181,18 @@ class ChatSeller {
   left: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
-  background: rgba(0, 0, 0, 0.7) !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
+  background: rgba(0, 0, 0, 0.75) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
   z-index: 2147483647 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  padding: 16px !important;
+  padding: 20px !important;
   opacity: 1 !important;
   visibility: visible !important;
   pointer-events: auto !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif !important;
   margin: 0 !important;
   border: none !important;
   outline: none !important;
@@ -205,15 +205,16 @@ class ChatSeller {
   justify-content: stretch !important;
 }
 
-/* CONTAINER CHAT DESKTOP */
+/* CONTAINER CHAT DESKTOP MODERNE */
 .cs-chat-container-desktop {
-  width: 520px !important;
-  height: 680px !important;
-  max-height: 90vh !important;
+  width: 450px !important;
+  height: 650px !important;
+  max-height: 85vh !important;
   max-width: 95vw !important;
   background: white !important;
-  border-radius: 20px !important;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
   display: flex !important;
   flex-direction: column !important;
   overflow: hidden !important;
@@ -222,11 +223,8 @@ class ChatSeller {
   opacity: 1 !important;
   visibility: visible !important;
   font-family: inherit !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: none !important;
-  outline: none !important;
-  z-index: 1 !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
 }
 
 /* CONTAINER MOBILE */
@@ -244,16 +242,15 @@ class ChatSeller {
   border: none !important;
 }
 
-/* HEADER */
+/* HEADER MODERNE */
 .cs-desktop-header, .cs-mobile-header {
-  padding: 24px !important;
-  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%) !important;
+  padding: 20px !important;
   color: white !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
   flex-shrink: 0 !important;
-  min-height: 80px !important;
+  min-height: 85px !important;
   margin: 0 !important;
   border: none !important;
   position: relative !important;
@@ -262,469 +259,7 @@ class ChatSeller {
 
 .cs-mobile-header {
   padding: 16px 20px !important;
-  min-height: 70px !important;
-}
-
-/* AGENT INFO */
-.cs-agent-info, .cs-mobile-agent-info {
-  display: flex !important;
-  align-items: center !important;
-  gap: 12px !important;
-  flex: 1 !important;
-  min-width: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-agent-avatar, .cs-mobile-avatar {
-  width: 48px !important;
-  height: 48px !important;
-  border-radius: 50% !important;
-  position: relative !important;
-  overflow: hidden !important;
-  border: 3px solid rgba(255, 255, 255, 0.3) !important;
-  flex-shrink: 0 !important;
-  background: rgba(255, 255, 255, 0.1) !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  display: block !important;
-  z-index: 1 !important;
-}
-
-.cs-mobile-avatar {
-  width: 40px !important;
-  height: 40px !important;
-  border: 2px solid rgba(255, 255, 255, 0.3) !important;
-}
-
-.cs-avatar-image, .cs-mobile-avatar img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  display: block !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-agent-details, .cs-mobile-details {
-  min-width: 0 !important;
-  flex: 1 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-agent-name, .cs-mobile-name {
-  font-size: 18px !important;
-  font-weight: 600 !important;
-  color: white !important;
-  margin: 0 0 4px 0 !important;
-  padding: 0 !important;
-  display: block !important;
-  line-height: 1.2 !important;
-  background: transparent !important;
-  border: none !important;
-  text-decoration: none !important;
-  font-family: inherit !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-mobile-name {
-  font-size: 16px !important;
-}
-
-.cs-agent-title, .cs-mobile-title {
-  font-size: 13px !important;
-  color: rgba(255, 255, 255, 0.9) !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  display: block !important;
-  line-height: 1.2 !important;
-  background: transparent !important;
-  border: none !important;
-  text-decoration: none !important;
-  font-family: inherit !important;
-  font-weight: normal !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-/* BOUTON CLOSE */
-.cs-close-button, .cs-mobile-close {
-  background: rgba(255, 255, 255, 0.1) !important;
-  border: none !important;
-  color: white !important;
-  width: 40px !important;
-  height: 40px !important;
-  border-radius: 50% !important;
-  cursor: pointer !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  transition: all 0.2s ease !important;
-  flex-shrink: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  text-decoration: none !important;
-  outline: none !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-close-button:hover, .cs-mobile-close:hover {
-  background: rgba(255, 255, 255, 0.2) !important;
-  transform: rotate(90deg) !important;
-}
-
-.cs-close-button svg, .cs-mobile-close svg {
-  width: 20px !important;
-  height: 20px !important;
-  fill: none !important;
-  stroke: currentColor !important;
-  stroke-width: 2 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-/* ZONE MESSAGES */
-.cs-messages-area-desktop, .cs-messages-area-mobile {
-  flex: 1 !important;
-  background: linear-gradient(to bottom, #f8fafc 0%, #ffffff 100%) !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  padding: 24px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  min-height: 0 !important;
-  margin: 0 !important;
-  border: none !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-messages-area-mobile {
-  background: #f5f5f5 !important;
-  padding: 20px !important;
-}
-
-.cs-messages-list, .cs-mobile-messages-list {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 20px !important;
-  min-height: 100% !important;
-  flex: 1 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-/* MESSAGES */
-.cs-message-item, .cs-mobile-message {
-  display: flex !important;
-  max-width: 100% !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  align-items: flex-start !important;
-  background: transparent !important;
-  border: none !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-assistant-message, .cs-mobile-assistant {
-  justify-content: flex-start !important;
-}
-
-.cs-user-message, .cs-mobile-user {
-  justify-content: flex-end !important;
-}
-
-.cs-assistant-bubble, .cs-mobile-assistant-bubble {
-  display: flex !important;
-  align-items: flex-start !important;
-  gap: 12px !important;
-  max-width: 85% !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-user-bubble, .cs-mobile-user-bubble {
-  display: flex !important;
-  align-items: flex-start !important;
-  gap: 12px !important;
-  max-width: 85% !important;
-  flex-direction: row-reverse !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-message-avatar, .cs-mobile-message-avatar {
-  width: 40px !important;
-  height: 40px !important;
-  border-radius: 50% !important;
-  overflow: hidden !important;
-  flex-shrink: 0 !important;
-  border: 2px solid #f3f4f6 !important;
-  background: #f3f4f6 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-message-avatar img, .cs-mobile-message-avatar img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  display: block !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-user-avatar {
-  width: 40px !important;
-  height: 40px !important;
-  border-radius: 50% !important;
-  background: #EF4444 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  color: white !important;
-  font-weight: 600 !important;
-  font-size: 16px !important;
-  flex-shrink: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: none !important;
-  text-decoration: none !important;
-  font-family: inherit !important;
-  line-height: 1 !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-message-content, .cs-mobile-bubble-content {
-  flex: 1 !important;
-  min-width: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-message-text, .cs-mobile-message-text {
-  background: white !important;
-  border: 1px solid #e2e8f0 !important;
-  border-radius: 16px !important;
-  padding: 16px !important;
-  font-size: 14px !important;
-  line-height: 1.6 !important;
-  word-wrap: break-word !important;
-  word-break: break-word !important;
-  margin: 0 0 4px 0 !important;
-  color: #374151 !important;
-  display: block !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-  max-width: 100% !important;
-  font-family: inherit !important;
-  font-weight: normal !important;
-  text-decoration: none !important;
-  outline: none !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-user-message .cs-message-text, .cs-mobile-user .cs-mobile-message-text {
-  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%) !important;
-  color: white !important;
-  border: none !important;
-}
-
-.cs-message-time, .cs-mobile-message-time {
-  font-size: 11px !important;
-  color: #9ca3af !important;
-  padding: 0 4px !important;
-  display: block !important;
-  margin: 2px 0 0 0 !important;
-  background: transparent !important;
-  border: none !important;
-  text-decoration: none !important;
-  font-family: inherit !important;
-  font-weight: normal !important;
-  line-height: 1.2 !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-/* INPUT SECTION */
-.cs-input-section-desktop, .cs-mobile-input-section {
-  padding: 20px !important;
-  border-top: 1px solid #e2e8f0 !important;
-  background: white !important;
-  flex-shrink: 0 !important;
-  margin: 0 !important;
-  border-left: none !important;
-  border-right: none !important;
-  border-bottom: none !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-input-container, .cs-mobile-input-container {
-  display: flex !important;
-  align-items: center !important;
-  gap: 12px !important;
-  margin: 0 0 12px 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-input-wrapper {
-  flex: 1 !important;
-  display: flex !important;
-  align-items: center !important;
-  background: #f8fafc !important;
-  border: 2px solid #e2e8f0 !important;
-  border-radius: 12px !important;
-  padding: 0 16px !important;
-  transition: all 0.2s ease !important;
-  min-height: 48px !important;
-  margin: 0 !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-input-wrapper:focus-within {
-  background: white !important;
-  border-color: #EF4444 !important;
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
-}
-
-.cs-message-input, .cs-mobile-message-input {
-  flex: 1 !important;
-  background: transparent !important;
-  border: none !important;
-  outline: none !important;
-  padding: 14px 0 !important;
-  font-size: 14px !important;
-  color: #374151 !important;
-  font-family: inherit !important;
-  line-height: 1.5 !important;
-  margin: 0 !important;
-  box-shadow: none !important;
-  resize: none !important;
-  min-height: 20px !important;
-  text-decoration: none !important;
-  font-weight: normal !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-message-input::placeholder, .cs-mobile-message-input::placeholder {
-  color: #9ca3af !important;
-  opacity: 1 !important;
-  font-family: inherit !important;
-  font-size: inherit !important;
-  font-weight: normal !important;
-}
-
-.cs-send-button, .cs-mobile-send {
-  width: 48px !important;
-  height: 48px !important;
-  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%) !important;
-  border: none !important;
-  border-radius: 12px !important;
-  color: white !important;
-  cursor: pointer !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  transition: all 0.2s ease !important;
-  flex-shrink: 0 !important;
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
-  transform: translateY(0) !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  text-decoration: none !important;
-  outline: none !important;
-  font-family: inherit !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-send-button:hover:not(:disabled), .cs-mobile-send:hover:not(:disabled) {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4) !important;
-}
-
-.cs-send-button:disabled, .cs-mobile-send:disabled {
-  opacity: 0.5 !important;
-  cursor: not-allowed !important;
-}
-
-.cs-send-button svg, .cs-mobile-send svg {
-  width: 20px !important;
-  height: 20px !important;
-  fill: none !important;
-  stroke: currentColor !important;
-  stroke-width: 2 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-/* FOOTER */
-.cs-footer-info, .cs-mobile-footer {
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  font-size: 11px !important;
-  color: #9ca3af !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  font-family: inherit !important;
-  font-weight: normal !important;
-  line-height: 1.2 !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.cs-mobile-footer {
-  justify-content: center !important;
-  text-align: center !important;
+  min-height: 75px !important;
 }
 
 /* RESPONSIVE */
@@ -744,12 +279,12 @@ class ChatSeller {
 
 /* ANIMATIONS */
 @keyframes cs-fadeIn {
-  0% { opacity: 0; transform: scale(0.95); }
+  0% { opacity: 0; transform: scale(0.96); }
   100% { opacity: 1; transform: scale(1); }
 }
 
 .cs-modal-enter-active {
-  animation: cs-fadeIn 0.3s ease-out;
+  animation: cs-fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .cs-chat-container-desktop {
@@ -773,7 +308,7 @@ class ChatSeller {
     document.head.appendChild(style)
     this.cssLoaded = true
     
-    console.log('✅ [CSS CRITIQUE] CSS critique injecté directement')
+    console.log('✅ [CSS CRITIQUE] CSS moderne injecté directement')
   }
 
   private cleanupExistingWidgets(): void {
@@ -799,7 +334,7 @@ class ChatSeller {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 10000)
       
-      // ✅ CORRECTION CRITIQUE : URL ROUTE PUBLIQUE SANS AUTH
+      // ✅ URL ROUTE PUBLIQUE SANS AUTH
       const url = `${this.config.apiUrl}/api/v1/public/shops/public/${this.config.shopId}/config`
       console.log('🔗 URL API appelée:', url)
       
@@ -845,15 +380,15 @@ class ChatSeller {
   }
 
   private updateWidgetWithConfig(): void {
-  if (!this.widgetElement || !this.shopConfig) return
+    if (!this.widgetElement || !this.shopConfig) return
 
-  const triggerBtn = this.widgetElement.querySelector('#chatseller-trigger-btn') as HTMLElement
-  if (triggerBtn) {
-    const primaryColor = this.shopConfig.widget_config?.primaryColor || this.config.primaryColor || '#3B82F6'
-    
-    triggerBtn.style.background = `linear-gradient(135deg, ${primaryColor} 0%, ${this.adjustColor(primaryColor, -15)} 100%)`
+    const triggerBtn = this.widgetElement.querySelector('#chatseller-trigger-btn') as HTMLElement
+    if (triggerBtn) {
+      const primaryColor = this.shopConfig.widget_config?.primaryColor || this.config.primaryColor || '#EC4899'
+      
+      triggerBtn.style.background = `linear-gradient(135deg, ${primaryColor} 0%, ${this.adjustColor(primaryColor, -15)} 100%)`
+    }
   }
-}
 
   private getBorderRadiusValue(radius: string): string {
     const radiusMap = {
@@ -901,7 +436,7 @@ class ChatSeller {
       'support': 'Conseiller support',
       'upsell': 'Conseiller premium'
     }
-    return titles[type as keyof typeof titles] || 'Assistant commercial'
+    return titles[type as keyof typeof titles] || 'Vendeuse IA'
   }
 
   private detectProductInfo(): boolean {
@@ -1067,11 +602,12 @@ class ChatSeller {
     }
   }
 
+  // ✅ RENDU WIDGET MODERNE
   private renderWidget() {
     if (!this.widgetElement) return
 
     const buttonText = this.config.buttonText || 'Parler à la vendeuse'
-    const primaryColor = this.config.primaryColor || '#EF4444'
+    const primaryColor = this.config.primaryColor || '#EC4899'
     const borderRadius = this.getBorderRadiusValue(this.config.borderRadius || 'full')
 
     this.widgetElement.innerHTML = `
@@ -1090,8 +626,8 @@ class ChatSeller {
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            box-shadow: 0 8px 25px rgba(236, 72, 153, 0.3);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1104,8 +640,8 @@ class ChatSeller {
             z-index: 1;
             min-height: 56px;
           "
-          onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 35px rgba(239, 68, 68, 0.4)'"
-          onmouseout="this.style.transform='translateY(0px)'; this.style.boxShadow='0 8px 25px rgba(239, 68, 68, 0.3)'"
+          onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 35px rgba(236, 72, 153, 0.4)'"
+          onmouseout="this.style.transform='translateY(0px)'; this.style.boxShadow='0 8px 25px rgba(236, 72, 153, 0.3)'"
         >
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink: 0;">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.906-1.479L3 21l2.521-5.094A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"></path>
@@ -1131,7 +667,7 @@ class ChatSeller {
     if (this.isOpen) return
 
     this.isOpen = true
-    console.log('💬 Ouverture chat avec CSS forcé')
+    console.log('💬 Ouverture chat moderne avec CSS forcé')
     
     try {
       this.createVueChatModal()
@@ -1157,14 +693,14 @@ class ChatSeller {
       left: 0 !important;
       right: 0 !important;
       bottom: 0 !important;
-      background: rgba(0, 0, 0, 0.7) !important;
-      backdrop-filter: blur(8px) !important;
+      background: rgba(0, 0, 0, 0.75) !important;
+      backdrop-filter: blur(12px) !important;
       z-index: 2147483647 !important;
       display: flex !important;
       align-items: ${isMobile ? 'stretch' : 'center'} !important;
       justify-content: ${isMobile ? 'stretch' : 'center'} !important;
-      padding: ${isMobile ? '0' : '16px'} !important;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+      padding: ${isMobile ? '0' : '20px'} !important;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif !important;
       opacity: 1 !important;
       visibility: visible !important;
       pointer-events: auto !important;
@@ -1185,19 +721,19 @@ class ChatSeller {
 
   private initVueWidget(): void {
     try {
-      console.log('🎨 Initialisation composant Vue avec CSS forcé...')
+      console.log('🎨 Initialisation composant Vue moderne...')
       
       if (!this.modalElement) {
         throw new Error('Modal element non trouvé')
       }
       
-      // ✅ CONFIGURATION COMPLÈTE POUR VUE
+      // ✅ CONFIGURATION COMPLÈTE POUR VUE MODERNE
       const widgetConfig = {
         shopId: this.config.shopId,
         apiUrl: this.config.apiUrl,
         agentConfig: this.config.agentConfig || {
-          name: 'Rose',
-          title: 'Spécialiste produit'
+          name: 'Anna',
+          title: 'Vendeuse IA'
         },
         primaryColor: this.config.primaryColor,
         buttonText: this.config.buttonText,
@@ -1215,7 +751,7 @@ class ChatSeller {
 
       this.vueApp.mount(this.modalElement)
 
-      console.log('✅ Composant Vue initialisé avec CSS forcé')
+      console.log('✅ Composant Vue moderne initialisé')
 
     } catch (error) {
       console.error('❌ Erreur initialisation Vue:', error)
@@ -1224,41 +760,41 @@ class ChatSeller {
   }
 
   private createSimpleChatModal() {
-    const agentName = this.config.agentConfig?.name || 'Rose'
-    const agentTitle = this.config.agentConfig?.title || 'Spécialiste produit'
-    const primaryColor = this.config.primaryColor || '#EF4444'
+    const agentName = this.config.agentConfig?.name || 'Anna'
+    const agentTitle = this.config.agentConfig?.title || 'Vendeuse IA'
+    const primaryColor = this.config.primaryColor || '#EC4899'
 
     this.modalElement = document.createElement('div')
     this.modalElement.className = 'cs-chat-modal-overlay'
     this.modalElement.innerHTML = `
       <div class="cs-chat-container-desktop" style="
-        width: 520px; height: 680px; max-height: 90vh;
-        background: white; border-radius: 20px;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        width: 450px; height: 650px; max-height: 85vh;
+        background: white; border-radius: 24px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
         display: flex; flex-direction: column; overflow: hidden;
         position: relative; opacity: 1; visibility: visible;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
       ">
         <div class="cs-desktop-header" style="
-          padding: 24px; background: ${primaryColor}; color: white;
-          display: flex; align-items: center; justify-content: space-between;
+          padding: 20px; background: ${primaryColor}; color: white;
+          display: flex; align-items: center; justify-content: space-between; min-height: 85px;
         ">
-          <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 14px;">
             <div style="
               width: 48px; height: 48px; border-radius: 50%;
               background: rgba(255, 255, 255, 0.2);
               display: flex; align-items: center; justify-content: center;
-              font-weight: 600; font-size: 18px; color: white;
+              font-weight: 700; font-size: 18px; color: white;
             ">
               ${agentName.charAt(0).toUpperCase()}
             </div>
             <div>
-              <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: white;">${agentName}</h3>
-              <p style="margin: 2px 0 0 0; font-size: 14px; opacity: 0.9; color: white;">${agentTitle}</p>
+              <h3 style="margin: 0 0 6px 0; font-size: 18px; font-weight: 700; color: white;">${agentName} - ${agentTitle}</h3>
+              <p style="margin: 0; font-size: 14px; opacity: 0.95; color: white; font-weight: 500;">En ligne maintenant</p>
             </div>
           </div>
           <button id="chatseller-close-btn" class="cs-close-button" style="
-            background: rgba(255, 255, 255, 0.1); color: white;
+            background: rgba(255, 255, 255, 0.15); color: white;
             border: none; border-radius: 50%; width: 40px; height: 40px;
             cursor: pointer; display: flex; align-items: center; justify-content: center;
           ">
@@ -1268,13 +804,13 @@ class ChatSeller {
           </button>
         </div>
         
-        <div style="flex: 1; padding: 20px; display: flex; align-items: center; justify-content: center; background: #f8fafc;">
+        <div style="flex: 1; padding: 24px; display: flex; align-items: center; justify-content: center; background: linear-gradient(to bottom, #fafbfc 0%, #ffffff 100%);">
           <div style="text-align: center;">
-            <p style="margin: 0; font-size: 16px; color: #374151;">
-              🔧 Chargement du chat avec CSS forcé...
+            <p style="margin: 0; font-size: 16px; color: #374151; font-weight: 500;">
+              🔧 Chargement du chat moderne...
             </p>
             <p style="margin: 8px 0 0 0; font-size: 14px; color: #6b7280;">
-              Initialisation en cours...
+              Interface conforme aux captures 5 & 6
             </p>
           </div>
         </div>
@@ -1287,14 +823,14 @@ class ChatSeller {
       left: 0 !important;
       right: 0 !important;
       bottom: 0 !important;
-      background: rgba(0, 0, 0, 0.7) !important;
-      backdrop-filter: blur(8px) !important;
+      background: rgba(0, 0, 0, 0.75) !important;
+      backdrop-filter: blur(12px) !important;
       z-index: 2147483647 !important;
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
-      padding: 16px !important;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+      padding: 20px !important;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif !important;
       opacity: 1 !important;
       visibility: visible !important;
       pointer-events: auto !important;
@@ -1346,7 +882,7 @@ class ChatSeller {
     })
   }
 
-  // ✅ AMÉLIORATION : API avec URL corrigée
+  // ✅ API OPTIMISÉE
   async sendMessage(message: string, conversationId?: string | null, options?: any): Promise<any> {
     try {
       const payload = {
@@ -1424,11 +960,11 @@ class ChatSeller {
   }
 
   get version(): string {
-    return '1.3.0'
+    return '1.4.0'
   }
 }
 
-// ✅ EXPORT ET AUTO-INIT AMÉLIORÉ
+// ✅ EXPORT ET AUTO-INIT OPTIMISÉ POUR SHOPIFY
 const chatSeller = new ChatSeller()
 
 // ✅ AUTO-INIT SÉCURISÉ POUR SHOPIFY

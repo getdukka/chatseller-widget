@@ -15,7 +15,7 @@
           :style="containerStyles"
         >
           
-          <!-- ✅ HEADER SIMPLE ET ÉLÉGANT -->
+          <!-- ✅ HEADER CONFORME CAPTURES 5 & 6 -->
           <div class="cs-desktop-header" :style="headerStyles">
             <div class="cs-agent-info">
               <div class="cs-agent-avatar">
@@ -28,34 +28,28 @@
                 <div class="cs-status-indicator" :style="{ backgroundColor: primaryColor }"></div>
               </div>
               <div class="cs-agent-details">
-                <h3 class="cs-agent-name">{{ agentName }}</h3>
+                <h3 class="cs-agent-name">{{ agentName }} - {{ agentTitle }}</h3>
                 <p class="cs-agent-status">
-                  <span class="cs-status-dot" :style="{ backgroundColor: primaryColor }"></span>
-                  En ligne maintenant
+                  <span class="cs-status-dot" :style="{ backgroundColor: '#00D26A' }"></span>
+                  En ligne
+                  <span v-if="productInfo" class="cs-product-info-header">
+                    • {{ productInfo.name }}{{ productInfo.price ? ` • ${formatPrice(productInfo.price)}` : '' }}
+                  </span>
                 </p>
               </div>
             </div>
             
-            <button @click="closeChat" class="cs-close-button">
-              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
-          </div>
-
-          <!-- ✅ SECTION PRODUIT DISCRÈTE -->
-          <div
-            v-if="productInfo"
-            class="cs-product-section"
-          >
-            <div class="cs-product-badge">
-              <div class="cs-product-icon">🛍️</div>
-              <div class="cs-product-info">
-                <span class="cs-product-name">{{ productInfo.name }}</span>
-                <span v-if="productInfo.price" class="cs-product-price" :style="{ color: primaryColor }">
-                  {{ formatPrice(productInfo.price) }}
-                </span>
-              </div>
+            <div class="cs-header-actions">
+              <button @click="resetChat" class="cs-action-button" title="Recommencer la conversation">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+              </button>
+              <button @click="closeChat" class="cs-close-button">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
             </div>
           </div>
 
@@ -88,6 +82,7 @@
                     <div class="cs-message-text cs-user-text">{{ message.content }}</div>
                     <div class="cs-message-time">{{ formatTime(message.timestamp) }}</div>
                   </div>
+                  <div class="cs-user-avatar">V</div>
                 </div>
               </div>
 
@@ -111,7 +106,7 @@
             </div>
           </div>
 
-          <!-- ✅ INPUT MODERNE ET ÉPURÉ -->
+          <!-- ✅ INPUT MODERNE CONFORME CAPTURES 5 & 6 -->
           <div class="cs-input-section-desktop">
             <div class="cs-input-container">
               <div class="cs-input-wrapper">
@@ -124,12 +119,22 @@
                 />
                 
                 <button
+                  @click="handleVoiceMessage"
+                  class="cs-voice-button"
+                  title="Message vocal"
+                >
+                  <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                  </svg>
+                </button>
+                
+                <button
                   @click="sendMessage"
                   :disabled="!currentMessage.trim() || isTyping || isLoading"
                   class="cs-send-button"
                   :style="sendButtonStyles"
                 >
-                  <svg v-if="!isTyping" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg v-if="!isTyping" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                   </svg>
                   <div v-else class="cs-loading-spinner" :style="{ borderTopColor: primaryColor }"></div>
@@ -137,14 +142,15 @@
               </div>
             </div>
             
+            <!-- ✅ FOOTER CONFORME CAPTURES 5 & 6 -->
             <div class="cs-footer-info">
               <span class="cs-powered-by">Propulsé par <strong :style="{ color: primaryColor }">ChatSeller</strong></span>
-              <span class="cs-security">🔒 Sécurisé</span>
+              <span class="cs-security">🔒 Conversations sécurisées</span>
             </div>
           </div>
         </div>
 
-        <!-- ✅ INTERFACE MOBILE PLEIN ÉCRAN -->
+        <!-- ✅ INTERFACE MOBILE PLEIN ÉCRAN CONFORME CAPTURE 6 -->
         <div 
           v-else
           class="cs-chat-container-mobile"
@@ -155,28 +161,30 @@
             <div class="cs-mobile-agent-info">
               <div class="cs-mobile-avatar">
                 <img :src="agentAvatar" :alt="agentName" @error="handleAvatarError">
-                <div class="cs-mobile-status" :style="{ backgroundColor: primaryColor }"></div>
+                <div class="cs-mobile-status" :style="{ backgroundColor: '#00D26A' }"></div>
               </div>
               <div class="cs-mobile-details">
-                <h3 class="cs-mobile-name">{{ agentName }}</h3>
-                <p class="cs-mobile-status-text">En ligne maintenant</p>
+                <h3 class="cs-mobile-name">{{ agentName }} - {{ agentTitle }}</h3>
+                <p class="cs-mobile-status-text">
+                  En ligne
+                  <span v-if="productInfo" class="cs-mobile-product-info">
+                    • {{ productInfo.name }}
+                  </span>
+                </p>
               </div>
             </div>
             
-            <button @click="closeChat" class="cs-mobile-close">
-              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
-          </div>
-
-          <!-- Section produit mobile -->
-          <div v-if="productInfo" class="cs-mobile-product">
-            <div class="cs-mobile-product-badge">
-              <span class="cs-mobile-product-name">{{ productInfo.name }}</span>
-              <span v-if="productInfo.price" class="cs-mobile-product-price" :style="{ color: primaryColor }">
-                {{ formatPrice(productInfo.price) }}
-              </span>
+            <div class="cs-mobile-actions">
+              <button @click="resetChat" class="cs-mobile-reset" title="Recommencer">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+              </button>
+              <button @click="closeChat" class="cs-mobile-close">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
             </div>
           </div>
 
@@ -205,6 +213,7 @@
                     <div class="cs-mobile-message-text cs-mobile-user-text">{{ message.content }}</div>
                     <div class="cs-mobile-message-time">{{ formatTime(message.timestamp) }}</div>
                   </div>
+                  <div class="cs-mobile-user-avatar">V</div>
                 </div>
               </div>
 
@@ -238,21 +247,34 @@
                 class="cs-mobile-message-input"
                 :disabled="isTyping || isLoading"
               />
+              
+              <button
+                @click="handleVoiceMessage"
+                class="cs-mobile-voice"
+                title="Message vocal"
+              >
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                </svg>
+              </button>
+              
               <button
                 @click="sendMessage"
                 :disabled="!currentMessage.trim() || isTyping"
                 class="cs-mobile-send"
                 :style="{ backgroundColor: primaryColor }"
               >
-                <svg v-if="!isTyping" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg v-if="!isTyping" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                 </svg>
                 <div v-else class="cs-mobile-loading-spinner" :style="{ borderTopColor: 'white' }"></div>
               </button>
             </div>
             
+            <!-- ✅ FOOTER MOBILE CONFORME CAPTURE 6 -->
             <div class="cs-mobile-footer">
-              <span>Propulsé par <strong :style="{ color: primaryColor }">ChatSeller</strong> • 🔒 Sécurisé</span>
+              <span class="cs-mobile-powered">Propulsé par <strong :style="{ color: primaryColor }">ChatSeller</strong></span>
+              <span class="cs-mobile-security">🔒 Sécurisé</span>
             </div>
           </div>
         </div>
@@ -294,10 +316,10 @@ const props = withDefaults(defineProps<Props>(), {
     shopId: 'demo',
     apiUrl: 'https://chatseller-api-production.up.railway.app',
     agentConfig: {
-      name: 'Rose',
-      title: 'Spécialiste produit'
+      name: 'Anna',
+      title: 'Vendeuse IA'
     },
-    primaryColor: '#3B82F6', // ✅ Bleu par défaut au lieu de rouge
+    primaryColor: '#EC4899', // ✅ Rose par défaut comme dans les captures
     buttonText: 'Parler à la vendeuse',
     language: 'fr'
   })
@@ -333,11 +355,11 @@ const isMobile = computed(() => {
 })
 
 const agentName = computed(() => {
-  return configData.value.agentConfig?.name || 'Rose'
+  return configData.value.agentConfig?.name || 'Anna'
 })
 
 const agentTitle = computed(() => {
-  return configData.value.agentConfig?.title || 'Spécialiste produit'
+  return configData.value.agentConfig?.title || 'Vendeuse IA'
 })
 
 const agentAvatar = computed(() => {
@@ -345,7 +367,7 @@ const agentAvatar = computed(() => {
     return configData.value.agentConfig.avatar
   }
   // ✅ Avatar avec couleur dynamique
-  const color = (configData.value.primaryColor || '#3B82F6').replace('#', '')
+  const color = (configData.value.primaryColor || '#EC4899').replace('#', '')
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(agentName.value)}&background=${color}&color=fff&size=128`
 })
 
@@ -361,11 +383,11 @@ const productInfo = computed(() => {
   return null
 })
 
-// ✅ COULEUR PRIMAIRE DYNAMIQUE
-const primaryColor = computed(() => configData.value.primaryColor || '#3B82F6')
+// ✅ COULEUR PRIMAIRE DYNAMIQUE - ROSE PAR DÉFAUT
+const primaryColor = computed(() => configData.value.primaryColor || '#EC4899')
 
 const inputPlaceholder = computed(() => {
-  return `Posez vos questions sur ${productInfo.value?.name || 'nos produits'}...`
+  return `Tapez votre message...`
 })
 
 // ✅ STYLES COMPUTED DYNAMIQUES
@@ -476,6 +498,22 @@ const sendMessage = async () => {
   }
 }
 
+// ✅ NOUVELLE FONCTION : Gestion messages vocaux
+const handleVoiceMessage = () => {
+  // Placeholder pour la fonctionnalité vocale future
+  console.log('🎤 Message vocal demandé')
+  // TODO: Implémenter l'enregistrement vocal
+  alert('Fonctionnalité vocale bientôt disponible !')
+}
+
+// ✅ NOUVELLE FONCTION : Reset chat
+const resetChat = () => {
+  messages.value = []
+  conversationId.value = null
+  sendWelcomeMessage()
+  console.log('🔄 Chat réinitialisé')
+}
+
 // ✅ APPEL API CORRIGÉ
 const sendApiMessage = async (message: string) => {
   const apiUrl = configData.value.apiUrl || 'https://chatseller-api-production.up.railway.app'
@@ -552,12 +590,21 @@ const closeChatOnOverlay = () => {
   }
 }
 
+// ✅ FORMATAGE MESSAGE AVEC LIENS CLIQUABLES
 const formatMessage = (content: string) => {
-  return content
+  let formatted = content
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
     .replace(/\n\n/g, '<br><br>')
     .replace(/\n/g, '<br>')
+    
+  // ✅ SUPPORT DES LIENS CLIQUABLES
+  formatted = formatted.replace(
+    /(https?:\/\/[^\s]+)/g, 
+    '<a href="$1" target="_blank" rel="noopener noreferrer" style="color: ' + primaryColor.value + '; text-decoration: underline;">$1</a>'
+  )
+  
+  return formatted
 }
 
 const formatTime = (date: Date) => {
@@ -623,6 +670,129 @@ onMounted(() => {
 <style scoped>
 /* ✅ CSS MINIMAL - COMPLÉMENTAIRE AU CSS GLOBAL */
 /* Le CSS principal est dans widget-isolated.css */
+
+/* ✅ STYLES SPÉCIFIQUES POUR LES NOUVELLES FONCTIONNALITÉS */
+
+/* Header Actions */
+.cs-header-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.cs-action-button {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: none !important;
+  color: white !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+}
+
+.cs-action-button:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Product Info in Header */
+.cs-product-info-header {
+  font-weight: 500 !important;
+  opacity: 0.95 !important;
+}
+
+/* Voice Button */
+.cs-voice-button, .cs-mobile-voice {
+  background: transparent !important;
+  border: none !important;
+  color: #9ca3af !important;
+  cursor: pointer !important;
+  padding: 8px !important;
+  border-radius: 50% !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.cs-voice-button:hover, .cs-mobile-voice:hover {
+  color: #6b7280 !important;
+  background: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* User Avatar */
+.cs-user-avatar, .cs-mobile-user-avatar {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: white !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  flex-shrink: 0 !important;
+}
+
+/* Mobile Actions */
+.cs-mobile-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.cs-mobile-reset {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: none !important;
+  color: white !important;
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+}
+
+.cs-mobile-reset:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Mobile Footer Layout */
+.cs-mobile-footer {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  font-size: 10px !important;
+  color: #9ca3af !important;
+  margin-top: 8px !important;
+}
+
+.cs-mobile-powered {
+  font-size: 10px !important;
+  color: #9ca3af !important;
+}
+
+.cs-mobile-security {
+  font-size: 10px !important;
+  color: #9ca3af !important;
+}
+
+/* Liens cliquables */
+.cs-message-text a {
+  color: inherit !important;
+  text-decoration: underline !important;
+  font-weight: 500 !important;
+}
+
+.cs-message-text a:hover {
+  opacity: 0.8 !important;
+}
 
 /* Corrections spécifiques Vue uniquement */
 .cs-chatseller-widget {
