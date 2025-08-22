@@ -574,7 +574,7 @@ const getIntelligentResponse = (message: string): string => {
     return `Je vérifie le prix de **${productName}** pour vous... Un instant ! ⏳`
   }
   
-  return `Merci pour votre question ! 😊 Je vous mets en relation avec notre équipe pour les informations les plus précises sur **${productName}**.`
+  return `Merci pour votre question ! 😊 Je vous mets en relation avec notre équipe pour les informations plus précises sur **${productName}**.`
 }
 
 const closeChat = () => {
