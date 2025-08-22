@@ -1,4 +1,4 @@
-// src/embed.ts - ChatSeller Widget for Shopify
+// src/embed.ts - ChatSeller Widget for Shopify - VERSION CORRIGÉE COMPLÈTE
 import { createApp, App as VueApp } from 'vue'
 import ChatSellerWidget from './ChatSellerWidget.vue'
 
@@ -60,7 +60,7 @@ class ChatSeller {
       return
     }
 
-    console.log(`🚀 Initialisation ChatSeller widget (tentative ${this.initAttempts})...`, config.shopId)
+    console.log(`🚀 Initialisation ChatSeller widget moderne (tentative ${this.initAttempts})...`, config.shopId)
     const startTime = performance.now()
 
     this.config = { ...this.config, ...config }
@@ -71,48 +71,95 @@ class ChatSeller {
     }
 
     try {
-      // ✅ FORCER LE CHARGEMENT CSS EN PREMIER - CRITIQUE
-      await this.forceLoadCSS()
+      // ✅ ÉTAPE 1: INJECTION CSS CRITIQUE IMMÉDIATE - PRIORITÉ ABSOLUE
+      await this.injectCriticalCSS()
       
+      // ✅ ÉTAPE 2: ATTENDRE DOM ET NETTOYER
       await this.waitForDOM()
       this.cleanupExistingWidgets()
-      this.createWidget()
       
+      // ✅ ÉTAPE 3: DÉTECTION PRODUIT AMÉLIORÉE
       if (this.config.autoDetectProduct) {
         this.detectProductInfo()
       }
       
+      // ✅ ÉTAPE 4: CHARGEMENT CONFIG SHOP + CRÉATION WIDGET EN PARALLÈLE
+      const configPromise = this.loadShopConfigurationAsync()
+      this.createWidget()
+      
+      // Attendre la config (non bloquant)
+      await configPromise
+      
       this.isInitialized = true
-      this.loadShopConfigurationAsync()
       
       const initTime = performance.now() - startTime
-      console.log(`✅ ChatSeller widget initialisé en ${initTime.toFixed(2)}ms`)
+      console.log(`✅ ChatSeller widget moderne initialisé en ${initTime.toFixed(2)}ms`)
       
     } catch (error) {
-      console.error('❌ Échec initialisation ChatSeller:', error)
+      console.error('❌ Échec initialisation ChatSeller moderne:', error)
     }
   }
 
-  // ✅ INJECTION CSS CRITIQUE MODERNE - CONFORME CAPTURES 5 & 6
-  private async forceLoadCSS(): Promise<void> {
+  // ✅ INJECTION CSS CRITIQUE ULTRA-RENFORCÉE ANTI-SHOPIFY
+  private async injectCriticalCSS(): Promise<void> {
     if (this.cssLoaded) return
     
-    console.log('🎨 [CSS CRITIQUE] Injection CSS moderne Shopify...')
+    console.log('🎨 [CSS CRITIQUE] Injection CSS moderne ultra-renforcé anti-Shopify...')
     
-    // ✅ INJECTION CSS INLINE IMMÉDIATE (moderne et optimisé)
+    // ✅ SUPPRESSION PRÉVENTIVE DES ANCIENS STYLES
+    const oldStyles = document.querySelectorAll('#chatseller-critical-css, [data-chatseller-css]')
+    oldStyles.forEach(style => style.remove())
+    
+    // ✅ INJECTION CSS INLINE IMMÉDIATE ULTRA-ISOLÉE
     const style = document.createElement('style')
     style.id = 'chatseller-critical-css'
+    style.setAttribute('data-chatseller-css', 'critical')
+    
+    // ✅ CSS ULTRA-RENFORCÉ ANTI-SHOPIFY AVEC SPECIFICITÉ MAXIMALE
     style.textContent = `
-/* 🔥 CHATSELLER WIDGET - CSS CRITIQUE MODERNE - CONFORME CAPTURES 5 & 6 */
-.cs-chatseller-widget, .cs-chatseller-widget * {
+/* 🔥 CHATSELLER WIDGET - CSS ULTRA-RENFORCÉ ANTI-SHOPIFY - v1.4.0 */
+
+/* ✅ RESET GLOBAL ABSOLU AVEC SPECIFICITÉ MAXIMALE */
+.cs-chatseller-widget, 
+.cs-chatseller-widget *, 
+.cs-chatseller-widget *::before, 
+.cs-chatseller-widget *::after,
+[data-chatseller] *,
+[data-chatseller] *::before,
+[data-chatseller] *::after {
   all: unset !important;
   box-sizing: border-box !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif !important;
   line-height: normal !important;
   -webkit-font-smoothing: antialiased !important;
   -moz-osx-font-smoothing: grayscale !important;
+  text-rendering: optimizeLegibility !important;
+  color: inherit !important;
+  background: transparent !important;
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  outline: none !important;
+  text-decoration: none !important;
+  list-style: none !important;
+  vertical-align: baseline !important;
+  text-align: left !important;
+  direction: ltr !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
+  text-shadow: none !important;
+  filter: none !important;
+  clip: unset !important;
+  clip-path: none !important;
+  mask: none !important;
+  mix-blend-mode: normal !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
 }
 
+/* ✅ WIDGET PRINCIPAL AVEC ISOLATION MAXIMALE */
 .cs-chatseller-widget {
   position: relative !important;
   z-index: 999999 !important;
@@ -121,9 +168,13 @@ class ChatSeller {
   width: 100% !important;
   contain: layout style !important;
   isolation: isolate !important;
+  font-size: 14px !important;
+  font-weight: normal !important;
+  color: #374151 !important;
+  background: transparent !important;
 }
 
-/* BOUTON TRIGGER MODERNE */
+/* ✅ BOUTON TRIGGER MODERNE AVEC GRADIENT */
 .cs-chat-trigger-button {
   display: flex !important;
   align-items: center !important;
@@ -137,7 +188,7 @@ class ChatSeller {
   font-size: 15px !important;
   font-weight: 600 !important;
   cursor: pointer !important;
-  transition: all 0.3s ease !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   box-shadow: 0 8px 25px rgba(236, 72, 153, 0.3) !important;
   min-height: 56px !important;
   font-family: inherit !important;
@@ -146,12 +197,19 @@ class ChatSeller {
   appearance: none !important;
   -webkit-appearance: none !important;
   user-select: none !important;
+  position: relative !important;
+  overflow: hidden !important;
+  z-index: 1 !important;
 }
 
 .cs-chat-trigger-button:hover {
   transform: translateY(-2px) !important;
   box-shadow: 0 12px 35px rgba(236, 72, 153, 0.4) !important;
   background: linear-gradient(135deg, #F472B6 0%, #EC4899 100%) !important;
+}
+
+.cs-chat-trigger-button:active {
+  transform: translateY(0px) !important;
 }
 
 .cs-chat-trigger-button svg {
@@ -172,15 +230,18 @@ class ChatSeller {
   padding: 0 !important;
   background: transparent !important;
   border: none !important;
+  line-height: 1.4 !important;
 }
 
-/* MODAL OVERLAY - PRIORITÉ MAXIMALE */
+/* ✅ MODAL OVERLAY AVEC PRIORITÉ Z-INDEX MAXIMALE */
 .cs-chat-modal-overlay {
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
   background: rgba(0, 0, 0, 0.75) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
@@ -192,11 +253,12 @@ class ChatSeller {
   opacity: 1 !important;
   visibility: visible !important;
   pointer-events: auto !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif !important;
+  font-family: inherit !important;
   margin: 0 !important;
   border: none !important;
   outline: none !important;
   contain: layout style !important;
+  overflow: hidden !important;
 }
 
 .cs-chat-modal-overlay.cs-mobile {
@@ -205,15 +267,17 @@ class ChatSeller {
   justify-content: stretch !important;
 }
 
-/* CONTAINER CHAT DESKTOP MODERNE */
+/* ✅ CONTAINER DESKTOP MODERNE CONFORME AUX CAPTURES */
 .cs-chat-container-desktop {
   width: 450px !important;
   height: 650px !important;
   max-height: 85vh !important;
   max-width: 95vw !important;
-  background: white !important;
+  background: #ffffff !important;
   border-radius: 24px !important;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.2),
+    0 10px 10px -5px rgba(0, 0, 0, 0.1) !important;
   border: 1px solid rgba(255, 255, 255, 0.8) !important;
   display: flex !important;
   flex-direction: column !important;
@@ -225,44 +289,40 @@ class ChatSeller {
   font-family: inherit !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
+  color: #374151 !important;
+  line-height: 1.5 !important;
+  font-size: 14px !important;
+  font-weight: normal !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+  animation: cs-fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-/* CONTAINER MOBILE */
+/* ✅ CONTAINER MOBILE PLEIN ÉCRAN */
 .cs-chat-container-mobile {
   width: 100% !important;
   height: 100% !important;
-  background: white !important;
+  background: #ffffff !important;
   display: flex !important;
   flex-direction: column !important;
   overflow: hidden !important;
-  position: relative !important;
-  z-index: 1 !important;
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  font-family: inherit !important;
+  color: #374151 !important;
+  line-height: 1.5 !important;
+  font-size: 14px !important;
   margin: 0 !important;
   padding: 0 !important;
   border: none !important;
-}
-
-/* HEADER MODERNE */
-.cs-desktop-header, .cs-mobile-header {
-  padding: 20px !important;
-  color: white !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  flex-shrink: 0 !important;
-  min-height: 85px !important;
-  margin: 0 !important;
-  border: none !important;
+  border-radius: 0 !important;
   position: relative !important;
   z-index: 1 !important;
 }
 
-.cs-mobile-header {
-  padding: 16px 20px !important;
-  min-height: 75px !important;
-}
-
-/* RESPONSIVE */
+/* ✅ RESPONSIVE ULTRA-RENFORCÉ */
 @media (max-width: 767px) {
   .cs-chat-container-desktop {
     width: 100% !important;
@@ -277,7 +337,7 @@ class ChatSeller {
   }
 }
 
-/* ANIMATIONS */
+/* ✅ ANIMATIONS FLUIDES */
 @keyframes cs-fadeIn {
   0% { opacity: 0; transform: scale(0.96); }
   100% { opacity: 1; transform: scale(1); }
@@ -287,35 +347,100 @@ class ChatSeller {
   animation: cs-fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.cs-chat-container-desktop {
-  animation: cs-fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* PRINT MEDIA */
+/* ✅ PROTECTION PRINT MEDIA */
 @media print {
-  .cs-chatseller-widget, .cs-chat-modal-overlay {
+  .cs-chatseller-widget, 
+  .cs-chat-modal-overlay,
+  [data-chatseller] {
     display: none !important;
   }
 }
 
-/* ISOLATION FINALE */
+/* ✅ ISOLATION FINALE ABSOLUE */
 .cs-chatseller-widget {
   contain: layout style !important;
   isolation: isolate !important;
 }
+
+/* ✅ PROTECTION ANTI-INHERITANCE SHOPIFY MAXIMALE */
+.cs-chatseller-widget,
+.cs-chatseller-widget *,
+[data-chatseller],
+[data-chatseller] * {
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  clip: unset !important;
+  clip-path: none !important;
+  mask: none !important;
+  mix-blend-mode: normal !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  user-select: auto !important;
+  -webkit-user-select: auto !important;
+  -moz-user-select: auto !important;
+  -ms-user-select: auto !important;
+  transform: none !important;
+  animation: none !important;
+  transition: none !important;
+}
+
+.cs-chat-trigger-button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* ✅ RESET SHOPIFY INPUTS SPÉCIFIQUE */
+.cs-chatseller-widget input,
+.cs-chatseller-widget textarea,
+.cs-chatseller-widget button,
+[data-chatseller] input,
+[data-chatseller] textarea,
+[data-chatseller] button {
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  background-image: none !important;
+  background-clip: padding-box !important;
+  border-radius: inherit !important;
+}
+
+/* ✅ FORCE DISPLAY ABSOLUS */
+.cs-chat-modal-overlay {
+  display: flex !important;
+}
+
+.cs-chat-container-desktop,
+.cs-chat-container-mobile {
+  display: flex !important;
+}
+
+.cs-chat-trigger-button {
+  display: flex !important;
+}
     `
     
-    document.head.appendChild(style)
+    // ✅ INJECTION PRIORITAIRE DANS LE HEAD
+    if (document.head.firstChild) {
+      document.head.insertBefore(style, document.head.firstChild)
+    } else {
+      document.head.appendChild(style)
+    }
+    
     this.cssLoaded = true
     
-    console.log('✅ [CSS CRITIQUE] CSS moderne injecté directement')
+    console.log('✅ [CSS CRITIQUE] CSS moderne ultra-renforcé injecté avec succès')
   }
 
   private cleanupExistingWidgets(): void {
     const selectors = [
       '#chatseller-widget',
-      '#chatseller-modal',
+      '#chatseller-modal', 
       '#chatseller-vue-modal',
+      '#chatseller-modern-fallback',
       '[data-chatseller]',
       '.chatseller-widget',
       '.cs-chatseller-widget'
@@ -323,33 +448,38 @@ class ChatSeller {
     
     selectors.forEach(selector => {
       const elements = document.querySelectorAll(selector)
-      elements.forEach(el => el.remove())
+      elements.forEach(el => {
+        console.log(`🧹 Nettoyage widget existant: ${selector}`)
+        el.remove()
+      })
     })
   }
 
+  // ✅ CHARGEMENT CONFIGURATION SHOP AMÉLIORÉ AVEC TITRE
   private async loadShopConfigurationAsync(): Promise<void> {
     try {
-      console.log('🔄 Chargement configuration shop:', this.config.shopId)
+      console.log('🔄 [CONFIG] Chargement configuration shop moderne:', this.config.shopId)
       
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 10000)
+      const timeoutId = setTimeout(() => controller.abort(), 15000) // 15s timeout
       
-      // ✅ URL ROUTE PUBLIQUE SANS AUTH
+      // ✅ URL API PUBLIQUE CORRIGÉE
       const url = `${this.config.apiUrl}/api/v1/public/shops/public/${this.config.shopId}/config`
-      console.log('🔗 URL API appelée:', url)
+      console.log('🔗 [CONFIG] URL API:', url)
       
       const response = await fetch(url, {
         method: 'GET',
         headers: { 
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Accept': 'application/json',
+          'User-Agent': 'ChatSeller-Widget/1.4.0'
         },
         signal: controller.signal
       })
 
       clearTimeout(timeoutId)
 
-      console.log('📡 Réponse API status:', response.status)
+      console.log('📡 [CONFIG] Status API:', response.status)
 
       if (!response.ok) {
         throw new Error(`API Error: ${response.status} - ${response.statusText}`)
@@ -357,78 +487,76 @@ class ChatSeller {
 
       const data = await response.json()
       
-      if (data.success) {
+      if (data.success && data.data) {
         this.shopConfig = data.data.shop
         this.agentConfig = data.data.agent
         
+        // ✅ FUSION CONFIGURATION AVEC TITRE OBLIGATOIRE
         this.mergeApiConfiguration()
         this.updateWidgetWithConfig()
         
-        console.log('✅ Configuration chargée:', {
+        console.log('✅ [CONFIG] Configuration moderne chargée:', {
           shop: this.shopConfig?.id,
           agent: this.agentConfig?.name,
-          title: this.agentConfig?.title
+          title: this.agentConfig?.title, // ✅ NOUVEAU : Log du titre
+          primaryColor: this.config.primaryColor,
+          buttonText: this.config.buttonText
         })
       } else {
-        throw new Error('Configuration API non valide')
+        throw new Error('Configuration API invalide')
       }
       
     } catch (error) {
-      console.warn('⚠️ Erreur configuration API:', error)
-      console.log('🔧 Utilisation configuration par défaut')
-    }
-  }
-
-  private updateWidgetWithConfig(): void {
-    if (!this.widgetElement || !this.shopConfig) return
-
-    const triggerBtn = this.widgetElement.querySelector('#chatseller-trigger-btn') as HTMLElement
-    if (triggerBtn) {
-      const primaryColor = this.shopConfig.widget_config?.primaryColor || this.config.primaryColor || '#EC4899'
+      console.warn('⚠️ [CONFIG] Erreur configuration API (non critique):', error)
+      console.log('🔧 [CONFIG] Utilisation configuration par défaut avec titre')
       
-      triggerBtn.style.background = `linear-gradient(135deg, ${primaryColor} 0%, ${this.adjustColor(primaryColor, -15)} 100%)`
+      // ✅ CONFIGURATION FALLBACK AVEC TITRE
+      this.agentConfig = {
+        name: 'Anna',
+        title: 'Vendeuse IA', // ✅ TITRE PAR DÉFAUT
+        personality: 'friendly',
+        welcomeMessage: 'Bonjour ! Comment puis-je vous aider ?'
+      }
     }
   }
 
-  private getBorderRadiusValue(radius: string): string {
-    const radiusMap = {
-      'none': '0px',
-      'sm': '6px', 
-      'md': '12px',
-      'lg': '16px',
-      'xl': '24px',
-      'full': '50px'
-    }
-    const value = radiusMap[radius as keyof typeof radiusMap] || '50px'
-    return value
-  }
-
+  // ✅ FUSION CONFIGURATION API AVEC TITRE OBLIGATOIRE
   private mergeApiConfiguration(): void {
-    if (this.shopConfig) {
+    if (this.shopConfig?.widget_config) {
       this.config = {
         ...this.config,
-        primaryColor: this.shopConfig.primaryColor || this.config.primaryColor,
-        buttonText: this.shopConfig.buttonText || this.config.buttonText,
-        position: this.shopConfig.position || this.config.position,
-        theme: this.shopConfig.theme || this.config.theme,
-        language: this.shopConfig.language || this.config.language,
-        borderRadius: this.shopConfig.borderRadius || this.config.borderRadius
+        primaryColor: this.shopConfig.widget_config.primaryColor || this.config.primaryColor,
+        buttonText: this.shopConfig.widget_config.buttonText || this.config.buttonText,
+        position: this.shopConfig.widget_config.position || this.config.position,
+        theme: this.shopConfig.widget_config.theme || this.config.theme,
+        language: this.shopConfig.widget_config.language || this.config.language,
+        borderRadius: this.shopConfig.widget_config.borderRadius || this.config.borderRadius
       }
+      console.log('✅ [CONFIG] Widget config fusionnée:', this.config.primaryColor, this.config.buttonText)
     }
 
     if (this.agentConfig) {
+      // ✅ TITRE OBLIGATOIRE AVEC FALLBACK INTELLIGENT
+      const title = this.agentConfig.title || this.getDefaultTitle(this.agentConfig.type)
+      
       this.config.agentConfig = {
         id: this.agentConfig.id,
         name: this.agentConfig.name,
-        title: this.agentConfig.title || this.getDefaultTitle(this.agentConfig.type),
+        title: title, // ✅ TITRE GARANTI
         avatar: this.agentConfig.avatar,
         welcomeMessage: this.agentConfig.welcomeMessage,
         fallbackMessage: this.agentConfig.fallbackMessage,
         personality: this.agentConfig.personality
       }
+      
+      console.log('✅ [CONFIG] Agent config fusionnée avec titre:', {
+        name: this.config.agentConfig.name,
+        title: this.config.agentConfig.title
+      })
     }
   }
 
+  // ✅ TITRE PAR DÉFAUT SELON LE TYPE
   private getDefaultTitle(type: string): string {
     const titles = {
       'general': 'Conseiller commercial',
@@ -439,24 +567,57 @@ class ChatSeller {
     return titles[type as keyof typeof titles] || 'Vendeuse IA'
   }
 
+  // ✅ MISE À JOUR WIDGET AVEC NOUVELLE CONFIG
+  private updateWidgetWithConfig(): void {
+    if (!this.widgetElement) return
+
+    const triggerBtn = this.widgetElement.querySelector('#chatseller-trigger-btn') as HTMLElement
+    if (triggerBtn) {
+      const primaryColor = this.config.primaryColor || '#EC4899'
+      const buttonText = this.config.buttonText || 'Parler à la vendeuse'
+      
+      // ✅ MISE À JOUR STYLE DYNAMIQUE
+      triggerBtn.style.background = `linear-gradient(135deg, ${primaryColor} 0%, ${this.adjustColor(primaryColor, -15)} 100%)`
+      triggerBtn.style.borderRadius = this.getBorderRadiusValue(this.config.borderRadius || 'full')
+      
+      // ✅ MISE À JOUR TEXTE
+      const textSpan = triggerBtn.querySelector('span')
+      if (textSpan) {
+        textSpan.textContent = buttonText
+      }
+      
+      console.log('✅ [CONFIG] Widget bouton mis à jour:', { primaryColor, buttonText })
+    }
+  }
+
+  // ✅ DÉTECTION PRODUIT SHOPIFY AMÉLIORÉE
   private detectProductInfo(): boolean {
     try {
-      console.log('🔍 Détection produit Shopify...')
+      console.log('🔍 [PRODUIT] Détection produit Shopify améliorée...')
       
       let detectedName = this.config.productName
       let detectedPrice = this.config.productPrice
       let detectedId = this.config.productId
 
-      // ✅ AMÉLIORATION : Détection Shopify plus robuste
+      // ✅ MÉTHODE 1: Shopify Analytics (plus fiable)
       const shopifyProduct = (window as any).ShopifyAnalytics?.meta?.product
       if (shopifyProduct && shopifyProduct.title) {
         detectedName = shopifyProduct.title
         detectedPrice = shopifyProduct.price ? shopifyProduct.price / 100 : undefined
         detectedId = shopifyProduct.id?.toString()
-        console.log('✅ Produit Shopify détecté:', detectedName)
+        console.log('✅ [PRODUIT] Shopify Analytics:', detectedName)
+      }
+
+      // ✅ MÉTHODE 2: Variables globales Shopify
+      if (!detectedName && (window as any).meta?.product) {
+        const metaProduct = (window as any).meta.product
+        detectedName = metaProduct.title
+        detectedPrice = metaProduct.price ? metaProduct.price / 100 : undefined
+        detectedId = metaProduct.id?.toString()
+        console.log('✅ [PRODUIT] Meta global:', detectedName)
       }
       
-      // ✅ AMÉLIORATION : Sélecteurs Shopify plus complets
+      // ✅ MÉTHODE 3: Sélecteurs DOM améliorés
       if (!detectedName) {
         const titleSelectors = [
           '.product__title',
@@ -465,27 +626,34 @@ class ChatSeller {
           '.product-single__title',
           '.product__heading h1',
           '[class*="product-title"]',
-          '[class*="product__title"]'
+          '[class*="product__title"]',
+          'h1[class*="product"]',
+          '.product-meta__title',
+          '.pdp-product-name',
+          '.product-details h1'
         ]
         
         for (const selector of titleSelectors) {
           const element = document.querySelector(selector)
           if (element?.textContent?.trim()) {
             detectedName = element.textContent.trim()
-            console.log(`✅ Titre produit détecté via ${selector}:`, detectedName)
+            console.log(`✅ [PRODUIT] DOM ${selector}:`, detectedName)
             break
           }
         }
       }
 
+      // ✅ MÉTHODE 4: Détection prix améliorée
       if (!detectedPrice) {
         const priceSelectors = [
-          '.price__current',
+          '.price__current .money',
           '.product-form__price .price',
           '.money',
           '.price-current',
           '[class*="price-current"]',
-          '[class*="product-price"]'
+          '[class*="product-price"]',
+          '.product-price-value',
+          '.price-regular'
         ]
         
         for (const selector of priceSelectors) {
@@ -495,26 +663,59 @@ class ChatSeller {
             const priceMatch = priceText.match(/[\d,]+(?:[.,]\d{2})?/)
             if (priceMatch) {
               detectedPrice = parseFloat(priceMatch[0].replace(',', '.'))
-              console.log(`✅ Prix produit détecté via ${selector}:`, detectedPrice)
+              console.log(`✅ [PRODUIT] Prix ${selector}:`, detectedPrice)
               break
             }
           }
         }
       }
 
+      // ✅ MÉTHODE 5: JSON-LD structuré
+      if (!detectedName || !detectedPrice) {
+        const jsonLdScripts = document.querySelectorAll('script[type="application/ld+json"]')
+        for (const script of jsonLdScripts) {
+          try {
+            const data = JSON.parse(script.textContent || '')
+            if (data['@type'] === 'Product' || data.product) {
+              const product = data.product || data
+              if (!detectedName && product.name) {
+                detectedName = product.name
+                console.log('✅ [PRODUIT] JSON-LD nom:', detectedName)
+              }
+              if (!detectedPrice && product.offers?.price) {
+                detectedPrice = parseFloat(product.offers.price)
+                console.log('✅ [PRODUIT] JSON-LD prix:', detectedPrice)
+              }
+            }
+          } catch (e) {
+            // Ignorer erreurs JSON
+          }
+        }
+      }
+
+      // ✅ SAUVEGARDE FINALE
       if (detectedName) this.config.productName = detectedName
       if (detectedPrice) this.config.productPrice = detectedPrice
       if (detectedId) this.config.productId = detectedId
       if (!this.config.productUrl) this.config.productUrl = window.location.href
 
-      return !!(detectedName || detectedPrice)
+      const success = !!(detectedName || detectedPrice)
+      console.log(`${success ? '✅' : '⚠️'} [PRODUIT] Détection finale:`, {
+        nom: detectedName,
+        prix: detectedPrice,
+        id: detectedId,
+        url: this.config.productUrl
+      })
+
+      return success
 
     } catch (error) {
-      console.warn('⚠️ Erreur détection produit:', error)
+      console.warn('⚠️ [PRODUIT] Erreur détection:', error)
       return false
     }
   }
 
+  // ✅ CRÉATION WIDGET AVEC STYLES DYNAMIQUES
   private createWidget() {
     let container = document.getElementById('chatseller-widget')
     
@@ -522,6 +723,7 @@ class ChatSeller {
       container = document.createElement('div')
       container.id = 'chatseller-widget'
       container.className = 'cs-chatseller-widget'
+      container.setAttribute('data-chatseller', 'main-widget')
       container.style.cssText = 'margin: 8px 0; position: relative; z-index: 999999;'
       this.insertWidgetAtPosition(container)
     }
@@ -530,9 +732,11 @@ class ChatSeller {
     this.renderWidget()
   }
 
+  // ✅ INSERTION WIDGET POSITION AMÉLIORÉE
   private insertWidgetAtPosition(container: HTMLElement): void {
     const position = this.config.position || 'above-cta'
     
+    // ✅ SÉLECTEURS SHOPIFY PLUS COMPLETS
     const shopifyCtaSelectors = [
       '.product-form__buttons',
       'form[action*="/cart/add"] button[type="submit"]',
@@ -544,7 +748,11 @@ class ChatSeller {
       '.product__buttons',
       '.product-single__buttons',
       '[class*="add-to-cart"]',
-      '[class*="product-form"]'
+      '[class*="product-form"]',
+      '.product-form-buttons',
+      '.btn-add-to-cart',
+      '#AddToCart',
+      '.AddToCart'
     ]
     
     let targetElement = null
@@ -552,7 +760,7 @@ class ChatSeller {
     for (const selector of shopifyCtaSelectors) {
       targetElement = document.querySelector(selector)
       if (targetElement) {
-        console.log(`✅ Élément CTA trouvé: ${selector}`)
+        console.log(`✅ [POSITION] CTA trouvé: ${selector}`)
         break
       }
     }
@@ -563,46 +771,58 @@ class ChatSeller {
           targetElement.parentNode?.insertBefore(container, targetElement)
         } else if (position === 'below-cta') {
           targetElement.parentNode?.insertBefore(container, targetElement.nextSibling)
+        } else if (position === 'beside-cta') {
+          // Créer un wrapper flex pour mettre côte à côte
+          const wrapper = document.createElement('div')
+          wrapper.style.cssText = 'display: flex; gap: 12px; align-items: center; flex-wrap: wrap;'
+          targetElement.parentNode?.insertBefore(wrapper, targetElement)
+          wrapper.appendChild(targetElement)
+          wrapper.appendChild(container)
         } else {
           targetElement.parentNode?.insertBefore(container, targetElement.nextSibling)
         }
         
-        console.log('✅ Widget inséré avec succès')
+        console.log(`✅ [POSITION] Widget inséré: ${position}`)
         return
       } catch (error) {
-        console.warn('⚠️ Erreur insertion:', error)
+        console.warn('⚠️ [POSITION] Erreur insertion CTA:', error)
       }
     }
     
+    // ✅ FALLBACK: FORM PRODUIT
     const productForm = document.querySelector('form[action*="/cart/add"]') || 
                        document.querySelector('.product-form') ||
-                       document.querySelector('.product-single')
+                       document.querySelector('.product-single') ||
+                       document.querySelector('main')
     
     if (productForm) {
       try {
         productForm.appendChild(container)
-        console.log('✅ Widget inséré dans le formulaire produit')
+        console.log('✅ [POSITION] Widget inséré dans form/main')
         return
       } catch (error) {
-        console.warn('⚠️ Erreur insertion form:', error)
+        console.warn('⚠️ [POSITION] Erreur insertion form:', error)
       }
     }
     
+    // ✅ FALLBACK FINAL: POSITION FIXE
     if (!this.config.disableFallback) {
-      console.log('⚠️ Fallback: insertion body')
+      console.log('⚠️ [POSITION] Fallback: position fixe')
       container.style.cssText = `
         position: fixed !important;
         bottom: 20px !important;
         right: 20px !important;
         z-index: 999999 !important;
         max-width: 280px !important;
+        margin: 0 !important;
       `
       container.className = 'cs-chatseller-widget cs-chatseller-widget-fallback'
+      container.setAttribute('data-chatseller-position', 'fallback')
       document.body.appendChild(container)
     }
   }
 
-  // ✅ RENDU WIDGET MODERNE
+  // ✅ RENDU WIDGET AVEC CONFIGURATION DYNAMIQUE
   private renderWidget() {
     if (!this.widgetElement) return
 
@@ -611,10 +831,11 @@ class ChatSeller {
     const borderRadius = this.getBorderRadiusValue(this.config.borderRadius || 'full')
 
     this.widgetElement.innerHTML = `
-      <div style="width: 100%; margin: 8px 0; position: relative;">
+      <div style="width: 100%; margin: 8px 0; position: relative;" data-chatseller="button-container">
         <button 
           id="chatseller-trigger-btn"
           class="cs-chat-trigger-button"
+          data-chatseller="trigger-button"
           style="
             width: 100%;
             padding: 16px 24px;
@@ -625,7 +846,7 @@ class ChatSeller {
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 8px 25px rgba(236, 72, 153, 0.3);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
             display: flex;
@@ -639,14 +860,17 @@ class ChatSeller {
             position: relative;
             z-index: 1;
             min-height: 56px;
+            overflow: hidden;
           "
-          onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 35px rgba(236, 72, 153, 0.4)'"
-          onmouseout="this.style.transform='translateY(0px)'; this.style.boxShadow='0 8px 25px rgba(236, 72, 153, 0.3)'"
+          onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 35px rgba(236, 72, 153, 0.4)'; this.style.background='linear-gradient(135deg, #F472B6 0%, #EC4899 100%)'"
+          onmouseout="this.style.transform='translateY(0px)'; this.style.boxShadow='0 8px 25px rgba(236, 72, 153, 0.3)'; this.style.background='linear-gradient(135deg, ${primaryColor} 0%, ${this.adjustColor(primaryColor, -15)} 100%)'"
+          onmousedown="this.style.transform='translateY(0px)'"
+          onmouseup="this.style.transform='translateY(-2px)'"
         >
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink: 0;">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink: 0; margin-right: 8px;">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.906-1.479L3 21l2.521-5.094A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"></path>
           </svg>
-          <span style="color: inherit; font-size: inherit; font-weight: inherit; margin: 0; padding: 0;">${buttonText}</span>
+          <span style="color: inherit; font-size: inherit; font-weight: inherit; margin: 0; padding: 0; background: transparent; border: none;">${buttonText}</span>
         </button>
       </div>
     `
@@ -659,28 +883,35 @@ class ChatSeller {
         this.openChat()
       })
       
-      console.log(`🎨 Bouton rendu avec borderRadius: ${borderRadius}`)
+      console.log(`🎨 [WIDGET] Bouton rendu:`, { 
+        text: buttonText, 
+        color: primaryColor, 
+        radius: borderRadius 
+      })
     }
   }
 
+  // ✅ OUVERTURE CHAT AVEC VUE MODERNE
   private openChat() {
     if (this.isOpen) return
 
     this.isOpen = true
-    console.log('💬 Ouverture chat moderne avec CSS forcé')
+    console.log('💬 [CHAT] Ouverture interface moderne')
     
     try {
       this.createVueChatModal()
     } catch (error) {
-      console.error('❌ Erreur ouverture chat Vue:', error)
+      console.error('❌ [CHAT] Erreur Vue, fallback simple:', error)
       this.createSimpleChatModal()
     }
   }
 
+  // ✅ CRÉATION MODAL VUE AVEC CONFIGURATION COMPLÈTE
   private createVueChatModal() {
     this.modalElement = document.createElement('div')
     this.modalElement.id = 'chatseller-vue-modal'
     this.modalElement.className = 'cs-chat-modal-overlay'
+    this.modalElement.setAttribute('data-chatseller', 'modal-overlay')
     
     const isMobile = window.innerWidth < 768
     if (isMobile) {
@@ -719,21 +950,30 @@ class ChatSeller {
     }
   }
 
+  // ✅ INITIALISATION VUE AVEC CONFIG COMPLÈTE + TITRE
   private initVueWidget(): void {
     try {
-      console.log('🎨 Initialisation composant Vue moderne...')
+      console.log('🎨 [VUE] Initialisation composant moderne avec titre...')
       
       if (!this.modalElement) {
         throw new Error('Modal element non trouvé')
       }
       
-      // ✅ CONFIGURATION COMPLÈTE POUR VUE MODERNE
+      // ✅ CONFIGURATION ULTRA-COMPLÈTE AVEC TITRE GARANTI
+      const agentName = this.config.agentConfig?.name || 'Anna'
+      const agentTitle = this.config.agentConfig?.title || 'Vendeuse IA'
+      
       const widgetConfig = {
         shopId: this.config.shopId,
         apiUrl: this.config.apiUrl,
-        agentConfig: this.config.agentConfig || {
-          name: 'Anna',
-          title: 'Vendeuse IA'
+        agentConfig: {
+          id: this.config.agentConfig?.id || 'demo-agent',
+          name: agentName,
+          title: agentTitle, // ✅ TITRE OBLIGATOIRE
+          avatar: this.config.agentConfig?.avatar,
+          welcomeMessage: this.config.agentConfig?.welcomeMessage,
+          fallbackMessage: this.config.agentConfig?.fallbackMessage,
+          personality: this.config.agentConfig?.personality || 'friendly'
         },
         primaryColor: this.config.primaryColor,
         buttonText: this.config.buttonText,
@@ -745,20 +985,27 @@ class ChatSeller {
         productUrl: this.config.productUrl
       }
 
+      console.log('✅ [VUE] Config Vue avec titre:', {
+        agentName: widgetConfig.agentConfig.name,
+        agentTitle: widgetConfig.agentConfig.title,
+        productName: widgetConfig.productName
+      })
+
       this.vueApp = createApp(ChatSellerWidget, {
         config: widgetConfig
       })
 
       this.vueApp.mount(this.modalElement)
 
-      console.log('✅ Composant Vue moderne initialisé')
+      console.log('✅ [VUE] Composant Vue moderne monté avec titre')
 
     } catch (error) {
-      console.error('❌ Erreur initialisation Vue:', error)
+      console.error('❌ [VUE] Erreur initialisation:', error)
       throw error
     }
   }
 
+  // ✅ MODAL SIMPLE FALLBACK AVEC TITRE
   private createSimpleChatModal() {
     const agentName = this.config.agentConfig?.name || 'Anna'
     const agentTitle = this.config.agentConfig?.title || 'Vendeuse IA'
@@ -766,6 +1013,7 @@ class ChatSeller {
 
     this.modalElement = document.createElement('div')
     this.modalElement.className = 'cs-chat-modal-overlay'
+    this.modalElement.setAttribute('data-chatseller', 'fallback-modal')
     this.modalElement.innerHTML = `
       <div class="cs-chat-container-desktop" style="
         width: 450px; height: 650px; max-height: 85vh;
@@ -776,7 +1024,9 @@ class ChatSeller {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
       ">
         <div class="cs-desktop-header" style="
-          padding: 20px; background: ${primaryColor}; color: white;
+          padding: 20px; 
+          background: linear-gradient(135deg, ${primaryColor} 0%, ${this.adjustColor(primaryColor, -10)} 100%); 
+          color: white;
           display: flex; align-items: center; justify-content: space-between; min-height: 85px;
         ">
           <div style="display: flex; align-items: center; gap: 14px;">
@@ -790,13 +1040,17 @@ class ChatSeller {
             </div>
             <div>
               <h3 style="margin: 0 0 6px 0; font-size: 18px; font-weight: 700; color: white;">${agentName} - ${agentTitle}</h3>
-              <p style="margin: 0; font-size: 14px; opacity: 0.95; color: white; font-weight: 500;">En ligne maintenant</p>
+              <p style="margin: 0; font-size: 14px; opacity: 0.95; color: white; font-weight: 500;">
+                <span style="display: inline-block; width: 8px; height: 8px; background: #00D26A; border-radius: 50%; margin-right: 6px;"></span>
+                En ligne maintenant
+              </p>
             </div>
           </div>
           <button id="chatseller-close-btn" class="cs-close-button" style="
             background: rgba(255, 255, 255, 0.15); color: white;
             border: none; border-radius: 50%; width: 40px; height: 40px;
             cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s ease;
           ">
             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -804,14 +1058,31 @@ class ChatSeller {
           </button>
         </div>
         
-        <div style="flex: 1; padding: 24px; display: flex; align-items: center; justify-content: center; background: linear-gradient(to bottom, #fafbfc 0%, #ffffff 100%);">
+        <div style="
+          flex: 1; padding: 24px; display: flex; align-items: center; justify-content: center; 
+          background: linear-gradient(to bottom, #fafbfc 0%, #ffffff 100%);
+        ">
           <div style="text-align: center;">
-            <p style="margin: 0; font-size: 16px; color: #374151; font-weight: 500;">
-              🔧 Chargement du chat moderne...
+            <div style="
+              width: 64px; height: 64px; background: ${primaryColor}; 
+              border-radius: 50%; display: flex; align-items: center; justify-content: center;
+              margin: 0 auto 16px; color: white; font-size: 24px; font-weight: 700;
+            ">
+              ${agentName.charAt(0).toUpperCase()}
+            </div>
+            <h4 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: #1f2937;">
+              ${agentName} - ${agentTitle}
+            </h4>
+            <p style="margin: 0; font-size: 14px; color: #6b7280;">
+              🔧 Interface de chat moderne en cours de chargement...
             </p>
-            <p style="margin: 8px 0 0 0; font-size: 14px; color: #6b7280;">
-              Interface conforme aux captures 5 & 6
-            </p>
+            <div style="margin: 16px 0;">
+              <div style="
+                width: 32px; height: 32px; border: 3px solid ${primaryColor}; 
+                border-top: 3px solid transparent; border-radius: 50%;
+                animation: spin 1s linear infinite; margin: 0 auto;
+              "></div>
+            </div>
           </div>
         </div>
       </div>
@@ -836,12 +1107,25 @@ class ChatSeller {
       pointer-events: auto !important;
     `
 
+    // ✅ ANIMATION SPIN CSS INLINE
+    const spinStyle = document.createElement('style')
+    spinStyle.textContent = `
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `
+    document.head.appendChild(spinStyle)
+
     document.body.appendChild(this.modalElement)
 
     const closeBtn = this.modalElement.querySelector('#chatseller-close-btn')
     closeBtn?.addEventListener('click', () => this.closeChat())
+    
+    console.log(`✅ [FALLBACK] Modal simple avec titre: ${agentName} - ${agentTitle}`)
   }
 
+  // ✅ FERMETURE CHAT AVEC NETTOYAGE
   private closeChat() {
     this.isOpen = false
     if (this.modalElement) {
@@ -852,6 +1136,20 @@ class ChatSeller {
       this.modalElement.remove()
       this.modalElement = null
     }
+    console.log('✅ [CHAT] Interface fermée')
+  }
+
+  // ✅ HELPERS UTILITAIRES
+  private getBorderRadiusValue(radius: string): string {
+    const radiusMap = {
+      'none': '0px',
+      'sm': '8px', 
+      'md': '12px',
+      'lg': '16px',
+      'xl': '32px',
+      'full': '50px'
+    }
+    return radiusMap[radius as keyof typeof radiusMap] || '50px'
   }
 
   private adjustColor(color: string, percent: number): string {
@@ -882,7 +1180,7 @@ class ChatSeller {
     })
   }
 
-  // ✅ API OPTIMISÉE
+  // ✅ API PUBLIQUE
   async sendMessage(message: string, conversationId?: string | null, options?: any): Promise<any> {
     try {
       const payload = {
@@ -900,7 +1198,7 @@ class ChatSeller {
       }
 
       const url = `${this.config.apiUrl}/api/v1/public/chat`
-      console.log('📤 Envoi message API:', url, payload)
+      console.log('📤 [API] Envoi message:', url)
 
       const response = await fetch(url, {
         method: 'POST',
@@ -911,19 +1209,17 @@ class ChatSeller {
         body: JSON.stringify(payload)
       })
 
-      console.log('📥 Réponse API status:', response.status)
-
       if (!response.ok) {
         throw new Error(`API Error: ${response.status} - ${response.statusText}`)
       }
 
       const result = await response.json()
-      console.log('📥 Réponse API data:', result)
+      console.log('📥 [API] Réponse:', result.success)
 
       return result
 
     } catch (error) {
-      console.error('❌ Erreur API:', error)
+      console.error('❌ [API] Erreur:', error)
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Erreur inconnue'
@@ -931,6 +1227,7 @@ class ChatSeller {
     }
   }
 
+  // ✅ MÉTHODES PUBLIQUES
   show() {
     if (this.widgetElement) {
       this.widgetElement.style.display = 'block'
@@ -953,6 +1250,7 @@ class ChatSeller {
       this.modalElement = null
     }
     this.isInitialized = false
+    console.log('🧹 [WIDGET] Détruit complètement')
   }
 
   get isReady(): boolean {

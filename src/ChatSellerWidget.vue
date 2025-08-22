@@ -15,20 +15,21 @@
           :style="containerStyles"
         >
           
-          <!-- ✅ HEADER CONFORME CAPTURES 5 & 6 -->
+          <!-- ✅ HEADER CONFORME CAPTURES 5 & 6 AVEC TITRE DYNAMIQUE -->
           <div class="cs-desktop-header" :style="headerStyles">
             <div class="cs-agent-info">
               <div class="cs-agent-avatar">
                 <img
                   :src="agentAvatar"
-                  :alt="agentName"
+                  :alt="agentFullName"
                   class="cs-avatar-image"
                   @error="handleAvatarError"
                 >
-                <div class="cs-status-indicator" :style="{ backgroundColor: primaryColor }"></div>
+                <div class="cs-status-indicator" :style="{ backgroundColor: '#00D26A' }"></div>
               </div>
               <div class="cs-agent-details">
-                <h3 class="cs-agent-name">{{ agentName }} - {{ agentTitle }}</h3>
+                <!-- ✅ CORRECTION MAJEURE : Titre dynamique avec nom + titre -->
+                <h3 class="cs-agent-name">{{ agentFullName }}</h3>
                 <p class="cs-agent-status">
                   <span class="cs-status-dot" :style="{ backgroundColor: '#00D26A' }"></span>
                   En ligne
@@ -40,7 +41,8 @@
             </div>
             
             <div class="cs-header-actions">
-              <button @click="resetChat" class="cs-action-button" title="Recommencer la conversation">
+              <!-- ✅ NOUVEAU : Bouton reset conversation -->
+              <button @click="resetConversation" class="cs-action-button" title="Recommencer la conversation">
                 <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                 </svg>
@@ -125,7 +127,7 @@
                 >
                   <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
-                  </svg>
+                </svg>
                 </button>
                 
                 <button
@@ -160,11 +162,12 @@
           <div class="cs-mobile-header" :style="headerStyles">
             <div class="cs-mobile-agent-info">
               <div class="cs-mobile-avatar">
-                <img :src="agentAvatar" :alt="agentName" @error="handleAvatarError">
+                <img :src="agentAvatar" :alt="agentFullName" @error="handleAvatarError">
                 <div class="cs-mobile-status" :style="{ backgroundColor: '#00D26A' }"></div>
               </div>
               <div class="cs-mobile-details">
-                <h3 class="cs-mobile-name">{{ agentName }} - {{ agentTitle }}</h3>
+                <!-- ✅ CORRECTION MAJEURE : Titre dynamique mobile -->
+                <h3 class="cs-mobile-name">{{ agentFullName }}</h3>
                 <p class="cs-mobile-status-text">
                   En ligne
                   <span v-if="productInfo" class="cs-mobile-product-info">
@@ -175,7 +178,7 @@
             </div>
             
             <div class="cs-mobile-actions">
-              <button @click="resetChat" class="cs-mobile-reset" title="Recommencer">
+              <button @click="resetConversation" class="cs-mobile-reset" title="Recommencer">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                 </svg>
@@ -284,7 +287,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick, watch } from 'vue'
+import { ref, computed, onMounted, nextTick, watch, onUnmounted } from 'vue'
 import { v4 as uuidv4 } from 'uuid'
 
 // ✅ PROPS AVEC CONFIGURATION DYNAMIQUE
@@ -330,9 +333,11 @@ interface Message {
   role: 'user' | 'assistant'
   content: string
   timestamp: Date
+  provider?: string
+  responseTime?: number
 }
 
-// State
+// ✅ STATE PRINCIPAL
 const isOpen = ref(true)
 const messages = ref<Message[]>([])
 const currentMessage = ref('')
@@ -343,6 +348,10 @@ const messagesContainer = ref<HTMLElement>()
 const mobileMessagesContainer = ref<HTMLElement>()
 const messagesEndRef = ref<HTMLElement>()
 const mobileMessagesEndRef = ref<HTMLElement>()
+
+// ✅ STATE POUR PERSISTANCE
+const storageKey = computed(() => `chatseller_messages_${configData.value.shopId}`)
+const conversationKey = computed(() => `chatseller_conversation_${configData.value.shopId}`)
 
 // ✅ COMPUTED AVEC SÉCURITÉ
 const configData = computed(() => props.config || {})
@@ -360,6 +369,20 @@ const agentName = computed(() => {
 
 const agentTitle = computed(() => {
   return configData.value.agentConfig?.title || 'Vendeuse IA'
+})
+
+// ✅ CORRECTION MAJEURE : Nom complet avec titre
+const agentFullName = computed(() => {
+  const name = agentName.value
+  const title = agentTitle.value
+  
+  // Format : "Anna - Vendeuse IA" ou "Rose - Spécialiste produit"
+  if (name && title && title !== 'Vendeuse IA') {
+    return `${name} - ${title}`
+  } else if (name) {
+    return `${name} - Vendeuse IA`
+  }
+  return 'Anna - Vendeuse IA'
 })
 
 const agentAvatar = computed(() => {
@@ -407,7 +430,76 @@ const sendButtonStyles = computed(() => ({
   borderRadius: '50%'
 }))
 
-// ✅ MESSAGES D'ACCUEIL CONTEXTUEL
+// ✅ PERSISTANCE LOCALSTORAGE
+const saveMessagesToStorage = () => {
+  if (typeof window === 'undefined') return
+  
+  try {
+    const data = {
+      messages: messages.value,
+      conversationId: conversationId.value,
+      timestamp: Date.now(),
+      agentConfig: {
+        name: agentName.value,
+        title: agentTitle.value,
+        avatar: agentAvatar.value
+      }
+    }
+    localStorage.setItem(storageKey.value, JSON.stringify(data))
+    localStorage.setItem(conversationKey.value, conversationId.value || '')
+    console.log('💾 [Widget] Messages sauvegardés en localStorage')
+  } catch (error) {
+    console.warn('⚠️ [Widget] Erreur sauvegarde localStorage:', error)
+  }
+}
+
+const loadMessagesFromStorage = () => {
+  if (typeof window === 'undefined') return false
+  
+  try {
+    const saved = localStorage.getItem(storageKey.value)
+    const savedConvId = localStorage.getItem(conversationKey.value)
+    
+    if (saved) {
+      const data = JSON.parse(saved)
+      const age = Date.now() - (data.timestamp || 0)
+      
+      // Données valides pendant 24h
+      if (age < 24 * 60 * 60 * 1000 && data.messages && data.messages.length > 0) {
+        messages.value = data.messages.map((msg: any) => ({
+          ...msg,
+          timestamp: new Date(msg.timestamp)
+        }))
+        conversationId.value = savedConvId || data.conversationId || null
+        
+        console.log('📥 [Widget] Messages restaurés depuis localStorage:', messages.value.length)
+        return true
+      } else {
+        // Nettoyer les données expirées
+        localStorage.removeItem(storageKey.value)
+        localStorage.removeItem(conversationKey.value)
+      }
+    }
+  } catch (error) {
+    console.warn('⚠️ [Widget] Erreur lecture localStorage:', error)
+  }
+  
+  return false
+}
+
+const clearStoredMessages = () => {
+  if (typeof window === 'undefined') return
+  
+  try {
+    localStorage.removeItem(storageKey.value)
+    localStorage.removeItem(conversationKey.value)
+    console.log('🧹 [Widget] Messages localStorage nettoyés')
+  } catch (error) {
+    console.warn('⚠️ [Widget] Erreur nettoyage localStorage:', error)
+  }
+}
+
+// ✅ MESSAGE D'ACCUEIL CONTEXTUEL AVEC TITRE DYNAMIQUE
 const sendWelcomeMessage = async () => {
   try {
     let welcomeMessage = ''
@@ -416,11 +508,11 @@ const sendWelcomeMessage = async () => {
       welcomeMessage = configData.value.agentConfig.welcomeMessage
     } else {
       if (productInfo.value?.name) {
-        welcomeMessage = `Bonjour ! 👋 Je suis ${agentName.value}, votre ${agentTitle.value}.
+        welcomeMessage = `Bonjour ! 👋 Je suis ${agentFullName.value}.
 
 Je vois que vous vous intéressez à **${productInfo.value.name}**. Comment puis-je vous aider aujourd'hui ? 😊`
       } else {
-        welcomeMessage = `Bonjour ! 👋 Je suis ${agentName.value}, votre ${agentTitle.value}.
+        welcomeMessage = `Bonjour ! 👋 Je suis ${agentFullName.value}.
 
 Comment puis-je vous aider aujourd'hui ? 😊`
       }
@@ -433,6 +525,7 @@ Comment puis-je vous aider aujourd'hui ? 😊`
       timestamp: new Date()
     }
     messages.value.push(aiMessage)
+    saveMessagesToStorage()
 
   } catch (error: any) {
     console.error('❌ Erreur message d\'accueil:', error)
@@ -453,6 +546,7 @@ const sendMessage = async () => {
     timestamp: new Date()
   }
   messages.value.push(userMessage)
+  saveMessagesToStorage()
 
   isTyping.value = true
   await nextTick()
@@ -471,9 +565,12 @@ const sendMessage = async () => {
         id: uuidv4(),
         role: 'assistant',
         content: response.data.message,
-        timestamp: new Date()
+        timestamp: new Date(),
+        provider: response.data.provider || 'openai',
+        responseTime: response.data.responseTime || 0
       }
       messages.value.push(aiMessage)
+      saveMessagesToStorage()
       
       console.log('✅ [WIDGET] Message IA ajouté à la liste')
     } else {
@@ -487,15 +584,26 @@ const sendMessage = async () => {
       id: uuidv4(),
       role: 'assistant',
       content: getIntelligentResponse(messageContent),
-      timestamp: new Date()
+      timestamp: new Date(),
+      provider: 'fallback'
     }
     messages.value.push(aiMessage)
+    saveMessagesToStorage()
     
   } finally {
     isTyping.value = false
     await nextTick()
     scrollToBottom()
   }
+}
+
+// ✅ NOUVELLE FONCTION : Reset conversation
+const resetConversation = () => {
+  messages.value = []
+  conversationId.value = null
+  clearStoredMessages()
+  sendWelcomeMessage()
+  console.log('🔄 [Widget] Conversation réinitialisée')
 }
 
 // ✅ NOUVELLE FONCTION : Gestion messages vocaux
@@ -506,18 +614,10 @@ const handleVoiceMessage = () => {
   alert('Fonctionnalité vocale bientôt disponible !')
 }
 
-// ✅ NOUVELLE FONCTION : Reset chat
-const resetChat = () => {
-  messages.value = []
-  conversationId.value = null
-  sendWelcomeMessage()
-  console.log('🔄 Chat réinitialisé')
-}
-
-// ✅ APPEL API CORRIGÉ
-const sendApiMessage = async (message: string) => {
+// ✅ APPEL API CORRIGÉ AVEC RETRY
+const sendApiMessage = async (message: string, retryCount = 0): Promise<any> => {
   const apiUrl = configData.value.apiUrl || 'https://chatseller-api-production.up.railway.app'
-  const endpoint = `${apiUrl}/api/v1/public/chat`
+  const endpoint = `${apiUrl}/api/v1/public/chat`  // ✅ CORRIGÉ: Route publique
   
   const payload = {
     shopId: configData.value.shopId || 'demo',
@@ -533,36 +633,50 @@ const sendApiMessage = async (message: string) => {
     isFirstMessage: messages.value.length <= 2
   }
 
-  console.log('📤 [API CALL] URL:', endpoint)
-  console.log('📤 [API CALL] Payload:', payload)
+  console.log(`📤 [WIDGET API] Tentative ${retryCount + 1}/3 - URL:`, endpoint)
+  console.log('📤 [WIDGET API] Payload:', payload)
 
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: { 
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    },
-    body: JSON.stringify(payload)
-  })
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    })
 
-  console.log('📥 [API CALL] Status:', response.status)
+    console.log('📥 [WIDGET API] Status:', response.status)
 
-  if (!response.ok) {
-    const errorText = await response.text()
-    console.error('❌ [API CALL] Error Body:', errorText)
-    throw new Error(`API Error: ${response.status} - ${errorText}`)
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('❌ [WIDGET API] Error Body:', errorText)
+      throw new Error(`API Error: ${response.status} - ${errorText}`)
+    }
+
+    const result = await response.json()
+    console.log('📥 [WIDGET API] Success Result:', result)
+
+    return result
+  } catch (error: any) {
+    console.error(`❌ [WIDGET API] Tentative ${retryCount + 1} échouée:`, error)
+    
+    // Retry logic (max 3 tentatives)
+    if (retryCount < 2) {
+      console.log(`🔄 [WIDGET API] Retry dans ${(retryCount + 1) * 1000}ms...`)
+      await new Promise(resolve => setTimeout(resolve, (retryCount + 1) * 1000))
+      return sendApiMessage(message, retryCount + 1)
+    }
+    
+    throw error
   }
-
-  const result = await response.json()
-  console.log('📥 [API CALL] Success Result:', result)
-
-  return result
 }
 
 // ✅ HELPER FUNCTIONS
 const getIntelligentResponse = (message: string): string => {
   const msg = message.toLowerCase()
   const productName = productInfo.value?.name || 'ce produit'
+  const fullName = agentFullName.value
   
   if (msg.includes('acheter') || msg.includes('commander')) {
     return `Parfait ! Je vais vous aider à commander **${productName}**. 🎉
@@ -574,7 +688,15 @@ const getIntelligentResponse = (message: string): string => {
     return `Je vérifie le prix de **${productName}** pour vous... Un instant ! ⏳`
   }
   
-  return `Merci pour votre question ! 😊 Je vous mets en relation avec notre équipe pour les informations plus précises sur **${productName}**.`
+  if (msg.includes('bonjour') || msg.includes('salut')) {
+    return `Bonjour ! 👋 Je suis ${fullName}.
+
+${productInfo.value?.name ? `Je vois que vous vous intéressez à **"${productInfo.value.name}"**.` : ''}
+
+Comment puis-je vous aider ? 😊`
+  }
+  
+  return `Merci pour votre question ! 😊 En tant que ${agentTitle.value}, je vous mets en relation avec notre équipe pour les informations plus précises sur **${productName}**.`
 }
 
 const closeChat = () => {
@@ -590,20 +712,29 @@ const closeChatOnOverlay = () => {
   }
 }
 
-// ✅ FORMATAGE MESSAGE AVEC LIENS CLIQUABLES
+// ✅ FORMATAGE MESSAGE AVEC LIENS CLIQUABLES AMÉLIORÉ
 const formatMessage = (content: string) => {
   let formatted = content
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/\n\n/g, '<br><br>')
-    .replace(/\n/g, '<br>')
+    // Préserver les emojis AVANT tout autre traitement
+    .replace(/([\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}])/gu, '<span class="emoji">$1</span>')
     
-  // ✅ SUPPORT DES LIENS CLIQUABLES
-  formatted = formatted.replace(
-    /(https?:\/\/[^\s]+)/g, 
-    '<a href="$1" target="_blank" rel="noopener noreferrer" style="color: ' + primaryColor.value + '; text-decoration: underline;">$1</a>'
-  )
-  
+    // Gestion des markdown
+    .replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-gray-900">$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em class="italic text-gray-700">$1</em>')
+    
+    // Gestion des liens
+    .replace(/(https?:\/\/[^\s]+)/g, `<a href="$1" target="_blank" rel="noopener noreferrer" style="color: ${primaryColor.value}; text-decoration: underline;">$1</a>`)
+    
+    // Gestion des sauts de ligne
+    .replace(/\n\n/g, '<br><br class="my-2">')
+    .replace(/\n/g, '<br class="my-1">')
+    
+    // Amélioration des listes
+    .replace(/^\- (.*)/gm, `<span class="block ml-2 relative"><span class="absolute -ml-2" style="color: ${primaryColor.value}">•</span>$1</span>`)
+    
+    // Amélioration des prix
+    .replace(/(\d+(?:[.,]\d{2})?\s*(?:FCFA|€|USD|\$))/g, '<span class="font-semibold text-green-600 bg-green-50 px-1 rounded">$1</span>')
+    
   return formatted
 }
 
@@ -655,15 +786,35 @@ const scrollToBottom = () => {
   }
 }
 
+// ✅ WATCHERS
 watch(messages, () => {
   nextTick(() => {
     scrollToBottom()
   })
 }, { deep: true })
 
+// ✅ AUTO-SAVE MESSAGES
+watch(messages, saveMessagesToStorage, { deep: true })
+
+// ✅ LIFECYCLE
 onMounted(() => {
   console.log('🎨 [WIDGET VUE] Composant monté avec config:', configData.value)
-  sendWelcomeMessage()
+  console.log('👤 [WIDGET VUE] Agent complet:', agentFullName.value)
+  
+  // Essayer de restaurer les messages
+  const restored = loadMessagesFromStorage()
+  
+  if (!restored) {
+    // Envoyer le message d'accueil seulement si pas de restoration
+    sendWelcomeMessage()
+  } else {
+    console.log('📥 [WIDGET VUE] Messages restaurés, pas de message d\'accueil')
+  }
+})
+
+onUnmounted(() => {
+  // Sauvegarder une dernière fois avant destruction
+  saveMessagesToStorage()
 })
 </script>
 
@@ -849,7 +1000,7 @@ onMounted(() => {
   100% { transform: rotate(360deg); }
 }
 
-.cs-loading-icon {
+.cs-loading-spinner, .cs-mobile-loading-spinner {
   animation: spin 1s linear infinite;
 }
 </style>
