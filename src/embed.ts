@@ -1,6 +1,7 @@
 // src/embed.ts - ChatSeller Widget for Shopify - VERSION CORRIGÉE COMPLÈTE
 import { createApp, App as VueApp } from 'vue'
 import ChatSellerWidget from './ChatSellerWidget.vue'
+import './style.css'
 
 export interface ChatSellerConfig {
   shopId: string
