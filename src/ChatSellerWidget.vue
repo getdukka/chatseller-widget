@@ -1,4 +1,4 @@
-<!-- src/ChatSellerWidget.vue - VERSION CORRIGÉE FINALE -->
+<!-- src/ChatSellerWidget.vue - VERSION CORRIGÉE COMPLÈTE -->
 <template>
   <div class="cs-chatseller-widget-vue">
     <!-- ✅ INTERFACE DESKTOP -->
@@ -8,7 +8,7 @@
       :style="desktopContainerStyle"
     >
       
-      <!-- ✅ HEADER -->
+      <!-- ✅ HEADER CORRIGÉ - PRODUIT SUR MÊME LIGNE -->
       <div class="cs-desktop-header" :style="headerStyle">
         <div class="cs-agent-info" :style="agentInfoStyle">
           <div class="cs-agent-avatar" :style="avatarStyle">
@@ -18,16 +18,18 @@
               :style="avatarImageStyle"
               @error="handleAvatarError"
             >
-            <div class="cs-status-indicator" :style="statusIndicatorStyle"></div>
+            <!-- ✅ SUPPRIMÉ : Indicateur vert dans l'avatar -->
           </div>
           <div class="cs-agent-details">
             <h3 class="cs-agent-name" :style="agentNameStyle">{{ agentName }} - {{ agentTitle }}</h3>
+            <!-- ✅ STATUS AVEC PRODUIT SUR MÊME LIGNE -->
             <p class="cs-agent-status" :style="agentStatusStyle">
-              <span style="display: flex; align-items: center; gap: 6px;">
+              <span class="cs-online-section" :style="onlineSectionStyle">
                 <span class="cs-status-dot" :style="statusDotStyle"></span>
                 En ligne
               </span>
-              <span v-if="productInfo" class="cs-product-info-header" style="width: 100%; margin-top: 4px;">
+              <span v-if="productInfo" class="cs-product-separator" :style="productSeparatorStyle">|</span>
+              <span v-if="productInfo" class="cs-product-name" :style="productNameStyle">
                 {{ productInfo.name }}{{ productInfo.price ? ` • ${formatPrice(productInfo.price)}` : '' }}
               </span>
             </p>
@@ -52,41 +54,38 @@
       <div ref="messagesContainer" class="cs-messages-area-desktop" :style="messagesAreaStyle">
         <div class="cs-messages-list" :style="messagesListStyle">
           
-          <!-- Messages -->
+          <!-- ✅ MESSAGES ALIGNÉS STYLE -->
           <div
             v-for="message in messages"
             :key="message.id"
             class="cs-message-item"
-            :style="messageItemStyle"
+            :class="message.role === 'assistant' ? 'cs-assistant-message' : 'cs-user-message'"
+            :style="messageItemStyle(message.role)"
           >
             
-            <!-- Message assistant -->
+            <!-- ✅ MESSAGE ASSISTANT - ALIGNÉ À GAUCHE AVEC NOM DANS BULLE -->
             <div v-if="message.role === 'assistant'" class="cs-assistant-bubble" :style="assistantBubbleStyle">
-              <div class="cs-message-avatar" :style="messageAvatarStyle">
-                <img :src="agentAvatar" :alt="agentName" :style="avatarImageStyle" @error="handleAvatarError">
-              </div>
-              <div class="cs-message-content">
-                <div class="cs-message-text cs-assistant-text" :style="assistantTextStyle" v-html="formatMessage(message.content)"></div>
+              <div class="cs-message-text cs-assistant-text" :style="assistantTextStyle">
+                <div class="cs-agent-name-in-bubble" :style="agentNameInBubbleStyle">{{ agentName }}</div>
+                <div class="cs-agent-title-in-bubble" :style="agentTitleInBubbleStyle">{{ agentTitle }}</div>
+                <div v-html="formatMessage(message.content)"></div>
                 <div class="cs-message-time" :style="messageTimeStyle">{{ formatTime(message.timestamp) }}</div>
               </div>
             </div>
 
-            <!-- Message utilisateur -->
+            <!-- ✅ MESSAGE UTILISATEUR - ALIGNÉ À DROITE AVEC "VOUS" -->
             <div v-else class="cs-user-bubble" :style="userBubbleStyle">
-              <div class="cs-message-content">
-                <div class="cs-message-text cs-user-text" :style="userTextStyle">{{ message.content }}</div>
+              <div class="cs-message-text cs-user-text" :style="userTextStyle">
+                <div class="cs-you-label-in-bubble" :style="youLabelInBubbleStyle">Vous</div>
+                <div>{{ message.content }}</div>
                 <div class="cs-message-time" :style="messageTimeStyle">{{ formatTime(message.timestamp) }}</div>
               </div>
-              <div class="cs-user-avatar" :style="userAvatarStyle">V</div>
             </div>
           </div>
 
-          <!-- Indicateur de frappe -->
-          <div v-if="isTyping" class="cs-message-item cs-assistant-message" :style="messageItemStyle">
+          <!-- ✅ INDICATEUR DE FRAPPE ALIGNÉ À GAUCHE -->
+          <div v-if="isTyping" class="cs-message-item cs-assistant-message" :style="messageItemStyle('assistant')">
             <div class="cs-assistant-bubble" :style="assistantBubbleStyle">
-              <div class="cs-message-avatar" :style="messageAvatarStyle">
-                <img :src="agentAvatar" :alt="agentName" :style="avatarImageStyle" @error="handleAvatarError">
-              </div>
               <div class="cs-typing-content">
                 <div class="cs-typing-indicator" :style="typingIndicatorStyle">
                   <div class="cs-typing-dot" :style="typingDotStyle"></div>
@@ -101,7 +100,7 @@
         </div>
       </div>
 
-      <!-- ✅ INPUT SECTION CORRIGÉE -->
+      <!-- ✅ INPUT SECTION -->
       <div class="cs-input-section-desktop" :style="inputSectionStyle">
         <div class="cs-input-container" :style="inputContainerStyle">
           <input
@@ -137,15 +136,17 @@
           </button>
         </div>
         
-        <!-- ✅ FOOTER CORRIGÉ - DEUX LIGNES -->
+        <!-- ✅ FOOTER CORRIGÉ - DEUX COLONNES -->
         <div class="cs-footer-info" :style="footerInfoStyle">
-          <span class="cs-powered-by">Propulsé par <strong :style="{ color: primaryColor }">ChatSeller</strong></span>
-          <span class="cs-security">🔒 Conversations sécurisées</span>
+          <span class="cs-powered-by" :style="poweredByStyle">
+            Powered by <strong :style="{ color: primaryColor }">ChatSeller</strong>
+          </span>
+          <span class="cs-security" :style="securityStyle">🔒 Conversations sécurisées</span>
         </div>
       </div>
     </div>
 
-    <!-- ✅ INTERFACE MOBILE PLEIN ÉCRAN -->
+    <!-- ✅ INTERFACE MOBILE IDENTIQUE MAIS ADAPTÉE -->
     <div 
       v-else
       class="cs-chat-container-mobile"
@@ -157,15 +158,15 @@
         <div class="cs-mobile-agent-info" :style="agentInfoStyle">
           <div class="cs-mobile-avatar" :style="mobileAvatarStyle">
             <img :src="agentAvatar" :alt="agentName" :style="avatarImageStyle" @error="handleAvatarError">
-            <div class="cs-mobile-status" :style="statusIndicatorStyle"></div>
           </div>
           <div class="cs-mobile-details">
             <h3 class="cs-mobile-name" :style="mobileNameStyle">{{ agentName }} - {{ agentTitle }}</h3>
             <p class="cs-mobile-status-text" :style="mobileStatusStyle">
-              <span style="display: flex; align-items: center; gap: 6px;">
+              <span class="cs-online-section" :style="onlineSectionStyle">
                 En ligne
               </span>
-              <span v-if="productInfo" class="cs-mobile-product-info" style="width: 100%; margin-top: 4px;">
+              <span v-if="productInfo" class="cs-product-separator" :style="productSeparatorStyle"> | </span>
+              <span v-if="productInfo" class="cs-product-name" :style="productNameStyle">
                 {{ productInfo.name }}
               </span>
             </p>
@@ -193,34 +194,31 @@
             v-for="message in messages"
             :key="message.id"
             class="cs-mobile-message"
-            :style="messageItemStyle"
+            :class="message.role === 'assistant' ? 'cs-mobile-assistant' : 'cs-mobile-user'"
+            :style="messageItemStyle(message.role)"
           >
             
             <div v-if="message.role === 'assistant'" class="cs-mobile-assistant-bubble" :style="assistantBubbleStyle">
-              <div class="cs-mobile-message-avatar" :style="messageAvatarStyle">
-                <img :src="agentAvatar" :alt="agentName" :style="avatarImageStyle" @error="handleAvatarError">
-              </div>
-              <div class="cs-mobile-bubble-content">
-                <div class="cs-mobile-message-text cs-mobile-assistant-text" :style="assistantTextStyle" v-html="formatMessage(message.content)"></div>
+              <div class="cs-mobile-message-text cs-mobile-assistant-text" :style="assistantTextStyle">
+                <div class="cs-agent-name-in-bubble" :style="agentNameInBubbleStyle">{{ agentName }}</div>
+                <div class="cs-agent-title-in-bubble" :style="agentTitleInBubbleStyle">{{ agentTitle }}</div>
+                <div v-html="formatMessage(message.content)"></div>
                 <div class="cs-mobile-message-time" :style="messageTimeStyle">{{ formatTime(message.timestamp) }}</div>
               </div>
             </div>
 
             <div v-else class="cs-mobile-user-bubble" :style="userBubbleStyle">
-              <div class="cs-mobile-bubble-content">
-                <div class="cs-mobile-message-text cs-mobile-user-text" :style="userTextStyle">{{ message.content }}</div>
+              <div class="cs-mobile-message-text cs-mobile-user-text" :style="userTextStyle">
+                <div class="cs-you-label-in-bubble" :style="youLabelInBubbleStyle">Vous</div>
+                <div>{{ message.content }}</div>
                 <div class="cs-mobile-message-time" :style="messageTimeStyle">{{ formatTime(message.timestamp) }}</div>
               </div>
-              <div class="cs-mobile-user-avatar" :style="userAvatarStyle">V</div>
             </div>
           </div>
 
           <!-- Typing mobile -->
-          <div v-if="isTyping" class="cs-mobile-message cs-mobile-assistant" :style="messageItemStyle">
+          <div v-if="isTyping" class="cs-mobile-message cs-mobile-assistant" :style="messageItemStyle('assistant')">
             <div class="cs-mobile-assistant-bubble" :style="assistantBubbleStyle">
-              <div class="cs-mobile-message-avatar" :style="messageAvatarStyle">
-                <img :src="agentAvatar" :alt="agentName" :style="avatarImageStyle" @error="handleAvatarError">
-              </div>
               <div class="cs-mobile-typing">
                 <div class="cs-mobile-typing-dots" :style="typingIndicatorStyle">
                   <div class="cs-mobile-dot" :style="typingDotStyle"></div>
@@ -235,7 +233,7 @@
         </div>
       </div>
 
-      <!-- ✅ INPUT MOBILE CORRIGÉ -->
+      <!-- Input Mobile -->
       <div class="cs-mobile-input-section" :style="mobileInputSectionStyle">
         <div class="cs-mobile-input-container" :style="mobileInputContainerStyle">
           <input
@@ -273,8 +271,10 @@
         
         <!-- ✅ FOOTER MOBILE CORRIGÉ -->
         <div class="cs-mobile-footer" :style="mobileFooterStyle">
-          <span class="cs-mobile-powered">Propulsé par <strong :style="{ color: primaryColor }">ChatSeller</strong></span>
-          <span class="cs-mobile-security">🔒 Sécurisé</span>
+          <span class="cs-mobile-powered" :style="poweredByStyle">
+            Powered by <strong :style="{ color: primaryColor }">ChatSeller</strong>
+          </span>
+          <span class="cs-mobile-security" :style="securityStyle">🔒 Conversations sécurisées</span>
         </div>
       </div>
     </div>
@@ -286,7 +286,6 @@ import { ref, computed, onMounted, nextTick, watch } from 'vue'
 import { v4 as uuidv4 } from 'uuid'
 import type { CSSProperties } from 'vue'
 
-// ✅ PROPS
 interface Props {
   config?: {
     shopId?: string
@@ -386,7 +385,7 @@ const inputPlaceholder = computed(() => {
   return `Tapez votre message...`
 })
 
-// ✅ STYLES COMPUTED AVEC DIMENSIONS CORRIGÉES
+// ✅ STYLES COMPUTED CORRIGÉS POUR LAYOUT WHATSAPP
 
 const headerStyle = computed((): CSSProperties => ({
   padding: '20px',
@@ -402,9 +401,8 @@ const headerStyle = computed((): CSSProperties => ({
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
 }))
 
-// ✅ CORRECTION PRINCIPALE : Largeur desktop 650px
 const desktopContainerStyle = computed((): CSSProperties => ({
-  width: '650px', // ✅ CHANGÉ de 520px à 650px
+  width: '650px',
   height: '700px',
   maxHeight: '90vh',
   maxWidth: '95vw',
@@ -420,10 +418,9 @@ const desktopContainerStyle = computed((): CSSProperties => ({
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
 }))
 
-// ✅ CORRECTION PRINCIPALE : Mobile plein écran
 const mobileContainerStyle = computed((): CSSProperties => ({
-  width: '100vw', // ✅ Plein écran
-  height: '100vh', // ✅ Plein écran
+  width: '100vw',
+  height: '100vh',
   background: '#ffffff',
   display: 'flex',
   flexDirection: 'column',
@@ -431,7 +428,7 @@ const mobileContainerStyle = computed((): CSSProperties => ({
   margin: '0',
   padding: '0',
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  position: 'fixed', // ✅ Position fixe pour éviter scroll
+  position: 'fixed',
   top: '0',
   left: '0',
   zIndex: '999999'
@@ -442,7 +439,8 @@ const agentInfoStyle = computed((): CSSProperties => ({
   alignItems: 'center',
   gap: '14px',
   flex: '1',
-  color: '#ffffff'
+  color: '#ffffff',
+  minWidth: '0'
 }))
 
 const avatarStyle = computed((): CSSProperties => ({
@@ -453,7 +451,8 @@ const avatarStyle = computed((): CSSProperties => ({
   overflow: 'hidden',
   border: '3px solid rgba(255, 255, 255, 0.3)',
   background: 'rgba(255, 255, 255, 0.1)',
-  display: 'block'
+  display: 'block',
+  flexShrink: '0'
 }))
 
 const mobileAvatarStyle = computed((): CSSProperties => ({
@@ -464,7 +463,8 @@ const mobileAvatarStyle = computed((): CSSProperties => ({
   overflow: 'hidden',
   border: '2px solid rgba(255, 255, 255, 0.3)',
   background: 'rgba(255, 255, 255, 0.1)',
-  display: 'block'
+  display: 'block',
+  flexShrink: '0'
 }))
 
 const avatarImageStyle = computed((): CSSProperties => ({
@@ -474,22 +474,11 @@ const avatarImageStyle = computed((): CSSProperties => ({
   display: 'block'
 }))
 
-const statusIndicatorStyle = computed((): CSSProperties => ({
-  position: 'absolute',
-  bottom: '2px',
-  right: '2px',
-  width: '14px',
-  height: '14px',
-  borderRadius: '50%',
-  background: '#00D26A',
-  border: '3px solid #ffffff'
-}))
-
 const agentNameStyle = computed((): CSSProperties => ({
   fontSize: '18px',
   fontWeight: '700',
   color: '#ffffff',
-  margin: '0 0 6px 0',
+  margin: '0 0 4px 0',
   lineHeight: '1.2',
   fontFamily: 'inherit'
 }))
@@ -498,22 +487,24 @@ const mobileNameStyle = computed((): CSSProperties => ({
   fontSize: '16px',
   fontWeight: '700',
   color: '#ffffff',
-  margin: '0 0 6px 0',
+  margin: '0 0 4px 0',
   lineHeight: '1.2',
   fontFamily: 'inherit'
 }))
 
+// ✅ STATUS AVEC PRODUIT SUR MÊME LIGNE
 const agentStatusStyle = computed((): CSSProperties => ({
   fontSize: '14px',
   color: 'rgba(255, 255, 255, 0.95)',
   margin: '0',
   display: 'flex',
   alignItems: 'center',
-  gap: '6px',
+  flexWrap: 'wrap',
+  gap: '8px',
+  lineHeight: '1.3',
   fontWeight: '500',
   fontFamily: 'inherit',
-  flexWrap: 'wrap',
-  minWidth: '80px'
+  minWidth: '0'
 }))
 
 const mobileStatusStyle = computed((): CSSProperties => ({
@@ -522,9 +513,19 @@ const mobileStatusStyle = computed((): CSSProperties => ({
   margin: '0',
   display: 'flex',
   alignItems: 'center',
+  flexWrap: 'wrap',
   gap: '6px',
+  lineHeight: '1.3',
   fontWeight: '500',
   fontFamily: 'inherit'
+}))
+
+const onlineSectionStyle = computed((): CSSProperties => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '6px',
+  whiteSpace: 'nowrap',
+  flexShrink: '0'
 }))
 
 const statusDotStyle = computed((): CSSProperties => ({
@@ -532,13 +533,33 @@ const statusDotStyle = computed((): CSSProperties => ({
   height: '8px',
   borderRadius: '50%',
   background: '#00D26A',
-  display: 'block'
+  display: 'block',
+  flexShrink: '0',
+  animation: 'cs-pulse-status 2s infinite'
+}))
+
+const productSeparatorStyle = computed((): CSSProperties => ({
+  color: 'rgba(255, 255, 255, 0.7)',
+  margin: '0 4px',
+  flexShrink: '0'
+}))
+
+const productNameStyle = computed((): CSSProperties => ({
+  fontSize: '13px',
+  opacity: '0.9',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  maxWidth: isMobile.value ? '150px' : '200px',
+  flexShrink: '1',
+  minWidth: '0'
 }))
 
 const headerActionsStyle = computed((): CSSProperties => ({
   display: 'flex',
   alignItems: 'center',
-  gap: '8px'
+  gap: '8px',
+  flexShrink: '0'
 }))
 
 const actionButtonStyle = computed((): CSSProperties => ({
@@ -552,7 +573,8 @@ const actionButtonStyle = computed((): CSSProperties => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  transition: 'all 0.2s ease'
+  transition: 'all 0.2s ease',
+  flexShrink: '0'
 }))
 
 const mobileActionButtonStyle = computed((): CSSProperties => ({
@@ -566,7 +588,8 @@ const mobileActionButtonStyle = computed((): CSSProperties => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  transition: 'all 0.2s ease'
+  transition: 'all 0.2s ease',
+  flexShrink: '0'
 }))
 
 const closeButtonStyle = computed((): CSSProperties => ({
@@ -580,117 +603,128 @@ const closeButtonStyle = computed((): CSSProperties => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  transition: 'all 0.2s ease'
+  transition: 'all 0.2s ease',
+  flexShrink: '0'
 }))
 
+// ✅ BACKGROUND WHATSAPP STYLE
 const messagesAreaStyle = computed((): CSSProperties => ({
   flex: '1',
-  background: 'linear-gradient(to bottom, #fafbfc 0%, #ffffff 100%)',
-  overflowY: 'auto',
-  padding: '24px',
-  display: 'flex',
-  flexDirection: 'column',
-  color: '#374151',
-  fontFamily: 'inherit'
-}))
-
-const mobileMessagesAreaStyle = computed((): CSSProperties => ({
-  flex: '1',
-  background: '#fafbfc',
+  background: '#f0f2f5',
   overflowY: 'auto',
   padding: '20px',
   display: 'flex',
   flexDirection: 'column',
   color: '#374151',
-  fontFamily: 'inherit'
+  fontFamily: 'inherit',
+  minHeight: '0'
+}))
+
+const mobileMessagesAreaStyle = computed((): CSSProperties => ({
+  flex: '1',
+  background: '#f0f2f5',
+  overflowY: 'auto',
+  padding: '16px',
+  display: 'flex',
+  flexDirection: 'column',
+  color: '#374151',
+  fontFamily: 'inherit',
+  minHeight: '0'
 }))
 
 const messagesListStyle = computed((): CSSProperties => ({
   display: 'flex',
   flexDirection: 'column',
-  gap: '18px',
-  flex: '1'
-}))
-
-const messageItemStyle = computed((): CSSProperties => ({
-  display: 'flex',
-  alignItems: 'flex-start',
+  gap: '12px',
+  flex: '1',
   margin: '0',
   padding: '0'
 }))
 
-const assistantBubbleStyle = computed((): CSSProperties => ({
+// ✅ ALIGNMENT MESSAGES WHATSAPP STYLE
+const messageItemStyle = (role: string): CSSProperties => ({
   display: 'flex',
-  alignItems: 'flex-start',
-  gap: '12px',
-  maxWidth: '85%'
+  width: '100%',
+  justifyContent: role === 'assistant' ? 'flex-start' : 'flex-end',
+  margin: '0',
+  padding: '0'
+})
+
+const assistantBubbleStyle = computed((): CSSProperties => ({
+  maxWidth: '75%',
+  margin: '0',
+  padding: '0'
 }))
 
 const userBubbleStyle = computed((): CSSProperties => ({
-  display: 'flex',
-  alignItems: 'flex-start',
-  gap: '12px',
-  maxWidth: '85%',
-  flexDirection: 'row-reverse',
-  marginLeft: 'auto'
+  maxWidth: '75%',
+  margin: '0',
+  padding: '0'
 }))
 
-const messageAvatarStyle = computed((): CSSProperties => ({
-  width: '36px',
-  height: '36px',
-  borderRadius: '50%',
-  overflow: 'hidden',
-  border: '2px solid #f3f4f6',
-  background: '#f3f4f6',
-  display: 'block'
-}))
-
+// ✅ BULLES STYLE WHATSAPP SANS OMBRES
 const assistantTextStyle = computed((): CSSProperties => ({
-  borderRadius: '20px',
-  padding: '14px 18px',
+  borderRadius: '18px',
+  padding: '10px 14px',
   fontSize: '14px',
-  lineHeight: '1.5',
-  margin: '0 0 6px 0',
+  lineHeight: '1.4',
+  margin: '0',
   background: '#ffffff',
-  color: '#2d3748',
-  border: '1px solid #e2e8f0',
-  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+  color: '#1f2937',
+  border: 'none',
+  boxShadow: 'none',
   fontFamily: 'inherit',
-  wordWrap: 'break-word'
+  wordWrap: 'break-word',
+  position: 'relative'
 }))
 
 const userTextStyle = computed((): CSSProperties => ({
-  borderRadius: '20px',
-  padding: '14px 18px',
+  borderRadius: '18px',
+  padding: '10px 14px',
   fontSize: '14px',
-  lineHeight: '1.5',
-  margin: '0 0 6px 0',
-  background: `linear-gradient(135deg, ${primaryColor.value} 0%, ${adjustColor(primaryColor.value, -15)} 100%)`,
+  lineHeight: '1.4',
+  margin: '0',
+  background: '#25d366',
   color: '#ffffff',
   border: 'none',
-  boxShadow: `0 2px 8px rgba(${hexToRgb(primaryColor.value)}, 0.3)`,
+  boxShadow: 'none',
   fontFamily: 'inherit',
-  wordWrap: 'break-word'
+  wordWrap: 'break-word',
+  position: 'relative'
 }))
 
-const userAvatarStyle = computed((): CSSProperties => ({
-  width: '36px',
-  height: '36px',
-  borderRadius: '50%',
-  background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  color: '#ffffff',
+// ✅ NOMS DANS LES BULLES
+const agentNameInBubbleStyle = computed((): CSSProperties => ({
   fontWeight: '700',
-  fontSize: '16px',
+  fontSize: '13px',
+  color: primaryColor.value,
+  margin: '0 0 2px 0',
+  display: 'block',
+  fontFamily: 'inherit'
+}))
+
+const agentTitleInBubbleStyle = computed((): CSSProperties => ({
+  fontWeight: '500',
+  fontSize: '11px',
+  color: '#6b7280',
+  margin: '0 0 6px 0',
+  display: 'block',
+  fontFamily: 'inherit'
+}))
+
+const youLabelInBubbleStyle = computed((): CSSProperties => ({
+  fontWeight: '700',
+  fontSize: '13px',
+  color: 'rgba(255, 255, 255, 0.9)',
+  margin: '0 0 4px 0',
+  display: 'block',
   fontFamily: 'inherit'
 }))
 
 const messageTimeStyle = computed((): CSSProperties => ({
   fontSize: '11px',
   color: '#9ca3af',
-  padding: '0 4px',
+  margin: '4px 0 0 0',
   textAlign: 'right',
   opacity: '0.8',
   fontFamily: 'inherit'
@@ -699,70 +733,84 @@ const messageTimeStyle = computed((): CSSProperties => ({
 const typingIndicatorStyle = computed((): CSSProperties => ({
   display: 'flex',
   gap: '4px',
-  padding: '14px 18px',
+  padding: '12px 16px',
   background: '#ffffff',
-  borderRadius: '20px',
-  border: '1px solid #e2e8f0',
-  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)'
+  borderRadius: '18px',
+  margin: '0'
 }))
 
 const typingDotStyle = computed((): CSSProperties => ({
   width: '6px',
   height: '6px',
   borderRadius: '50%',
-  background: primaryColor.value,
+  background: '#9ca3af',
   animation: 'cs-typing-animation 1.4s infinite'
 }))
 
 const inputSectionStyle = computed((): CSSProperties => ({
-  padding: '20px',
+  padding: '16px 20px',
   borderTop: '1px solid #e5e7eb',
   background: '#ffffff',
-  flexShrink: '0'
+  flexShrink: '0',
+  margin: '0',
+  fontFamily: 'inherit'
 }))
 
-// ✅ CORRECTION PRINCIPALE : Input container prend toute la largeur
 const inputContainerStyle = computed((): CSSProperties => ({
   display: 'flex',
   alignItems: 'center',
   gap: '8px',
-  margin: '0 0 16px 0'
+  margin: '0 0 12px 0',
+  padding: '0'
 }))
 
-// ✅ CORRECTION : Style mobile input container
+const mobileInputSectionStyle = computed((): CSSProperties => ({
+  borderTop: '1px solid #e5e7eb',
+  background: '#ffffff',
+  flexShrink: '0',
+  paddingTop: '16px',
+  paddingBottom: '16px',
+  margin: '0',
+  fontFamily: 'inherit'
+}))
+
 const mobileInputContainerStyle = computed((): CSSProperties => ({
   display: 'flex',
   alignItems: 'center',
   gap: '8px',
-  margin: '0 0 12px 0',
+  margin: '0 0 10px 0',
   padding: '0 16px'
 }))
 
 const messageInputStyle = computed((): CSSProperties => ({
-  flex: '1', // ✅ Prend toute la largeur disponible
+  flex: '1',
   background: '#f8fafc',
   border: '2px solid #e2e8f0',
   borderRadius: '25px',
-  padding: '14px 18px',
+  padding: '12px 16px',
   fontSize: '14px',
   color: '#374151',
   fontFamily: 'inherit',
   outline: 'none',
-  transition: 'all 0.2s ease'
+  transition: 'all 0.2s ease',
+  margin: '0'
 }))
 
 const voiceButtonStyle = computed((): CSSProperties => ({
-  background: 'transparent',
+  background: primaryColor.value,
   border: 'none',
-  color: '#9ca3af',
+  color: '#ffffff',
   cursor: 'pointer',
   padding: '6px',
   borderRadius: '50%',
-  width: '32px',
-  height: '32px',
+  width: '36px',
+  height: '36px',
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'center'
+  justifyContent: 'center',
+  transition: 'all 0.2s ease',
+  margin: '0',
+  outline: 'none'
 }))
 
 const sendButtonStyle = computed((): CSSProperties => ({
@@ -777,7 +825,10 @@ const sendButtonStyle = computed((): CSSProperties => ({
   alignItems: 'center',
   justifyContent: 'center',
   transition: 'all 0.2s ease',
-  boxShadow: `0 4px 14px rgba(${hexToRgb(primaryColor.value)}, 0.4)`
+  flexShrink: '0',
+  boxShadow: `0 4px 14px rgba(${hexToRgb(primaryColor.value)}, 0.4)`,
+  margin: '0',
+  outline: 'none'
 }))
 
 const loadingSpinnerStyle = computed((): CSSProperties => ({
@@ -789,44 +840,46 @@ const loadingSpinnerStyle = computed((): CSSProperties => ({
   animation: 'cs-spin 1s linear infinite'
 }))
 
-// ✅ CORRECTION PRINCIPALE : Footer sur 2 lignes
+// ✅ FOOTER CORRIGÉ DEUX COLONNES
 const footerInfoStyle = computed((): CSSProperties => ({
   display: 'flex',
-  flexDirection: 'column',
+  justifyContent: 'space-between',
   alignItems: 'center',
-  justifyContent: 'center',
   fontSize: '11px',
   color: '#9ca3af',
-  gap: '4px',
-  textAlign: 'center'
+  margin: '0',
+  padding: '0',
+  width: '100%',
+  fontFamily: 'inherit'
 }))
 
 const mobileFooterStyle = computed((): CSSProperties => ({
   display: 'flex',
-  flexDirection: 'column',
+  justifyContent: 'space-between',
   alignItems: 'center',
-  justifyContent: 'center',
   fontSize: '10px',
   color: '#9ca3af',
-  marginTop: '12px',
-  gap: '4px',
-  textAlign: 'center',
-  padding: '0 16px'
+  margin: '0',
+  padding: '0 16px',
+  width: '100%',
+  fontFamily: 'inherit'
 }))
 
-// ✅ CORRECTION : Mobile input section sans conflits
-const mobileInputSectionStyle = computed((): CSSProperties => ({
-  borderTop: '1px solid #e5e7eb',
-  background: '#ffffff',
+const poweredByStyle = computed((): CSSProperties => ({
+  textAlign: 'left',
   flexShrink: '0',
-  paddingTop: '16px',
-  paddingBottom: '16px'
+  fontFamily: 'inherit'
+}))
+
+const securityStyle = computed((): CSSProperties => ({
+  textAlign: 'right',
+  flexShrink: '0',
+  fontFamily: 'inherit'
 }))
 
 // ✅ FONCTIONS
 const sendWelcomeMessage = async () => {
   try {
-    // Vérifier s'il y a une conversation sauvegardée
     if (typeof window !== 'undefined' && (window as any).ChatSeller) {
       const savedConversation = (window as any).ChatSeller.loadConversation()
       if (savedConversation && savedConversation.messages && savedConversation.messages.length > 0) {
@@ -837,7 +890,6 @@ const sendWelcomeMessage = async () => {
       }
     }
 
-    // Sinon, envoyer le message d'accueil
     let welcomeMessage = ''
     
     if (configData.value.agentConfig?.welcomeMessage) {
@@ -919,7 +971,6 @@ const sendMessage = async () => {
     await nextTick()
     scrollToBottom()
     
-    // Sauvegarder la conversation
     if (typeof window !== 'undefined' && (window as any).ChatSeller) {
       (window as any).ChatSeller.saveConversation(messages.value, conversationId.value)
     }
@@ -944,7 +995,7 @@ const resetChat = () => {
 
 const closeChat = () => {
   if (typeof window !== 'undefined' && (window as any).ChatSeller) {
-    (window as any).ChatSeller.closeChat() // ✅ CHANGÉ : Ne plus destroy, juste fermer
+    (window as any).ChatSeller.closeChat()
   }
 }
 
@@ -1086,7 +1137,6 @@ watch(messages, () => {
     scrollToBottom()
   })
   
-  // Sauvegarder automatiquement
   if (typeof window !== 'undefined' && (window as any).ChatSeller) {
     (window as any).ChatSeller.saveConversation(messages.value, conversationId.value)
   }
@@ -1096,20 +1146,16 @@ onMounted(() => {
   console.log('🎨 [WIDGET VUE] Composant monté')
   sendWelcomeMessage()
   
-  // Gestion mobile anti-scroll clavier (comme WhatsApp)
   if (isMobile.value && typeof window !== 'undefined') {
-    // Empêcher le zoom sur focus input
     const metaViewport = document.querySelector('meta[name="viewport"]')
     if (metaViewport) {
       metaViewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no')
     }
     
-    // Empêcher le scroll du body quand le chat est ouvert
     document.body.style.overflow = 'hidden'
     document.body.style.position = 'fixed'
     document.body.style.width = '100%'
     
-    // Restaurer au unmount
     return () => {
       document.body.style.overflow = ''
       document.body.style.position = ''
