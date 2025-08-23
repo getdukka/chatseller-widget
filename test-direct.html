@@ -1,0 +1,653 @@
+<!-- test-direct.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test ChatSeller Widget - Direct</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .product-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 300px;
+            background: #e5e7eb;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            font-size: 18px;
+        }
+        
+        .product-info h1 {
+            font-size: 28px;
+            margin: 0 0 16px 0;
+            color: #1f2937;
+        }
+        
+        .product-price {
+            font-size: 24px;
+            font-weight: 600;
+            color: #059669;
+            margin: 16px 0;
+        }
+        
+        .product-description {
+            color: #6b7280;
+            line-height: 1.6;
+            margin: 16px 0;
+        }
+        
+        .product-form__buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 32px;
+        }
+        
+        .btn-primary {
+            background: #1f2937;
+            color: white;
+            border: none;
+            padding: 16px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary:hover {
+            background: #374151;
+        }
+        
+        @media (max-width: 768px) {
+            .product-section {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="product-section">
+            <div class="product-image">
+                Image du produit
+            </div>
+            
+            <div class="product-info">
+                <h1 class="product__title">Ceinture Chauffante Mia</h1>
+                <div class="product-price price__current">
+                    <span class="money">29,900 CFA</span>
+                </div>
+                <div class="product-description">
+                    Découvrez notre ceinture chauffante révolutionnaire qui offre un soulagement instantané pour vos douleurs dorsales. Technologie infrarouge avancée, 3 niveaux de chaleur, batterie longue durée.
+                </div>
+                
+                <div class="product-form__buttons">
+                    <!-- ✅ LE WIDGET SERA INSÉRÉ ICI -->
+                    
+                    <button type="submit" name="add" class="btn-primary">
+                        Ajouter au panier - 29,900 CFA
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ CHARGEMENT DIRECT DU WIDGET SANS BUILD -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+        // ✅ CSS WIDGET INLINE COMPLET
+        const widgetCSS = `
+/* CHATSELLER WIDGET - CSS COMPLET */
+.cs-chatseller-widget, .cs-chatseller-widget *, .cs-chatseller-widget *::before, .cs-chatseller-widget *::after {
+  all: unset !important;
+  box-sizing: border-box !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif !important;
+  line-height: normal !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+}
+
+.cs-chatseller-widget {
+  position: relative !important;
+  z-index: 999999 !important;
+  display: block !important;
+  margin: 8px 0 !important;
+  width: 100% !important;
+  font-size: 14px !important;
+  color: #374151 !important;
+}
+
+/* BOUTON TRIGGER */
+.cs-chat-trigger-button {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  padding: 16px 24px !important;
+  background: linear-gradient(135deg, #EC4899 0%, #BE185D 100%) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 50px !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 8px 25px rgba(236, 72, 153, 0.3) !important;
+  min-height: 56px !important;
+  gap: 8px !important;
+  outline: none !important;
+}
+
+.cs-chat-trigger-button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 35px rgba(236, 72, 153, 0.4) !important;
+}
+
+/* MODAL OVERLAY */
+.cs-chat-modal-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(0, 0, 0, 0.75) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  z-index: 2147483647 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px !important;
+  font-family: inherit !important;
+  margin: 0 !important;
+  border: none !important;
+}
+
+.cs-chat-modal-overlay.cs-mobile {
+  padding: 0 !important;
+  align-items: stretch !important;
+  justify-content: stretch !important;
+}
+
+/* CONTAINER DESKTOP */
+.cs-chat-container-desktop {
+  width: 450px !important;
+  height: 650px !important;
+  max-height: 85vh !important;
+  max-width: 95vw !important;
+  background: #ffffff !important;
+  border-radius: 24px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  position: relative !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* CONTAINER MOBILE */
+.cs-chat-container-mobile {
+  width: 100% !important;
+  height: 100% !important;
+  background: #ffffff !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* HEADER */
+.cs-desktop-header, .cs-mobile-header {
+  padding: 20px !important;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #EC4899 0%, #BE185D 100%) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  min-height: 85px !important;
+  margin: 0 !important;
+  border: none !important;
+}
+
+.cs-mobile-header {
+  padding: 16px 20px !important;
+  min-height: 75px !important;
+}
+
+/* AGENT INFO */
+.cs-agent-info, .cs-mobile-agent-info {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  flex: 1 !important;
+  color: #ffffff !important;
+}
+
+.cs-agent-avatar, .cs-mobile-avatar {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 50% !important;
+  position: relative !important;
+  overflow: hidden !important;
+  border: 3px solid rgba(255, 255, 255, 0.3) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  display: block !important;
+}
+
+.cs-mobile-avatar {
+  width: 42px !important;
+  height: 42px !important;
+}
+
+.cs-avatar-image, .cs-mobile-avatar img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
+.cs-agent-name, .cs-mobile-name {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  margin: 0 0 6px 0 !important;
+  line-height: 1.2 !important;
+}
+
+.cs-mobile-name {
+  font-size: 16px !important;
+}
+
+.cs-agent-status, .cs-mobile-status-text {
+  font-size: 14px !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-weight: 500 !important;
+}
+
+.cs-mobile-status-text {
+  font-size: 13px !important;
+}
+
+/* STATUS DOT */
+.cs-status-dot {
+  width: 8px !important;
+  height: 8px !important;
+  border-radius: 50% !important;
+  background: #00D26A !important;
+  display: block !important;
+}
+
+/* BOUTONS HEADER */
+.cs-close-button, .cs-mobile-close {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: none !important;
+  color: #ffffff !important;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+}
+
+.cs-close-button:hover, .cs-mobile-close:hover {
+  background: rgba(255, 255, 255, 0.25) !important;
+}
+
+/* ZONE MESSAGES */
+.cs-messages-area-desktop, .cs-messages-area-mobile {
+  flex: 1 !important;
+  background: #fafbfc !important;
+  overflow-y: auto !important;
+  padding: 24px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  color: #374151 !important;
+}
+
+.cs-messages-area-mobile {
+  padding: 20px !important;
+}
+
+/* INPUT SECTION */
+.cs-input-section-desktop, .cs-mobile-input-section {
+  padding: 20px !important;
+  border-top: 1px solid #e5e7eb !important;
+  background: #ffffff !important;
+  margin: 0 !important;
+}
+
+.cs-input-container, .cs-mobile-input-container {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin: 0 0 16px 0 !important;
+}
+
+.cs-input-wrapper {
+  flex: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  background: #f8fafc !important;
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 25px !important;
+  padding: 0 18px !important;
+  min-height: 52px !important;
+}
+
+.cs-message-input, .cs-mobile-message-input {
+  flex: 1 !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  padding: 14px 0 !important;
+  font-size: 14px !important;
+  color: #374151 !important;
+  font-family: inherit !important;
+}
+
+.cs-send-button, .cs-mobile-send {
+  width: 48px !important;
+  height: 48px !important;
+  background: #EC4899 !important;
+  border: none !important;
+  border-radius: 50% !important;
+  color: #ffffff !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+}
+
+/* FOOTER */
+.cs-footer-info, .cs-mobile-footer {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  font-size: 11px !important;
+  color: #9ca3af !important;
+  margin: 0 !important;
+}
+
+.cs-mobile-footer {
+  font-size: 10px !important;
+  margin-top: 12px !important;
+}
+
+/* RESPONSIVE */
+@media (max-width: 767px) {
+  .cs-chat-container-desktop {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 0 !important;
+  }
+  
+  .cs-chat-modal-overlay {
+    padding: 0 !important;
+  }
+}
+        `;
+
+        // ✅ INJECTION CSS
+        const style = document.createElement('style');
+        style.textContent = widgetCSS;
+        document.head.appendChild(style);
+
+        // ✅ WIDGET CLASS SIMPLIFIÉ
+        class ChatSellerDirect {
+            constructor() {
+                this.isOpen = false;
+                this.modalElement = null;
+            }
+
+            init(config) {
+                console.log('🚀 Initialisation ChatSeller Direct:', config);
+                this.config = config;
+                this.createWidget();
+            }
+
+            createWidget() {
+                const container = document.createElement('div');
+                container.id = 'chatseller-widget';
+                container.className = 'cs-chatseller-widget';
+                
+                container.innerHTML = `
+                    <button 
+                        id="chatseller-trigger-btn"
+                        class="cs-chat-trigger-button"
+                        style="
+                            width: 100%;
+                            padding: 16px 24px;
+                            background: linear-gradient(135deg, ${this.config.primaryColor || '#EC4899'} 0%, ${this.adjustColor(this.config.primaryColor || '#EC4899', -15)} 100%);
+                            color: white;
+                            border: none;
+                            border-radius: 50px;
+                            font-size: 15px;
+                            font-weight: 600;
+                            cursor: pointer;
+                            transition: all 0.3s ease;
+                            box-shadow: 0 8px 25px rgba(236, 72, 153, 0.3);
+                            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            gap: 8px;
+                            min-height: 56px;
+                        "
+                    >
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.906-1.479L3 21l2.521-5.094A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"></path>
+                        </svg>
+                        <span>${this.config.buttonText || 'Parler à la vendeuse'}</span>
+                    </button>
+                `;
+
+                // ✅ INSERTION DANS LA PAGE
+                const targetElement = document.querySelector('.product-form__buttons');
+                if (targetElement) {
+                    targetElement.insertBefore(container, targetElement.firstChild);
+                } else {
+                    document.body.appendChild(container);
+                }
+
+                // ✅ EVENT LISTENER
+                const triggerBtn = container.querySelector('#chatseller-trigger-btn');
+                triggerBtn.addEventListener('click', () => this.openChat());
+
+                console.log('✅ Widget inséré avec succès');
+            }
+
+            openChat() {
+                if (this.isOpen) return;
+                this.isOpen = true;
+                console.log('💬 Ouverture chat');
+
+                const isMobile = window.innerWidth < 768;
+                
+                this.modalElement = document.createElement('div');
+                this.modalElement.className = 'cs-chat-modal-overlay';
+                if (isMobile) this.modalElement.classList.add('cs-mobile');
+
+                const agentName = this.config.agentConfig?.name || 'Anna';
+                const agentTitle = this.config.agentConfig?.title || 'Vendeuse IA';
+                const primaryColor = this.config.primaryColor || '#EC4899';
+
+                this.modalElement.innerHTML = `
+                    <div class="${isMobile ? 'cs-chat-container-mobile' : 'cs-chat-container-desktop'}">
+                        <div class="${isMobile ? 'cs-mobile-header' : 'cs-desktop-header'}" style="background: linear-gradient(135deg, ${primaryColor} 0%, ${this.adjustColor(primaryColor, -15)} 100%);">
+                            <div class="${isMobile ? 'cs-mobile-agent-info' : 'cs-agent-info'}">
+                                <div class="${isMobile ? 'cs-mobile-avatar' : 'cs-agent-avatar'}">
+                                    <div style="
+                                        width: 100%; height: 100%; border-radius: 50%;
+                                        background: rgba(255, 255, 255, 0.2);
+                                        display: flex; align-items: center; justify-content: center;
+                                        font-weight: 700; font-size: 18px; color: white;
+                                    ">
+                                        ${agentName.charAt(0).toUpperCase()}
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="${isMobile ? 'cs-mobile-name' : 'cs-agent-name'}">${agentName} - ${agentTitle}</h3>
+                                    <p class="${isMobile ? 'cs-mobile-status-text' : 'cs-agent-status'}">
+                                        <span class="cs-status-dot"></span>
+                                        En ligne • ${this.config.productName || 'Produit'}
+                                    </p>
+                                </div>
+                            </div>
+                            <button class="${isMobile ? 'cs-mobile-close' : 'cs-close-button'}" id="close-chat">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <div class="${isMobile ? 'cs-messages-area-mobile' : 'cs-messages-area-desktop'}">
+                            <div style="text-align: center; padding: 40px 20px;">
+                                <p style="margin: 0; font-size: 16px; color: #374151; font-weight: 500;">
+                                    👋 Bonjour ! Je suis ${agentName}
+                                </p>
+                                <p style="margin: 8px 0 0 0; font-size: 14px; color: #6b7280;">
+                                    Comment puis-je vous aider avec ${this.config.productName || 'ce produit'} ?
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="${isMobile ? 'cs-mobile-input-section' : 'cs-input-section-desktop'}">
+                            <div class="${isMobile ? 'cs-mobile-input-container' : 'cs-input-container'}">
+                                <div class="cs-input-wrapper">
+                                    <input 
+                                        type="text" 
+                                        placeholder="Tapez votre message..."
+                                        class="${isMobile ? 'cs-mobile-message-input' : 'cs-message-input'}"
+                                    />
+                                </div>
+                                <button class="${isMobile ? 'cs-mobile-send' : 'cs-send-button'}" style="background: ${primaryColor};">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            
+                            <div class="${isMobile ? 'cs-mobile-footer' : 'cs-footer-info'}">
+                                <span>Propulsé par <strong style="color: ${primaryColor};">ChatSeller</strong></span>
+                                <span>🔒 Conversations sécurisées</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(this.modalElement);
+
+                // ✅ EVENT LISTENERS
+                const closeBtn = this.modalElement.querySelector('#close-chat');
+                closeBtn.addEventListener('click', () => this.closeChat());
+
+                if (!isMobile) {
+                    this.modalElement.addEventListener('click', (e) => {
+                        if (e.target === this.modalElement) this.closeChat();
+                    });
+                }
+            }
+
+            closeChat() {
+                if (this.modalElement) {
+                    this.modalElement.remove();
+                    this.modalElement = null;
+                }
+                this.isOpen = false;
+            }
+
+            adjustColor(color, percent) {
+                try {
+                    const hex = color.replace('#', '');
+                    const r = parseInt(hex.substr(0, 2), 16);
+                    const g = parseInt(hex.substr(2, 2), 16);
+                    const b = parseInt(hex.substr(4, 2), 16);
+                    
+                    const adjust = (channel) => {
+                        const adjusted = channel + (channel * percent / 100);
+                        return Math.max(0, Math.min(255, Math.round(adjusted)));
+                    };
+                    
+                    return `rgb(${adjust(r)}, ${adjust(g)}, ${adjust(b)})`;
+                } catch (error) {
+                    return color;
+                }
+            }
+        }
+
+        // ✅ INITIALISATION AUTOMATIQUE
+        window.ChatSellerDirect = new ChatSellerDirect();
+        
+        // ✅ CONFIGURATION ET DÉMARRAGE
+        const config = {
+            shopId: 'demo',
+            productName: 'Ceinture Chauffante Mia',
+            productPrice: 29900,
+            agentConfig: {
+                name: 'Anna',
+                title: 'Vendeuse IA'
+            },
+            primaryColor: '#EC4899',
+            buttonText: 'Parler à la vendeuse',
+            language: 'fr'
+        };
+
+        // ✅ DÉMARRAGE QUAND LE DOM EST PRÊT
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                setTimeout(() => {
+                    window.ChatSellerDirect.init(config);
+                }, 100);
+            });
+        } else {
+            setTimeout(() => {
+                window.ChatSellerDirect.init(config);
+            }, 100);
+        }
+
+        console.log('🧪 ChatSeller Direct chargé');
+    </script>
+</body>
+</html>

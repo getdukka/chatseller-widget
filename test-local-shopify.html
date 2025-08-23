@@ -1,0 +1,581 @@
+<!-- test-local-shopify.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test ChatSeller Widget - Simulation Shopify</title>
+    
+    <!-- ✅ SIMULATION STYLES SHOPIFY QUI PEUVENT CRÉER DES CONFLITS -->
+    <style>
+        /* Styles Shopify typiques qui peuvent créer des conflits */
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f7f7f7;
+            line-height: 1.6;
+        }
+        
+        /* Styles agressifs Shopify */
+        button {
+            font-family: inherit !important;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            margin-top: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .product-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .product-info {
+            padding: 20px 0;
+        }
+        
+        .product__title {
+            font-size: 2.5rem;
+            margin: 0 0 20px 0;
+            color: #2c3e50;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        .price__current {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #27ae60;
+            margin: 20px 0;
+            display: block;
+        }
+        
+        .money {
+            color: inherit;
+        }
+        
+        .product-description {
+            color: #7f8c8d;
+            line-height: 1.8;
+            margin: 20px 0 40px 0;
+            font-size: 1.1rem;
+        }
+        
+        .product-features {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #3498db;
+        }
+        
+        .product-features h3 {
+            margin: 0 0 15px 0;
+            color: #2c3e50;
+            font-size: 1.3rem;
+        }
+        
+        .product-features ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .product-features li {
+            margin: 8px 0;
+            color: #5d6d7e;
+        }
+        
+        .product-form__buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 40px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            border: none;
+            padding: 18px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 6px 20px rgba(44, 62, 80, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #34495e, #2c3e50);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(44, 62, 80, 0.4);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #3498db;
+            border: 2px solid #3498db;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn-secondary:hover {
+            background: #3498db;
+            color: white;
+        }
+        
+        .shopify-header {
+            background: #2c3e50;
+            color: white;
+            padding: 15px 0;
+            margin-bottom: 20px;
+        }
+        
+        .shopify-header .container {
+            margin: 0 auto;
+            padding: 0 20px;
+            background: transparent;
+            box-shadow: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #ecf0f1;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .nav-links a {
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: #ecf0f1;
+        }
+        
+        .status-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 40px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .status-section h3 {
+            margin: 0 0 20px 0;
+            color: #2c3e50;
+            font-size: 1.4rem;
+        }
+        
+        .test-info {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .test-info h2 {
+            margin: 0 0 10px 0;
+            font-size: 1.5rem;
+        }
+        
+        .test-info p {
+            margin: 0;
+            opacity: 0.9;
+        }
+        
+        .test-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .test-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .test-btn:hover {
+            background: #c0392b;
+        }
+        
+        .test-btn.success {
+            background: #27ae60;
+        }
+        
+        .test-btn.success:hover {
+            background: #229954;
+        }
+        
+        .logs {
+            background: #2c3e50;
+            color: #2ecc71;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .product-section {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .product__title {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 15px;
+                margin-top: 10px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ✅ SIMULATION HEADER SHOPIFY -->
+    <header class="shopify-header">
+        <div class="container">
+            <div class="logo">🛍️ Ma Boutique Test</div>
+            <nav class="nav-links">
+                <a href="#">Accueil</a>
+                <a href="#">Produits</a>
+                <a href="#">Contact</a>
+                <a href="#">Panier</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="test-info">
+            <h2>🧪 Test ChatSeller Widget - Local</h2>
+            <p>Simulation environnement Shopify avec styles conflictuels</p>
+        </div>
+
+        <div class="product-section">
+            <div class="product-image">
+                📱<br>Produit Test<br>(Simulation Shopify)
+            </div>
+            
+            <div class="product-info">
+                <h1 class="product__title">Smartphone Revolution Pro</h1>
+                
+                <div class="price__current">
+                    <span class="money">599,99 €</span>
+                </div>
+                
+                <div class="product-description">
+                    Découvrez le nouveau Smartphone Revolution Pro avec sa caméra ultra-performante, 
+                    son écran OLED de 6.7 pouces et sa batterie longue durée. Innovation et élégance 
+                    réunies dans un design exceptionnel.
+                </div>
+
+                <div class="product-features">
+                    <h3>🌟 Caractéristiques principales</h3>
+                    <ul>
+                        <li>Écran OLED 6.7" 120Hz</li>
+                        <li>Triple caméra 108MP</li>
+                        <li>Batterie 5000mAh</li>
+                        <li>5G + WiFi 6</li>
+                        <li>256GB de stockage</li>
+                    </ul>
+                </div>
+                
+                <div class="product-form__buttons">
+                    <!-- ✅ LE WIDGET SERA INSÉRÉ ICI AUTOMATIQUEMENT -->
+                    
+                    <button type="submit" name="add" class="btn-primary">
+                        🛒 Ajouter au panier - 599,99 €
+                    </button>
+                    
+                    <button type="button" class="btn-secondary">
+                        💝 Ajouter à ma liste
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-section">
+            <h3>📊 Statut du Test Widget</h3>
+            
+            <div class="test-controls">
+                <button id="test-widget-presence" class="test-btn">Test Présence Widget</button>
+                <button id="test-modal-open" class="test-btn">Test Ouverture Modal</button>
+                <button id="test-responsive" class="test-btn">Test Responsive</button>
+                <button id="test-styles" class="test-btn">Test Isolation CSS</button>
+                <button id="reset-widget" class="test-btn">Reset Widget</button>
+            </div>
+
+            <div class="logs" id="test-logs">
+                🔧 Logs de test s'afficheront ici...
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ SIMULATION META SHOPIFY -->
+    <script>
+        // Simulation données Shopify
+        window.ShopifyAnalytics = {
+            meta: {
+                product: {
+                    id: 123456789,
+                    title: "Smartphone Revolution Pro",
+                    price: 59999, // En centimes
+                    vendor: "TechCorp",
+                    type: "Electronics"
+                }
+            }
+        };
+    </script>
+
+    <!-- ✅ CONFIGURATION WIDGET -->
+    <script>
+        window.ChatSellerConfig = {
+            shopId: 'test-local-shop',
+            apiUrl: 'https://chatseller-api-production.up.railway.app',
+            productName: 'Smartphone Revolution Pro', // Sera écrasé par détection auto
+            productPrice: 599.99, // Sera écrasé par détection auto
+            productId: 'smartphone-pro-123',
+            agentConfig: {
+                name: 'Sophie',
+                title: 'Conseillère Tech',
+                welcomeMessage: 'Bonjour ! Je suis Sophie, votre conseillère tech. Je vois que vous vous intéressez au Smartphone Revolution Pro. Comment puis-je vous aider ?'
+            },
+            primaryColor: '#3498db',
+            buttonText: '💬 Parler à la conseillère',
+            borderRadius: 'full',
+            language: 'fr',
+            position: 'above-cta',
+            theme: 'modern',
+            autoDetectProduct: true,
+            debug: true
+        };
+
+        // ✅ FONCTIONS DE TEST
+        function addLog(message, type = 'info') {
+            const logs = document.getElementById('test-logs');
+            const timestamp = new Date().toLocaleTimeString();
+            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️';
+            logs.innerHTML += `\n${timestamp} ${icon} ${message}`;
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        function updateButtonStatus(buttonId, success) {
+            const btn = document.getElementById(buttonId);
+            if (btn) {
+                btn.className = success ? 'test-btn success' : 'test-btn';
+                btn.textContent = success ? btn.textContent + ' ✓' : btn.textContent.replace(' ✓', '');
+            }
+        }
+
+        // ✅ TESTS AUTOMATIQUES
+        document.addEventListener('DOMContentLoaded', () => {
+            addLog('🚀 Page de test chargée');
+            addLog('📋 Configuration widget définie');
+            
+            // Test présence widget après chargement
+            setTimeout(() => {
+                const widget = document.getElementById('chatseller-widget');
+                if (widget && widget.querySelector('button')) {
+                    addLog('✅ Widget bouton détecté', 'success');
+                    updateButtonStatus('test-widget-presence', true);
+                } else {
+                    addLog('❌ Widget bouton NON détecté', 'error');
+                    updateButtonStatus('test-widget-presence', false);
+                }
+            }, 2000);
+
+            // Test ChatSeller global
+            setTimeout(() => {
+                if (window.ChatSeller) {
+                    addLog(`✅ ChatSeller global défini (v${window.ChatSeller.version})`, 'success');
+                    if (window.ChatSeller.isReady) {
+                        addLog('✅ ChatSeller initialisé', 'success');
+                    } else {
+                        addLog('⚠️ ChatSeller pas encore prêt', 'warning');
+                    }
+                } else {
+                    addLog('❌ ChatSeller global NON défini', 'error');
+                }
+            }, 3000);
+        });
+
+        // ✅ HANDLERS DE TEST
+        document.getElementById('test-widget-presence').addEventListener('click', () => {
+            const widget = document.getElementById('chatseller-widget');
+            const button = widget?.querySelector('button');
+            if (widget && button) {
+                addLog('✅ Widget présent et fonctionnel', 'success');
+                updateButtonStatus('test-widget-presence', true);
+            } else {
+                addLog('❌ Widget manquant ou défaillant', 'error');
+                updateButtonStatus('test-widget-presence', false);
+            }
+        });
+
+        document.getElementById('test-modal-open').addEventListener('click', () => {
+            const button = document.querySelector('#chatseller-widget button');
+            if (button) {
+                addLog('🖱️ Simulation clic sur widget...');
+                button.click();
+                
+                setTimeout(() => {
+                    const modal = document.querySelector('.cs-chat-modal-overlay');
+                    if (modal) {
+                        addLog('✅ Modal ouvert avec succès', 'success');
+                        updateButtonStatus('test-modal-open', true);
+                        
+                        // Fermer automatiquement après test
+                        setTimeout(() => {
+                            const closeBtn = modal.querySelector('[class*="close"]');
+                            if (closeBtn) {
+                                closeBtn.click();
+                                addLog('🔒 Modal fermé automatiquement');
+                            }
+                        }, 2000);
+                    } else {
+                        addLog('❌ Échec ouverture modal', 'error');
+                        updateButtonStatus('test-modal-open', false);
+                    }
+                }, 500);
+            } else {
+                addLog('❌ Bouton widget introuvable', 'error');
+            }
+        });
+
+        document.getElementById('test-responsive').addEventListener('click', () => {
+            addLog('📱 Test responsive - simulation mobile...');
+            
+            // Simuler viewport mobile
+            const viewport = document.querySelector('meta[name="viewport"]');
+            if (viewport) {
+                viewport.content = 'width=375, initial-scale=1.0';
+                addLog('📱 Viewport mobile simulé');
+                updateButtonStatus('test-responsive', true);
+                
+                // Restaurer après 3s
+                setTimeout(() => {
+                    viewport.content = 'width=device-width, initial-scale=1.0';
+                    addLog('💻 Viewport restauré');
+                }, 3000);
+            }
+        });
+
+        document.getElementById('test-styles').addEventListener('click', () => {
+            const widget = document.getElementById('chatseller-widget');
+            if (widget) {
+                const computedStyle = getComputedStyle(widget);
+                const isolation = computedStyle.isolation;
+                const contain = computedStyle.contain;
+                
+                addLog(`🎨 Isolation CSS: ${isolation}`);
+                addLog(`📦 Containment: ${contain}`);
+                
+                if (isolation === 'isolate' || contain.includes('style')) {
+                    addLog('✅ Isolation CSS active', 'success');
+                    updateButtonStatus('test-styles', true);
+                } else {
+                    addLog('⚠️ Isolation CSS partielle', 'warning');
+                    updateButtonStatus('test-styles', false);
+                }
+            }
+        });
+
+        document.getElementById('reset-widget').addEventListener('click', () => {
+            if (window.ChatSeller) {
+                window.ChatSeller.destroy();
+                addLog('🔄 Widget détruit');
+                
+                setTimeout(() => {
+                    window.ChatSeller.init(window.ChatSellerConfig);
+                    addLog('🔄 Widget réinitialisé');
+                }, 1000);
+            }
+        });
+    </script>
+
+    <!-- ✅ CHARGEMENT DU WIDGET - SIMPLE ET CORRECT -->
+    <script>
+        // Log du chargement
+        console.log('📦 Chargement embed.js...');
+        
+        // Vérification après chargement
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                if (window.ChatSeller) {
+                    console.log('✅ ChatSeller chargé:', window.ChatSeller.version);
+                    addLog('✅ ChatSeller chargé: v' + window.ChatSeller.version, 'success');
+                } else {
+                    console.error('❌ ChatSeller non chargé');
+                    addLog('❌ ChatSeller non chargé', 'error');
+                }
+            }, 1000);
+        });
+    </script>
+    <script src="./embed.js"></script>
+</body>
+</html>

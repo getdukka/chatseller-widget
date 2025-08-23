@@ -1,74 +1,99 @@
-// vite.config.ts 
+// vite.config.ts - CONFIGURATION EMBEDDING SIMPLIFIÉE
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 
-export default defineConfig({
-  plugins: [
-    vue({
-      template: {
-        compilerOptions: {
-          isCustomElement: (tag) => tag.startsWith('cs-')
-        }
-      }
-    })
-  ],
-
-  // ✅ BUILD CONFIGURATION POUR WIDGET EMBEDDABLE
-  build: {
-    target: 'es2018',
-    
-    rollupOptions: {
-      // ✅ POINT D'ENTRÉE UNIQUE AVEC VUE INTÉGRÉ
-      input: resolve(__dirname, 'src/embed.ts'),
-      output: {
-        // ✅ FORMAT IIFE POUR COMPATIBILITÉ MAXIMALE
-        format: 'iife',
-        name: 'ChatSellerWidget',
-        entryFileNames: 'embed.js',
-        chunkFileNames: 'chunk-[name].js',
-        assetFileNames: (assetInfo) => {
-          if (assetInfo.name?.endsWith('.css')) {
-            return 'widget.css'
+export default defineConfig(({ command }) => {
+  const isProduction = command === 'build'
+  
+  return {
+    plugins: [
+      vue({
+        template: {
+          compilerOptions: {
+            isCustomElement: (tag) => tag.startsWith('cs-')
           }
-          return '[name].[ext]'
-        },
-        // ✅ GLOBALS POUR ÉVITER L'EXTERNAL DES DÉPENDANCES
-        globals: {}
+        }
+      })
+    ],
+
+    build: isProduction ? {
+      target: ['es2020', 'chrome60', 'firefox60', 'safari11'],
+      lib: {
+        entry: resolve(__dirname, 'src/embed.ts'),
+        name: 'ChatSellerWidget',
+        fileName: 'embed',
+        formats: ['iife']
       },
-      // ✅ AUCUNE DÉPENDANCE EXTERNE - TOUT BUNDLÉ
-      external: []
+      rollupOptions: {
+        output: {
+          format: 'iife',
+          name: 'ChatSellerWidget',
+          entryFileNames: 'embed.js',
+          inlineDynamicImports: true,
+          exports: 'named' // ✅ CORRECTION POUR LE WARNING
+        },
+        external: []
+      },
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          drop_console: false,
+          drop_debugger: true
+        },
+        mangle: {
+          reserved: ['ChatSeller', 'Vue', 'createApp']
+        }
+      },
+      sourcemap: false,
+      outDir: 'dist',
+      emptyOutDir: true,
+      // ✅ FORCER L'INLINE CSS - PARAMÈTRES NATIFS VITE
+      cssCodeSplit: false,
+      assetsInlineLimit: 999999999
+    } : {
+      outDir: 'dist'
     },
 
-    minify: 'esbuild',
-    sourcemap: false,
-    outDir: 'dist',
-    emptyOutDir: true,
-    
-    // ✅ CSS INTÉGRÉ DANS LE JS
-    cssCodeSplit: false
-  },
+    server: {
+      host: '0.0.0.0',
+      port: 3000,
+      cors: true,
+      open: '/index.html'
+    },
 
-  server: {
-    host: '0.0.0.0',
-    port: 3000,
-    cors: true
-  },
+    preview: {
+      host: '0.0.0.0', 
+      port: 3000,
+      cors: true
+    },
 
-  preview: {
-    host: '0.0.0.0', 
-    port: 3000,
-    cors: true
-  },
+    resolve: {
+      alias: {
+        '@': resolve(__dirname, 'src')
+      }
+    },
 
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, 'src')
+    define: {
+      __VUE_OPTIONS_API__: false,
+      __VUE_PROD_DEVTOOLS__: false,
+      'process.env.NODE_ENV': JSON.stringify(isProduction ? 'production' : 'development'),
+      // ✅ AJOUT CRITIQUE : Définir process pour éviter l'erreur
+      'process.env': JSON.stringify({}),
+      'global': 'globalThis',
+      'process': JSON.stringify({
+        env: {
+          NODE_ENV: isProduction ? 'production' : 'development'
+        }
+      })
+    },
+
+    optimizeDeps: {
+      include: ['vue', 'uuid']
+    },
+
+    css: {
+      modules: false
     }
-  },
-
-  define: {
-    __VUE_OPTIONS_API__: false,
-    __VUE_PROD_DEVTOOLS__: false
   }
 })

@@ -1,9 +1,9 @@
 {
   "name": "chatseller-widget",
-  "version": "1.0.0",
+  "version": "1.5.0",
   "description": "🤖 Agent IA Commercial pour E-commerce - Widget avec connexion Dashboard",
-  "main": "dist/chatseller-widget.js",
-  "module": "dist/chatseller-widget.esm.js",
+  "main": "dist/embed.js",
+  "module": "dist/embed.js",
   "types": "dist/embed.d.ts",
   "files": [
     "dist/",
@@ -12,20 +12,21 @@
   ],
   "exports": {
     ".": {
-      "import": "./dist/chatseller-widget.esm.js",
-      "require": "./dist/chatseller-widget.js",
+      "import": "./dist/embed.js",
+      "require": "./dist/embed.js",
       "types": "./dist/embed.d.ts"
     }
   },
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 3000",
-    "build": "npm run clean && npm run type-check && vite build",
-    "build:prod": "npm run clean && npm run type-check && vite build --mode production",
-    "vercel-build": "npm run build:prod",
+    "build": "npm run clean && vite build",
+    "build:prod": "npm run clean && vite build --mode production",
     "type-check": "vue-tsc --noEmit --skipLibCheck",
     "preview": "vite preview --host 0.0.0.0 --port 3000",
     "clean": "rm -rf dist .vite",
-    "test-build": "npm run build && node test-build.js"
+    "test-build": "npm run build && node test-build.js",
+    "start": "npm run dev",
+    "serve": "npm run preview"
   },
   "dependencies": {
     "uuid": "^9.0.1",

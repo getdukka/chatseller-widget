@@ -1,7 +1,17 @@
-// src/embed.ts - ChatSeller Widget for Shopify - VERSION CORRIGÉE COMPLÈTE
-import { createApp, App as VueApp } from 'vue'
+// src/embed.ts - SCRIPT D'EMBEDDING CORRIGÉ AVEC CSS INJECTION
+
+// ✅ POLYFILLS CRITIQUES POUR LE NAVIGATEUR
+if (typeof global === 'undefined') {
+  (window as any).global = window
+}
+if (typeof process === 'undefined') {
+  (window as any).process = {
+    env: { NODE_ENV: 'production' }
+  }
+}
+
+import { createApp } from 'vue'
 import ChatSellerWidget from './ChatSellerWidget.vue'
-import './style.css'
 
 export interface ChatSellerConfig {
   shopId: string
@@ -30,19 +40,15 @@ class ChatSeller {
   private isInitialized = false
   private isOpen = false
   private modalElement: HTMLElement | null = null
-  private shopConfig: any = null
-  private agentConfig: any = null
-  private conversationId: string | null = null
   private vueApp: any = null
-  private initAttempts = 0
-  private cssLoaded = false
+  private cssInjected = false
 
   constructor() {
     this.config = {
       shopId: '',
       apiUrl: 'https://chatseller-api-production.up.railway.app',
       theme: 'modern',
-      primaryColor: '#EC4899', // ✅ Rose par défaut comme dans les captures
+      primaryColor: '#EC4899',
       position: 'above-cta',
       buttonText: 'Parler à la vendeuse',
       borderRadius: 'full',
@@ -54,16 +60,12 @@ class ChatSeller {
   }
 
   async init(config: ChatSellerConfig) {
-    this.initAttempts++
-    
     if (this.isInitialized) {
-      console.warn(`🟡 ChatSeller déjà initialisé (tentative ${this.initAttempts})`)
+      console.warn('🟡 ChatSeller déjà initialisé')
       return
     }
 
-    console.log(`🚀 Initialisation ChatSeller widget moderne (tentative ${this.initAttempts})...`, config.shopId)
-    const startTime = performance.now()
-
+    console.log('🚀 Initialisation ChatSeller widget...', config.shopId)
     this.config = { ...this.config, ...config }
 
     if (!this.config.shopId) {
@@ -72,68 +74,52 @@ class ChatSeller {
     }
 
     try {
-      // ✅ ÉTAPE 1: INJECTION CSS CRITIQUE IMMÉDIATE - PRIORITÉ ABSOLUE
-      await this.injectCriticalCSS()
-      
-      // ✅ ÉTAPE 2: ATTENDRE DOM ET NETTOYER
       await this.waitForDOM()
+      this.injectCriticalCSS()
       this.cleanupExistingWidgets()
+      this.createWidget()
       
-      // ✅ ÉTAPE 3: DÉTECTION PRODUIT AMÉLIORÉE
       if (this.config.autoDetectProduct) {
         this.detectProductInfo()
       }
       
-      // ✅ ÉTAPE 4: CHARGEMENT CONFIG SHOP + CRÉATION WIDGET EN PARALLÈLE
-      const configPromise = this.loadShopConfigurationAsync()
-      this.createWidget()
-      
-      // Attendre la config (non bloquant)
-      await configPromise
-      
       this.isInitialized = true
-      
-      const initTime = performance.now() - startTime
-      console.log(`✅ ChatSeller widget moderne initialisé en ${initTime.toFixed(2)}ms`)
+      console.log('✅ ChatSeller widget initialisé')
       
     } catch (error) {
-      console.error('❌ Échec initialisation ChatSeller moderne:', error)
+      console.error('❌ Échec initialisation ChatSeller:', error)
+      this.createFallbackWidget()
     }
   }
 
-  // ✅ INJECTION CSS CRITIQUE ULTRA-RENFORCÉE ANTI-SHOPIFY
-  private async injectCriticalCSS(): Promise<void> {
-    if (this.cssLoaded) return
-    
-    console.log('🎨 [CSS CRITIQUE] Injection CSS moderne ultra-renforcé anti-Shopify...')
-    
-    // ✅ SUPPRESSION PRÉVENTIVE DES ANCIENS STYLES
-    const oldStyles = document.querySelectorAll('#chatseller-critical-css, [data-chatseller-css]')
-    oldStyles.forEach(style => style.remove())
-    
-    // ✅ INJECTION CSS INLINE IMMÉDIATE ULTRA-ISOLÉE
-    const style = document.createElement('style')
-    style.id = 'chatseller-critical-css'
-    style.setAttribute('data-chatseller-css', 'critical')
-    
-    // ✅ CSS ULTRA-RENFORCÉ ANTI-SHOPIFY AVEC SPECIFICITÉ MAXIMALE
-    style.textContent = `
-/* 🔥 CHATSELLER WIDGET - CSS ULTRA-RENFORCÉ ANTI-SHOPIFY - v1.4.0 */
+  private injectCriticalCSS(): void {
+    if (this.cssInjected) return
 
-/* ✅ RESET GLOBAL ABSOLU AVEC SPECIFICITÉ MAXIMALE */
-.cs-chatseller-widget, 
-.cs-chatseller-widget *, 
-.cs-chatseller-widget *::before, 
-.cs-chatseller-widget *::after,
-[data-chatseller] *,
-[data-chatseller] *::before,
-[data-chatseller] *::after {
+    // ✅ SUPPRESSION DES ANCIENS STYLES
+    const existingStyle = document.getElementById('chatseller-styles')
+    if (existingStyle) existingStyle.remove()
+
+    const style = document.createElement('style')
+    style.id = 'chatseller-styles'
+    style.innerHTML = this.getCompleteCSS()
+    document.head.appendChild(style)
+    
+    this.cssInjected = true
+    console.log('✅ CSS ChatSeller injecté')
+  }
+
+  private getCompleteCSS(): string {
+    return `
+/* ✅ CHATSELLER WIDGET - CSS COMPLET AVEC ISOLATION RENFORCÉE */
+.cs-chatseller-widget,
+.cs-chatseller-widget *,
+.cs-chatseller-widget *::before,
+.cs-chatseller-widget *::after {
   all: unset !important;
   box-sizing: border-box !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', 'Helvetica Neue', Arial, sans-serif !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
   line-height: normal !important;
   -webkit-font-smoothing: antialiased !important;
-  -moz-osx-font-smoothing: grayscale !important;
   text-rendering: optimizeLegibility !important;
   color: inherit !important;
   background: transparent !important;
@@ -145,41 +131,22 @@ class ChatSeller {
   list-style: none !important;
   vertical-align: baseline !important;
   text-align: left !important;
-  direction: ltr !important;
-  text-transform: none !important;
-  letter-spacing: normal !important;
-  word-spacing: normal !important;
-  text-shadow: none !important;
-  filter: none !important;
-  clip: unset !important;
-  clip-path: none !important;
-  mask: none !important;
-  mix-blend-mode: normal !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  pointer-events: auto !important;
 }
 
-/* ✅ WIDGET PRINCIPAL AVEC ISOLATION MAXIMALE */
 .cs-chatseller-widget {
   position: relative !important;
   z-index: 999999 !important;
   display: block !important;
   margin: 8px 0 !important;
   width: 100% !important;
+  font-size: 14px !important;
+  color: #374151 !important;
   contain: layout style !important;
   isolation: isolate !important;
-  font-size: 14px !important;
-  font-weight: normal !important;
-  color: #374151 !important;
-  background: transparent !important;
 }
 
-/* ✅ BOUTON TRIGGER MODERNE AVEC GRADIENT */
+/* ✅ BOUTON TRIGGER ULTRA-VISIBLE */
 .cs-chat-trigger-button {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
   width: 100% !important;
   padding: 16px 24px !important;
   background: linear-gradient(135deg, #EC4899 0%, #BE185D 100%) !important;
@@ -189,52 +156,39 @@ class ChatSeller {
   font-size: 15px !important;
   font-weight: 600 !important;
   cursor: pointer !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition: all 0.3s ease !important;
   box-shadow: 0 8px 25px rgba(236, 72, 153, 0.3) !important;
-  min-height: 56px !important;
   font-family: inherit !important;
-  text-decoration: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
   outline: none !important;
-  appearance: none !important;
-  -webkit-appearance: none !important;
-  user-select: none !important;
+  min-height: 56px !important;
+  margin: 0 !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  opacity: 1 !important;
+  visibility: visible !important;
   position: relative !important;
-  overflow: hidden !important;
-  z-index: 1 !important;
+  z-index: 999999 !important;
 }
 
 .cs-chat-trigger-button:hover {
   transform: translateY(-2px) !important;
   box-shadow: 0 12px 35px rgba(236, 72, 153, 0.4) !important;
-  background: linear-gradient(135deg, #F472B6 0%, #EC4899 100%) !important;
-}
-
-.cs-chat-trigger-button:active {
-  transform: translateY(0px) !important;
 }
 
 .cs-chat-trigger-button svg {
   width: 20px !important;
   height: 20px !important;
-  margin-right: 8px !important;
   fill: none !important;
   stroke: currentColor !important;
   stroke-width: 2 !important;
   flex-shrink: 0 !important;
 }
 
-.cs-chat-trigger-button span {
-  color: inherit !important;
-  font-size: inherit !important;
-  font-weight: inherit !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  line-height: 1.4 !important;
-}
-
-/* ✅ MODAL OVERLAY AVEC PRIORITÉ Z-INDEX MAXIMALE */
+/* ✅ MODAL OVERLAY - PROTECTION MAXIMALE */
 .cs-chat-modal-overlay {
   position: fixed !important;
   top: 0 !important;
@@ -251,24 +205,24 @@ class ChatSeller {
   align-items: center !important;
   justify-content: center !important;
   padding: 20px !important;
+  margin: 0 !important;
+  border: none !important;
+  font-family: inherit !important;
   opacity: 1 !important;
   visibility: visible !important;
   pointer-events: auto !important;
-  font-family: inherit !important;
-  margin: 0 !important;
-  border: none !important;
-  outline: none !important;
   contain: layout style !important;
-  overflow: hidden !important;
 }
 
-.cs-chat-modal-overlay.cs-mobile {
-  padding: 0 !important;
-  align-items: stretch !important;
-  justify-content: stretch !important;
+@media (max-width: 767px) {
+  .cs-chat-modal-overlay {
+    padding: 0 !important;
+    align-items: stretch !important;
+    justify-content: stretch !important;
+  }
 }
 
-/* ✅ CONTAINER DESKTOP MODERNE CONFORME AUX CAPTURES */
+/* ✅ CONTAINERS PRINCIPAUX */
 .cs-chat-container-desktop {
   width: 450px !important;
   height: 650px !important;
@@ -290,17 +244,11 @@ class ChatSeller {
   font-family: inherit !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
-  color: #374151 !important;
-  line-height: 1.5 !important;
-  font-size: 14px !important;
-  font-weight: normal !important;
   margin: 0 !important;
   padding: 0 !important;
   text-align: left !important;
-  animation: cs-fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-/* ✅ CONTAINER MOBILE PLEIN ÉCRAN */
 .cs-chat-container-mobile {
   width: 100% !important;
   height: 100% !important;
@@ -312,9 +260,6 @@ class ChatSeller {
   opacity: 1 !important;
   visibility: visible !important;
   font-family: inherit !important;
-  color: #374151 !important;
-  line-height: 1.5 !important;
-  font-size: 14px !important;
   margin: 0 !important;
   padding: 0 !important;
   border: none !important;
@@ -323,7 +268,697 @@ class ChatSeller {
   z-index: 1 !important;
 }
 
-/* ✅ RESPONSIVE ULTRA-RENFORCÉ */
+/* ✅ HEADERS ULTRA-RENFORCÉS */
+.cs-desktop-header,
+.cs-mobile-header {
+  padding: 20px !important;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #EC4899 0%, #BE185D 100%) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-shrink: 0 !important;
+  position: relative !important;
+  overflow: hidden !important;
+  min-height: 85px !important;
+  margin: 0 !important;
+  border: none !important;
+  z-index: 2 !important;
+  font-family: inherit !important;
+  text-align: left !important;
+}
+
+.cs-mobile-header {
+  padding: 16px 20px !important;
+  min-height: 75px !important;
+}
+
+/* ✅ AGENT INFO */
+.cs-agent-info,
+.cs-mobile-agent-info {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  flex: 1 !important;
+  min-width: 0 !important;
+  color: #ffffff !important;
+  font-family: inherit !important;
+}
+
+.cs-agent-avatar,
+.cs-mobile-avatar {
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 50% !important;
+  position: relative !important;
+  overflow: hidden !important;
+  border: 3px solid rgba(255, 255, 255, 0.3) !important;
+  flex-shrink: 0 !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  display: block !important;
+}
+
+.cs-mobile-avatar {
+  width: 42px !important;
+  height: 42px !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+.cs-agent-avatar img,
+.cs-mobile-avatar img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.cs-agent-details,
+.cs-mobile-details {
+  min-width: 0 !important;
+  flex: 1 !important;
+  color: #ffffff !important;
+}
+
+.cs-agent-name,
+.cs-mobile-name {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  margin: 0 0 6px 0 !important;
+  display: block !important;
+  line-height: 1.2 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  font-family: inherit !important;
+  text-decoration: none !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+.cs-mobile-name {
+  font-size: 16px !important;
+}
+
+.cs-agent-status,
+.cs-mobile-status-text {
+  font-size: 14px !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  line-height: 1.3 !important;
+  font-weight: 500 !important;
+  font-family: inherit !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+.cs-mobile-status-text {
+  font-size: 13px !important;
+}
+
+.cs-product-info-header,
+.cs-mobile-product-info {
+  font-size: 13px !important;
+  opacity: 0.9 !important;
+}
+
+/* ✅ STATUS INDICATORS */
+.cs-status-dot {
+  width: 8px !important;
+  height: 8px !important;
+  border-radius: 50% !important;
+  background: #00D26A !important;
+  flex-shrink: 0 !important;
+  animation: cs-pulse-status 2s infinite !important;
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+.cs-status-indicator,
+.cs-mobile-status {
+  position: absolute !important;
+  bottom: 2px !important;
+  right: 2px !important;
+  width: 14px !important;
+  height: 14px !important;
+  border-radius: 50% !important;
+  background: #00D26A !important;
+  border: 3px solid #ffffff !important;
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* ✅ BOUTONS HEADER */
+.cs-header-actions,
+.cs-mobile-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.cs-action-button,
+.cs-mobile-reset {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: none !important;
+  color: #ffffff !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+  flex-shrink: 0 !important;
+  backdrop-filter: blur(10px) !important;
+  font-family: inherit !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  outline: none !important;
+  text-decoration: none !important;
+  font-size: 16px !important;
+  line-height: 1 !important;
+}
+
+.cs-close-button,
+.cs-mobile-close {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: none !important;
+  color: #ffffff !important;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+  flex-shrink: 0 !important;
+  backdrop-filter: blur(10px) !important;
+  font-family: inherit !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  outline: none !important;
+  text-decoration: none !important;
+  font-size: 16px !important;
+  line-height: 1 !important;
+}
+
+.cs-close-button:hover,
+.cs-mobile-close:hover,
+.cs-action-button:hover,
+.cs-mobile-reset:hover {
+  background: rgba(255, 255, 255, 0.25) !important;
+  transform: scale(1.05) !important;
+}
+
+.cs-close-button:hover {
+  transform: rotate(90deg) !important;
+}
+
+/* ✅ ZONE MESSAGES */
+.cs-messages-area-desktop {
+  flex: 1 !important;
+  background: linear-gradient(to bottom, #fafbfc 0%, #ffffff 100%) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding: 24px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  color: #374151 !important;
+  font-family: inherit !important;
+  position: relative !important;
+  margin: 0 !important;
+  border: none !important;
+}
+
+.cs-messages-area-mobile {
+  flex: 1 !important;
+  background: #fafbfc !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding: 20px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  color: #374151 !important;
+  font-family: inherit !important;
+  position: relative !important;
+  margin: 0 !important;
+  border: none !important;
+}
+
+.cs-messages-list,
+.cs-mobile-messages-list {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 18px !important;
+  min-height: 100% !important;
+  flex: 1 !important;
+  color: #374151 !important;
+  font-family: inherit !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  list-style: none !important;
+}
+
+/* ✅ MESSAGES */
+.cs-message-item,
+.cs-mobile-message {
+  display: flex !important;
+  max-width: 100% !important;
+  align-items: flex-start !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  opacity: 1 !important;
+  animation: cs-message-appear 0.3s ease-out !important;
+}
+
+.cs-assistant-message,
+.cs-mobile-assistant {
+  justify-content: flex-start !important;
+}
+
+.cs-user-message,
+.cs-mobile-user {
+  justify-content: flex-end !important;
+}
+
+/* ✅ BULLES MESSAGES */
+.cs-assistant-bubble,
+.cs-mobile-assistant-bubble {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 12px !important;
+  max-width: 85% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+.cs-user-bubble,
+.cs-mobile-user-bubble {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 12px !important;
+  max-width: 85% !important;
+  flex-direction: row-reverse !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+/* ✅ AVATARS MESSAGES */
+.cs-message-avatar,
+.cs-mobile-message-avatar {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
+  border: 2px solid #f3f4f6 !important;
+  background: #f3f4f6 !important;
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.cs-message-avatar img,
+.cs-mobile-message-avatar img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.cs-user-avatar,
+.cs-mobile-user-avatar {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  font-size: 16px !important;
+  flex-shrink: 0 !important;
+  text-transform: uppercase !important;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3) !important;
+  font-family: inherit !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  line-height: 1 !important;
+}
+
+/* ✅ CONTENU MESSAGES */
+.cs-message-content,
+.cs-mobile-bubble-content {
+  flex: 1 !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  color: inherit !important;
+  font-family: inherit !important;
+}
+
+/* ✅ TEXTE MESSAGES */
+.cs-message-text,
+.cs-mobile-message-text {
+  border-radius: 20px !important;
+  padding: 14px 18px !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  word-wrap: break-word !important;
+  word-break: break-word !important;
+  margin: 0 0 6px 0 !important;
+  display: block !important;
+  max-width: 100% !important;
+  overflow-wrap: break-word !important;
+  font-weight: 400 !important;
+  font-family: inherit !important;
+  text-decoration: none !important;
+  outline: none !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.cs-assistant-text,
+.cs-mobile-assistant-text {
+  background: #ffffff !important;
+  color: #2d3748 !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+}
+
+.cs-user-text,
+.cs-mobile-user-text {
+  background: linear-gradient(135deg, #EC4899 0%, #BE185D 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(236, 72, 153, 0.3) !important;
+  margin-left: auto !important;
+}
+
+.cs-message-time,
+.cs-mobile-message-time {
+  font-size: 11px !important;
+  color: #9ca3af !important;
+  padding: 0 4px !important;
+  display: block !important;
+  margin: 2px 0 0 0 !important;
+  text-align: right !important;
+  opacity: 0.8 !important;
+  font-family: inherit !important;
+  font-weight: normal !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+/* ✅ TYPING INDICATOR */
+.cs-typing-content,
+.cs-mobile-typing {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+.cs-typing-indicator,
+.cs-mobile-typing-dots {
+  display: flex !important;
+  gap: 4px !important;
+  padding: 14px 18px !important;
+  background: #ffffff !important;
+  border-radius: 20px !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  margin: 0 !important;
+}
+
+.cs-typing-dot,
+.cs-mobile-dot {
+  width: 6px !important;
+  height: 6px !important;
+  border-radius: 50% !important;
+  background: #9ca3af !important;
+  animation: cs-typing-animation 1.4s infinite !important;
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+.cs-typing-dot:nth-child(1),
+.cs-mobile-dot:nth-child(1) { animation-delay: 0s !important; }
+.cs-typing-dot:nth-child(2),
+.cs-mobile-dot:nth-child(2) { animation-delay: 0.2s !important; }
+.cs-typing-dot:nth-child(3),
+.cs-mobile-dot:nth-child(3) { animation-delay: 0.4s !important; }
+
+/* ✅ INPUT SECTION */
+.cs-input-section-desktop,
+.cs-mobile-input-section {
+  padding: 20px !important;
+  border-top: 1px solid #e5e7eb !important;
+  background: #ffffff !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+  color: #374151 !important;
+  font-family: inherit !important;
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+.cs-input-container,
+.cs-mobile-input-container {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin: 0 0 16px 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+.cs-input-wrapper {
+  flex: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  background: #f8fafc !important;
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 25px !important;
+  padding: 0 18px !important;
+  transition: all 0.2s ease !important;
+  min-height: 52px !important;
+  margin: 0 !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.cs-input-wrapper:focus-within {
+  background: #ffffff !important;
+  border-color: #EC4899 !important;
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1) !important;
+  transform: translateY(-1px) !important;
+}
+
+.cs-message-input,
+.cs-mobile-message-input {
+  flex: 1 !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  padding: 14px 0 !important;
+  font-size: 14px !important;
+  color: #374151 !important;
+  font-family: inherit !important;
+  line-height: 1.5 !important;
+  resize: none !important;
+  min-height: 20px !important;
+  font-weight: 400 !important;
+  margin: 0 !important;
+  text-decoration: none !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+}
+
+.cs-message-input::placeholder,
+.cs-mobile-message-input::placeholder {
+  color: #9ca3af !important;
+  opacity: 1 !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  font-weight: normal !important;
+}
+
+/* ✅ BOUTONS VOICE */
+.cs-voice-button,
+.cs-mobile-voice {
+  background: transparent !important;
+  border: none !important;
+  color: #9ca3af !important;
+  cursor: pointer !important;
+  padding: 8px !important;
+  border-radius: 50% !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 36px !important;
+  height: 36px !important;
+  margin: 0 !important;
+  outline: none !important;
+  font-family: inherit !important;
+}
+
+.cs-voice-button:hover,
+.cs-mobile-voice:hover {
+  color: #6b7280 !important;
+  background: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* ✅ BOUTONS SEND */
+.cs-send-button,
+.cs-mobile-send {
+  width: 48px !important;
+  height: 48px !important;
+  background: #EC4899 !important;
+  border: none !important;
+  border-radius: 50% !important;
+  color: #ffffff !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 4px 14px rgba(236, 72, 153, 0.4) !important;
+  transform: translateY(0) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  outline: none !important;
+  font-family: inherit !important;
+  font-size: 16px !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+}
+
+.cs-send-button:hover:not(:disabled),
+.cs-mobile-send:hover:not(:disabled) {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 18px rgba(236, 72, 153, 0.5) !important;
+}
+
+.cs-send-button:disabled,
+.cs-mobile-send:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+.cs-loading-spinner,
+.cs-mobile-loading-spinner {
+  width: 20px !important;
+  height: 20px !important;
+  border: 2px solid transparent !important;
+  border-top: 2px solid currentColor !important;
+  border-radius: 50% !important;
+  animation: cs-spin 1s linear infinite !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+}
+
+/* ✅ FOOTER */
+.cs-footer-info {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  font-size: 11px !important;
+  color: #9ca3af !important;
+  gap: 12px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  font-family: inherit !important;
+  line-height: 1.3 !important;
+}
+
+.cs-mobile-footer {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  font-size: 10px !important;
+  color: #9ca3af !important;
+  margin-top: 12px !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  font-family: inherit !important;
+  line-height: 1.3 !important;
+}
+
+.cs-powered-by,
+.cs-mobile-powered {
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  font-weight: 500 !important;
+  color: inherit !important;
+  font-family: inherit !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  text-decoration: none !important;
+}
+
+.cs-security,
+.cs-mobile-security {
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  font-weight: 500 !important;
+  color: inherit !important;
+  font-family: inherit !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  text-decoration: none !important;
+}
+
+/* ✅ RESPONSIVE */
 @media (max-width: 767px) {
   .cs-chat-container-desktop {
     width: 100% !important;
@@ -336,43 +971,119 @@ class ChatSeller {
   .cs-chat-modal-overlay {
     padding: 0 !important;
   }
+  
+  .cs-mobile-input-container {
+    margin: 0 0 12px 0 !important;
+  }
 }
 
-/* ✅ ANIMATIONS FLUIDES */
+/* ✅ ANIMATIONS */
+@keyframes cs-pulse-status {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes cs-typing-animation {
+  0%, 60%, 100% {
+    transform: translateY(0) !important;
+  }
+  30% {
+    transform: translateY(-6px) !important;
+  }
+}
+
+@keyframes cs-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 @keyframes cs-fadeIn {
   0% { opacity: 0; transform: scale(0.96); }
   100% { opacity: 1; transform: scale(1); }
 }
 
+@keyframes cs-message-appear {
+  0% { 
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ✅ CLASSE RACINE COMPOSANT VUE */
+.cs-chatseller-widget-vue {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  color: #374151 !important;
+  line-height: 1.5 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+@keyframes cs-typing-animation {
+  0%, 60%, 100% {
+    transform: translateY(0) !important;
+  }
+  30% {
+    transform: translateY(-6px) !important;
+  }
+}
+
+@keyframes cs-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes cs-fadeIn {
+  0% { opacity: 0; transform: scale(0.96); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes cs-message-appear {
+  0% { 
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ✅ TRANSITIONS VUE */
 .cs-modal-enter-active {
   animation: cs-fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ✅ PROTECTION PRINT MEDIA */
-@media print {
-  .cs-chatseller-widget, 
-  .cs-chat-modal-overlay,
-  [data-chatseller] {
-    display: none !important;
-  }
+.cs-modal-leave-active {
+  transition: opacity 0.3s ease;
 }
 
-/* ✅ ISOLATION FINALE ABSOLUE */
+.cs-modal-enter-from,
+.cs-modal-leave-to {
+  opacity: 0;
+}
+
+.cs-chat-container-desktop {
+  animation: cs-fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ✅ PROTECTION FINALE ANTI-SHOPIFY */
 .cs-chatseller-widget {
   contain: layout style !important;
   isolation: isolate !important;
 }
 
-/* ✅ PROTECTION ANTI-INHERITANCE SHOPIFY MAXIMALE */
 .cs-chatseller-widget,
-.cs-chatseller-widget *,
-[data-chatseller],
-[data-chatseller] * {
+.cs-chatseller-widget * {
   text-transform: none !important;
   letter-spacing: normal !important;
   word-spacing: normal !important;
   text-shadow: none !important;
-  box-shadow: none !important;
   filter: none !important;
   clip: unset !important;
   clip-path: none !important;
@@ -385,31 +1096,18 @@ class ChatSeller {
   -webkit-user-select: auto !important;
   -moz-user-select: auto !important;
   -ms-user-select: auto !important;
-  transform: none !important;
-  animation: none !important;
-  transition: none !important;
 }
 
-.cs-chat-trigger-button {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-/* ✅ RESET SHOPIFY INPUTS SPÉCIFIQUE */
 .cs-chatseller-widget input,
 .cs-chatseller-widget textarea,
-.cs-chatseller-widget button,
-[data-chatseller] input,
-[data-chatseller] textarea,
-[data-chatseller] button {
+.cs-chatseller-widget button {
   -webkit-appearance: none !important;
   -moz-appearance: none !important;
   appearance: none !important;
   background-image: none !important;
   background-clip: padding-box !important;
-  border-radius: inherit !important;
 }
 
-/* ✅ FORCE DISPLAY ABSOLUS */
 .cs-chat-modal-overlay {
   display: flex !important;
 }
@@ -419,242 +1117,83 @@ class ChatSeller {
   display: flex !important;
 }
 
-.cs-chat-trigger-button {
+.cs-desktop-header,
+.cs-mobile-header,
+.cs-messages-area-desktop,
+.cs-messages-area-mobile,
+.cs-input-section-desktop,
+.cs-mobile-input-section {
   display: flex !important;
 }
+
+/* ✅ PRINT MEDIA */
+@media print {
+  .cs-chatseller-widget,
+  .cs-chat-modal-overlay {
+    display: none !important;
+  }
+}
     `
-    
-    // ✅ INJECTION PRIORITAIRE DANS LE HEAD
-    if (document.head.firstChild) {
-      document.head.insertBefore(style, document.head.firstChild)
-    } else {
-      document.head.appendChild(style)
-    }
-    
-    this.cssLoaded = true
-    
-    console.log('✅ [CSS CRITIQUE] CSS moderne ultra-renforcé injecté avec succès')
   }
 
   private cleanupExistingWidgets(): void {
     const selectors = [
       '#chatseller-widget',
-      '#chatseller-modal', 
-      '#chatseller-vue-modal',
-      '#chatseller-modern-fallback',
+      '#chatseller-modal',
       '[data-chatseller]',
-      '.chatseller-widget',
-      '.cs-chatseller-widget'
+      '.chatseller-widget'
     ]
     
     selectors.forEach(selector => {
       const elements = document.querySelectorAll(selector)
-      elements.forEach(el => {
-        console.log(`🧹 Nettoyage widget existant: ${selector}`)
-        el.remove()
-      })
+      elements.forEach(el => el.remove())
     })
   }
 
-  // ✅ CHARGEMENT CONFIGURATION SHOP AMÉLIORÉ AVEC TITRE
-  private async loadShopConfigurationAsync(): Promise<void> {
-    try {
-      console.log('🔄 [CONFIG] Chargement configuration shop moderne:', this.config.shopId)
-      
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 15000) // 15s timeout
-      
-      // ✅ URL API PUBLIQUE CORRIGÉE
-      const url = `${this.config.apiUrl}/api/v1/public/shops/public/${this.config.shopId}/config`
-      console.log('🔗 [CONFIG] URL API:', url)
-      
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'User-Agent': 'ChatSeller-Widget/1.4.0'
-        },
-        signal: controller.signal
-      })
-
-      clearTimeout(timeoutId)
-
-      console.log('📡 [CONFIG] Status API:', response.status)
-
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status} - ${response.statusText}`)
-      }
-
-      const data = await response.json()
-      
-      if (data.success && data.data) {
-        this.shopConfig = data.data.shop
-        this.agentConfig = data.data.agent
-        
-        // ✅ FUSION CONFIGURATION AVEC TITRE OBLIGATOIRE
-        this.mergeApiConfiguration()
-        this.updateWidgetWithConfig()
-        
-        console.log('✅ [CONFIG] Configuration moderne chargée:', {
-          shop: this.shopConfig?.id,
-          agent: this.agentConfig?.name,
-          title: this.agentConfig?.title, // ✅ NOUVEAU : Log du titre
-          primaryColor: this.config.primaryColor,
-          buttonText: this.config.buttonText
-        })
-      } else {
-        throw new Error('Configuration API invalide')
-      }
-      
-    } catch (error) {
-      console.warn('⚠️ [CONFIG] Erreur configuration API (non critique):', error)
-      console.log('🔧 [CONFIG] Utilisation configuration par défaut avec titre')
-      
-      // ✅ CONFIGURATION FALLBACK AVEC TITRE
-      this.agentConfig = {
-        name: 'Anna',
-        title: 'Vendeuse IA', // ✅ TITRE PAR DÉFAUT
-        personality: 'friendly',
-        welcomeMessage: 'Bonjour ! Comment puis-je vous aider ?'
-      }
-    }
-  }
-
-  // ✅ FUSION CONFIGURATION API AVEC TITRE OBLIGATOIRE
-  private mergeApiConfiguration(): void {
-    if (this.shopConfig?.widget_config) {
-      this.config = {
-        ...this.config,
-        primaryColor: this.shopConfig.widget_config.primaryColor || this.config.primaryColor,
-        buttonText: this.shopConfig.widget_config.buttonText || this.config.buttonText,
-        position: this.shopConfig.widget_config.position || this.config.position,
-        theme: this.shopConfig.widget_config.theme || this.config.theme,
-        language: this.shopConfig.widget_config.language || this.config.language,
-        borderRadius: this.shopConfig.widget_config.borderRadius || this.config.borderRadius
-      }
-      console.log('✅ [CONFIG] Widget config fusionnée:', this.config.primaryColor, this.config.buttonText)
-    }
-
-    if (this.agentConfig) {
-      // ✅ TITRE OBLIGATOIRE AVEC FALLBACK INTELLIGENT
-      const title = this.agentConfig.title || this.getDefaultTitle(this.agentConfig.type)
-      
-      this.config.agentConfig = {
-        id: this.agentConfig.id,
-        name: this.agentConfig.name,
-        title: title, // ✅ TITRE GARANTI
-        avatar: this.agentConfig.avatar,
-        welcomeMessage: this.agentConfig.welcomeMessage,
-        fallbackMessage: this.agentConfig.fallbackMessage,
-        personality: this.agentConfig.personality
-      }
-      
-      console.log('✅ [CONFIG] Agent config fusionnée avec titre:', {
-        name: this.config.agentConfig.name,
-        title: this.config.agentConfig.title
-      })
-    }
-  }
-
-  // ✅ TITRE PAR DÉFAUT SELON LE TYPE
-  private getDefaultTitle(type: string): string {
-    const titles = {
-      'general': 'Conseiller commercial',
-      'product_specialist': 'Spécialiste produit',
-      'support': 'Conseiller support',
-      'upsell': 'Conseiller premium'
-    }
-    return titles[type as keyof typeof titles] || 'Vendeuse IA'
-  }
-
-  // ✅ MISE À JOUR WIDGET AVEC NOUVELLE CONFIG
-  private updateWidgetWithConfig(): void {
-    if (!this.widgetElement) return
-
-    const triggerBtn = this.widgetElement.querySelector('#chatseller-trigger-btn') as HTMLElement
-    if (triggerBtn) {
-      const primaryColor = this.config.primaryColor || '#EC4899'
-      const buttonText = this.config.buttonText || 'Parler à la vendeuse'
-      
-      // ✅ MISE À JOUR STYLE DYNAMIQUE
-      triggerBtn.style.background = `linear-gradient(135deg, ${primaryColor} 0%, ${this.adjustColor(primaryColor, -15)} 100%)`
-      triggerBtn.style.borderRadius = this.getBorderRadiusValue(this.config.borderRadius || 'full')
-      
-      // ✅ MISE À JOUR TEXTE
-      const textSpan = triggerBtn.querySelector('span')
-      if (textSpan) {
-        textSpan.textContent = buttonText
-      }
-      
-      console.log('✅ [CONFIG] Widget bouton mis à jour:', { primaryColor, buttonText })
-    }
-  }
-
-  // ✅ DÉTECTION PRODUIT SHOPIFY AMÉLIORÉE
   private detectProductInfo(): boolean {
     try {
-      console.log('🔍 [PRODUIT] Détection produit Shopify améliorée...')
+      console.log('🔍 Détection produit...')
       
       let detectedName = this.config.productName
       let detectedPrice = this.config.productPrice
       let detectedId = this.config.productId
 
-      // ✅ MÉTHODE 1: Shopify Analytics (plus fiable)
+      // ✅ DÉTECTION SHOPIFY
       const shopifyProduct = (window as any).ShopifyAnalytics?.meta?.product
       if (shopifyProduct && shopifyProduct.title) {
         detectedName = shopifyProduct.title
         detectedPrice = shopifyProduct.price ? shopifyProduct.price / 100 : undefined
         detectedId = shopifyProduct.id?.toString()
-        console.log('✅ [PRODUIT] Shopify Analytics:', detectedName)
-      }
-
-      // ✅ MÉTHODE 2: Variables globales Shopify
-      if (!detectedName && (window as any).meta?.product) {
-        const metaProduct = (window as any).meta.product
-        detectedName = metaProduct.title
-        detectedPrice = metaProduct.price ? metaProduct.price / 100 : undefined
-        detectedId = metaProduct.id?.toString()
-        console.log('✅ [PRODUIT] Meta global:', detectedName)
+        console.log('✅ Produit Shopify détecté:', detectedName)
       }
       
-      // ✅ MÉTHODE 3: Sélecteurs DOM améliorés
+      // ✅ SÉLECTEURS DE TITRE
       if (!detectedName) {
         const titleSelectors = [
           '.product__title',
           '.product-form__title', 
           'h1.product-title',
           '.product-single__title',
-          '.product__heading h1',
-          '[class*="product-title"]',
-          '[class*="product__title"]',
-          'h1[class*="product"]',
-          '.product-meta__title',
-          '.pdp-product-name',
-          '.product-details h1'
+          'h1[class*="product"]'
         ]
         
         for (const selector of titleSelectors) {
           const element = document.querySelector(selector)
           if (element?.textContent?.trim()) {
             detectedName = element.textContent.trim()
-            console.log(`✅ [PRODUIT] DOM ${selector}:`, detectedName)
+            console.log(`✅ Titre détecté via ${selector}:`, detectedName)
             break
           }
         }
       }
 
-      // ✅ MÉTHODE 4: Détection prix améliorée
+      // ✅ SÉLECTEURS DE PRIX
       if (!detectedPrice) {
         const priceSelectors = [
-          '.price__current .money',
+          '.price__current',
           '.product-form__price .price',
           '.money',
-          '.price-current',
-          '[class*="price-current"]',
-          '[class*="product-price"]',
-          '.product-price-value',
-          '.price-regular'
+          '.price-current'
         ]
         
         for (const selector of priceSelectors) {
@@ -664,59 +1203,26 @@ class ChatSeller {
             const priceMatch = priceText.match(/[\d,]+(?:[.,]\d{2})?/)
             if (priceMatch) {
               detectedPrice = parseFloat(priceMatch[0].replace(',', '.'))
-              console.log(`✅ [PRODUIT] Prix ${selector}:`, detectedPrice)
+              console.log(`✅ Prix détecté via ${selector}:`, detectedPrice)
               break
             }
           }
         }
       }
 
-      // ✅ MÉTHODE 5: JSON-LD structuré
-      if (!detectedName || !detectedPrice) {
-        const jsonLdScripts = document.querySelectorAll('script[type="application/ld+json"]')
-        for (const script of jsonLdScripts) {
-          try {
-            const data = JSON.parse(script.textContent || '')
-            if (data['@type'] === 'Product' || data.product) {
-              const product = data.product || data
-              if (!detectedName && product.name) {
-                detectedName = product.name
-                console.log('✅ [PRODUIT] JSON-LD nom:', detectedName)
-              }
-              if (!detectedPrice && product.offers?.price) {
-                detectedPrice = parseFloat(product.offers.price)
-                console.log('✅ [PRODUIT] JSON-LD prix:', detectedPrice)
-              }
-            }
-          } catch (e) {
-            // Ignorer erreurs JSON
-          }
-        }
-      }
-
-      // ✅ SAUVEGARDE FINALE
       if (detectedName) this.config.productName = detectedName
       if (detectedPrice) this.config.productPrice = detectedPrice
       if (detectedId) this.config.productId = detectedId
       if (!this.config.productUrl) this.config.productUrl = window.location.href
 
-      const success = !!(detectedName || detectedPrice)
-      console.log(`${success ? '✅' : '⚠️'} [PRODUIT] Détection finale:`, {
-        nom: detectedName,
-        prix: detectedPrice,
-        id: detectedId,
-        url: this.config.productUrl
-      })
-
-      return success
+      return !!(detectedName || detectedPrice)
 
     } catch (error) {
-      console.warn('⚠️ [PRODUIT] Erreur détection:', error)
+      console.warn('⚠️ Erreur détection produit:', error)
       return false
     }
   }
 
-  // ✅ CRÉATION WIDGET AVEC STYLES DYNAMIQUES
   private createWidget() {
     let container = document.getElementById('chatseller-widget')
     
@@ -724,8 +1230,6 @@ class ChatSeller {
       container = document.createElement('div')
       container.id = 'chatseller-widget'
       container.className = 'cs-chatseller-widget'
-      container.setAttribute('data-chatseller', 'main-widget')
-      container.style.cssText = 'margin: 8px 0; position: relative; z-index: 999999;'
       this.insertWidgetAtPosition(container)
     }
 
@@ -733,35 +1237,23 @@ class ChatSeller {
     this.renderWidget()
   }
 
-  // ✅ INSERTION WIDGET POSITION AMÉLIORÉE
   private insertWidgetAtPosition(container: HTMLElement): void {
     const position = this.config.position || 'above-cta'
     
-    // ✅ SÉLECTEURS SHOPIFY PLUS COMPLETS
-    const shopifyCtaSelectors = [
+    const ctaSelectors = [
       '.product-form__buttons',
       'form[action*="/cart/add"] button[type="submit"]',
       '.product-form button[name="add"]',
-      '.shopify-payment-button',
       '.add-to-cart',
-      'button[name="add"]',
-      '.product-form__cart',
-      '.product__buttons',
-      '.product-single__buttons',
-      '[class*="add-to-cart"]',
-      '[class*="product-form"]',
-      '.product-form-buttons',
-      '.btn-add-to-cart',
-      '#AddToCart',
-      '.AddToCart'
+      'button[name="add"]'
     ]
     
     let targetElement = null
     
-    for (const selector of shopifyCtaSelectors) {
+    for (const selector of ctaSelectors) {
       targetElement = document.querySelector(selector)
       if (targetElement) {
-        console.log(`✅ [POSITION] CTA trouvé: ${selector}`)
+        console.log(`✅ Élément CTA trouvé: ${selector}`)
         break
       }
     }
@@ -772,108 +1264,82 @@ class ChatSeller {
           targetElement.parentNode?.insertBefore(container, targetElement)
         } else if (position === 'below-cta') {
           targetElement.parentNode?.insertBefore(container, targetElement.nextSibling)
-        } else if (position === 'beside-cta') {
-          // Créer un wrapper flex pour mettre côte à côte
-          const wrapper = document.createElement('div')
-          wrapper.style.cssText = 'display: flex; gap: 12px; align-items: center; flex-wrap: wrap;'
-          targetElement.parentNode?.insertBefore(wrapper, targetElement)
-          wrapper.appendChild(targetElement)
-          wrapper.appendChild(container)
         } else {
           targetElement.parentNode?.insertBefore(container, targetElement.nextSibling)
         }
         
-        console.log(`✅ [POSITION] Widget inséré: ${position}`)
+        console.log('✅ Widget inséré avec succès')
         return
       } catch (error) {
-        console.warn('⚠️ [POSITION] Erreur insertion CTA:', error)
+        console.warn('⚠️ Erreur insertion:', error)
       }
     }
     
-    // ✅ FALLBACK: FORM PRODUIT
+    // ✅ FALLBACK
     const productForm = document.querySelector('form[action*="/cart/add"]') || 
-                       document.querySelector('.product-form') ||
-                       document.querySelector('.product-single') ||
-                       document.querySelector('main')
+                       document.querySelector('.product-form')
     
     if (productForm) {
       try {
         productForm.appendChild(container)
-        console.log('✅ [POSITION] Widget inséré dans form/main')
+        console.log('✅ Widget inséré dans le formulaire')
         return
       } catch (error) {
-        console.warn('⚠️ [POSITION] Erreur insertion form:', error)
+        console.warn('⚠️ Erreur insertion form:', error)
       }
     }
     
-    // ✅ FALLBACK FINAL: POSITION FIXE
+    // ✅ FALLBACK FINAL
     if (!this.config.disableFallback) {
-      console.log('⚠️ [POSITION] Fallback: position fixe')
-      container.style.cssText = `
-        position: fixed !important;
-        bottom: 20px !important;
-        right: 20px !important;
-        z-index: 999999 !important;
-        max-width: 280px !important;
-        margin: 0 !important;
-      `
-      container.className = 'cs-chatseller-widget cs-chatseller-widget-fallback'
-      container.setAttribute('data-chatseller-position', 'fallback')
+      console.log('⚠️ Fallback: insertion body')
       document.body.appendChild(container)
     }
   }
 
-  // ✅ RENDU WIDGET AVEC CONFIGURATION DYNAMIQUE
   private renderWidget() {
     if (!this.widgetElement) return
 
     const buttonText = this.config.buttonText || 'Parler à la vendeuse'
     const primaryColor = this.config.primaryColor || '#EC4899'
-    const borderRadius = this.getBorderRadiusValue(this.config.borderRadius || 'full')
+    const darkerColor = this.adjustColor(primaryColor, -15)
 
     this.widgetElement.innerHTML = `
-      <div style="width: 100%; margin: 8px 0; position: relative;" data-chatseller="button-container">
-        <button 
-          id="chatseller-trigger-btn"
-          class="cs-chat-trigger-button"
-          data-chatseller="trigger-button"
-          style="
-            width: 100%;
-            padding: 16px 24px;
-            background: linear-gradient(135deg, ${primaryColor} 0%, ${this.adjustColor(primaryColor, -15)} 100%);
-            color: white;
-            border: none;
-            border-radius: ${borderRadius};
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 8px 25px rgba(236, 72, 153, 0.3);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            outline: none;
-            text-transform: none;
-            letter-spacing: normal;
-            line-height: 1.5;
-            position: relative;
-            z-index: 1;
-            min-height: 56px;
-            overflow: hidden;
-          "
-          onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 35px rgba(236, 72, 153, 0.4)'; this.style.background='linear-gradient(135deg, #F472B6 0%, #EC4899 100%)'"
-          onmouseout="this.style.transform='translateY(0px)'; this.style.boxShadow='0 8px 25px rgba(236, 72, 153, 0.3)'; this.style.background='linear-gradient(135deg, ${primaryColor} 0%, ${this.adjustColor(primaryColor, -15)} 100%)'"
-          onmousedown="this.style.transform='translateY(0px)'"
-          onmouseup="this.style.transform='translateY(-2px)'"
-        >
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink: 0; margin-right: 8px;">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.906-1.479L3 21l2.521-5.094A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"></path>
-          </svg>
-          <span style="color: inherit; font-size: inherit; font-weight: inherit; margin: 0; padding: 0; background: transparent; border: none;">${buttonText}</span>
-        </button>
-      </div>
+      <button 
+        id="chatseller-trigger-btn"
+        class="cs-chat-trigger-button"
+        style="
+          width: 100% !important;
+          padding: 16px 24px !important;
+          background: linear-gradient(135deg, ${primaryColor} 0%, ${darkerColor} 100%) !important;
+          color: white !important;
+          border: none !important;
+          border-radius: 50px !important;
+          font-size: 15px !important;
+          font-weight: 600 !important;
+          cursor: pointer !important;
+          transition: all 0.3s ease !important;
+          box-shadow: 0 8px 25px rgba(236, 72, 153, 0.3) !important;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          gap: 8px !important;
+          outline: none !important;
+          min-height: 56px !important;
+          margin: 0 !important;
+          text-transform: none !important;
+          letter-spacing: normal !important;
+          opacity: 1 !important;
+          visibility: visible !important;
+          position: relative !important;
+          z-index: 999999 !important;
+        "
+      >
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.906-1.479L3 21l2.521-5.094A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"></path>
+        </svg>
+        <span>${buttonText}</span>
+      </button>
     `
 
     const triggerBtn = this.widgetElement.querySelector('#chatseller-trigger-btn') as HTMLElement
@@ -883,98 +1349,74 @@ class ChatSeller {
         event.stopPropagation()
         this.openChat()
       })
-      
-      console.log(`🎨 [WIDGET] Bouton rendu:`, { 
-        text: buttonText, 
-        color: primaryColor, 
-        radius: borderRadius 
-      })
     }
   }
 
-  // ✅ OUVERTURE CHAT AVEC VUE MODERNE
   private openChat() {
     if (this.isOpen) return
 
     this.isOpen = true
-    console.log('💬 [CHAT] Ouverture interface moderne')
+    console.log('💬 Ouverture chat')
+    
+    // ✅ NE PLUS CACHER LE BOUTON - IL RESTE VISIBLE
+    // Le bouton widget reste accessible pour revenir au chat
     
     try {
       this.createVueChatModal()
     } catch (error) {
-      console.error('❌ [CHAT] Erreur Vue, fallback simple:', error)
-      this.createSimpleChatModal()
+      console.error('❌ Erreur ouverture chat Vue:', error)
+      this.createFallbackModal()
     }
   }
 
-  // ✅ CRÉATION MODAL VUE AVEC CONFIGURATION COMPLÈTE
   private createVueChatModal() {
     this.modalElement = document.createElement('div')
     this.modalElement.id = 'chatseller-vue-modal'
     this.modalElement.className = 'cs-chat-modal-overlay'
-    this.modalElement.setAttribute('data-chatseller', 'modal-overlay')
-    
-    const isMobile = window.innerWidth < 768
-    if (isMobile) {
-      this.modalElement.classList.add('cs-mobile')
-    }
-    
+
+    // ✅ STYLES INLINE POUR FORCER L'AFFICHAGE
     this.modalElement.style.cssText = `
       position: fixed !important;
       top: 0 !important;
       left: 0 !important;
       right: 0 !important;
       bottom: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
       background: rgba(0, 0, 0, 0.75) !important;
       backdrop-filter: blur(12px) !important;
       z-index: 2147483647 !important;
       display: flex !important;
-      align-items: ${isMobile ? 'stretch' : 'center'} !important;
-      justify-content: ${isMobile ? 'stretch' : 'center'} !important;
-      padding: ${isMobile ? '0' : '20px'} !important;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-      pointer-events: auto !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 20px !important;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     `
 
     document.body.appendChild(this.modalElement)
 
-    this.initVueWidget()
-
-    if (!isMobile) {
-      this.modalElement.addEventListener('click', (e) => {
-        if (e.target === this.modalElement) {
-          this.closeChat()
-        }
-      })
+    try {
+      this.initVueWidget()
+    } catch (error) {
+      console.error('❌ Erreur Vue:', error)
+      throw error
     }
   }
 
-  // ✅ INITIALISATION VUE AVEC CONFIG COMPLÈTE + TITRE
   private initVueWidget(): void {
     try {
-      console.log('🎨 [VUE] Initialisation composant moderne avec titre...')
+      console.log('🎨 Initialisation composant Vue...')
       
       if (!this.modalElement) {
         throw new Error('Modal element non trouvé')
       }
       
-      // ✅ CONFIGURATION ULTRA-COMPLÈTE AVEC TITRE GARANTI
-      const agentName = this.config.agentConfig?.name || 'Anna'
-      const agentTitle = this.config.agentConfig?.title || 'Vendeuse IA'
-      
       const widgetConfig = {
         shopId: this.config.shopId,
         apiUrl: this.config.apiUrl,
-        agentConfig: {
-          id: this.config.agentConfig?.id || 'demo-agent',
-          name: agentName,
-          title: agentTitle, // ✅ TITRE OBLIGATOIRE
-          avatar: this.config.agentConfig?.avatar,
-          welcomeMessage: this.config.agentConfig?.welcomeMessage,
-          fallbackMessage: this.config.agentConfig?.fallbackMessage,
-          personality: this.config.agentConfig?.personality || 'friendly'
+        agentConfig: this.config.agentConfig || {
+          name: 'Anna',
+          title: 'Vendeuse IA'
         },
         primaryColor: this.config.primaryColor,
         buttonText: this.config.buttonText,
@@ -986,147 +1428,79 @@ class ChatSeller {
         productUrl: this.config.productUrl
       }
 
-      console.log('✅ [VUE] Config Vue avec titre:', {
-        agentName: widgetConfig.agentConfig.name,
-        agentTitle: widgetConfig.agentConfig.title,
-        productName: widgetConfig.productName
-      })
-
       this.vueApp = createApp(ChatSellerWidget, {
         config: widgetConfig
       })
 
       this.vueApp.mount(this.modalElement)
 
-      console.log('✅ [VUE] Composant Vue moderne monté avec titre')
+      console.log('✅ Composant Vue initialisé')
 
     } catch (error) {
-      console.error('❌ [VUE] Erreur initialisation:', error)
+      console.error('❌ Erreur initialisation Vue:', error)
       throw error
     }
   }
 
-  // ✅ MODAL SIMPLE FALLBACK AVEC TITRE
-  private createSimpleChatModal() {
+  private createFallbackModal() {
+    // ✅ FALLBACK SIMPLE EN CAS D'ÉCHEC VUE
     const agentName = this.config.agentConfig?.name || 'Anna'
-    const agentTitle = this.config.agentConfig?.title || 'Vendeuse IA'
     const primaryColor = this.config.primaryColor || '#EC4899'
 
     this.modalElement = document.createElement('div')
     this.modalElement.className = 'cs-chat-modal-overlay'
-    this.modalElement.setAttribute('data-chatseller', 'fallback-modal')
     this.modalElement.innerHTML = `
-      <div class="cs-chat-container-desktop" style="
-        width: 450px; height: 650px; max-height: 85vh;
-        background: white; border-radius: 24px;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
-        display: flex; flex-direction: column; overflow: hidden;
-        position: relative; opacity: 1; visibility: visible;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+      <div style="
+        width: 400px; height: 500px; background: white; border-radius: 16px;
+        display: flex; flex-direction: column; padding: 20px; text-align: center;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       ">
-        <div class="cs-desktop-header" style="
-          padding: 20px; 
-          background: linear-gradient(135deg, ${primaryColor} 0%, ${this.adjustColor(primaryColor, -10)} 100%); 
-          color: white;
-          display: flex; align-items: center; justify-content: space-between; min-height: 85px;
-        ">
-          <div style="display: flex; align-items: center; gap: 14px;">
-            <div style="
-              width: 48px; height: 48px; border-radius: 50%;
-              background: rgba(255, 255, 255, 0.2);
-              display: flex; align-items: center; justify-content: center;
-              font-weight: 700; font-size: 18px; color: white;
-            ">
-              ${agentName.charAt(0).toUpperCase()}
-            </div>
-            <div>
-              <h3 style="margin: 0 0 6px 0; font-size: 18px; font-weight: 700; color: white;">${agentName} - ${agentTitle}</h3>
-              <p style="margin: 0; font-size: 14px; opacity: 0.95; color: white; font-weight: 500;">
-                <span style="display: inline-block; width: 8px; height: 8px; background: #00D26A; border-radius: 50%; margin-right: 6px;"></span>
-                En ligne maintenant
-              </p>
-            </div>
-          </div>
-          <button id="chatseller-close-btn" class="cs-close-button" style="
-            background: rgba(255, 255, 255, 0.15); color: white;
-            border: none; border-radius: 50%; width: 40px; height: 40px;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: all 0.2s ease;
-          ">
-            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-          </button>
-        </div>
-        
-        <div style="
-          flex: 1; padding: 24px; display: flex; align-items: center; justify-content: center; 
-          background: linear-gradient(to bottom, #fafbfc 0%, #ffffff 100%);
-        ">
-          <div style="text-align: center;">
-            <div style="
-              width: 64px; height: 64px; background: ${primaryColor}; 
-              border-radius: 50%; display: flex; align-items: center; justify-content: center;
-              margin: 0 auto 16px; color: white; font-size: 24px; font-weight: 700;
-            ">
-              ${agentName.charAt(0).toUpperCase()}
-            </div>
-            <h4 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: #1f2937;">
-              ${agentName} - ${agentTitle}
-            </h4>
-            <p style="margin: 0; font-size: 14px; color: #6b7280;">
-              🔧 Interface de chat moderne en cours de chargement...
-            </p>
-            <div style="margin: 16px 0;">
-              <div style="
-                width: 32px; height: 32px; border: 3px solid ${primaryColor}; 
-                border-top: 3px solid transparent; border-radius: 50%;
-                animation: spin 1s linear infinite; margin: 0 auto;
-              "></div>
-            </div>
-          </div>
-        </div>
+        <h3 style="margin: 0 0 20px 0; color: ${primaryColor};">
+          💬 ${agentName} - Vendeuse IA
+        </h3>
+        <p style="margin: 0 0 20px 0; color: #666;">
+          Interface de chat en cours de chargement...
+        </p>
+        <button 
+          id="close-fallback"
+          style="
+            background: ${primaryColor}; color: white; border: none; 
+            padding: 10px 20px; border-radius: 8px; cursor: pointer;
+            margin-top: auto;
+          "
+        >
+          Fermer
+        </button>
       </div>
     `
 
-    this.modalElement.style.cssText = `
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      bottom: 0 !important;
-      background: rgba(0, 0, 0, 0.75) !important;
-      backdrop-filter: blur(12px) !important;
-      z-index: 2147483647 !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      padding: 20px !important;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-      pointer-events: auto !important;
-    `
-
-    // ✅ ANIMATION SPIN CSS INLINE
-    const spinStyle = document.createElement('style')
-    spinStyle.textContent = `
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-    `
-    document.head.appendChild(spinStyle)
-
     document.body.appendChild(this.modalElement)
 
-    const closeBtn = this.modalElement.querySelector('#chatseller-close-btn')
+    const closeBtn = this.modalElement.querySelector('#close-fallback')
     closeBtn?.addEventListener('click', () => this.closeChat())
-    
-    console.log(`✅ [FALLBACK] Modal simple avec titre: ${agentName} - ${agentTitle}`)
   }
 
-  // ✅ FERMETURE CHAT AVEC NETTOYAGE
+  private createFallbackWidget() {
+    // ✅ FALLBACK SI INIT ÉCHOUE COMPLÈTEMENT
+    console.log('🛡️ Création widget de fallback')
+    
+    const container = document.createElement('div')
+    container.className = 'cs-chatseller-widget'
+    container.innerHTML = `
+      <div style="
+        background: #f3f4f6; padding: 12px; border-radius: 8px;
+        text-align: center; font-size: 14px; color: #666;
+      ">
+        ⚠️ Widget ChatSeller en cours de chargement...
+      </div>
+    `
+    
+    const targetElement = document.querySelector('.product-form__buttons')
+    if (targetElement) {
+      targetElement.insertBefore(container, targetElement.firstChild)
+    }
+  }
+
   private closeChat() {
     this.isOpen = false
     if (this.modalElement) {
@@ -1137,20 +1511,6 @@ class ChatSeller {
       this.modalElement.remove()
       this.modalElement = null
     }
-    console.log('✅ [CHAT] Interface fermée')
-  }
-
-  // ✅ HELPERS UTILITAIRES
-  private getBorderRadiusValue(radius: string): string {
-    const radiusMap = {
-      'none': '0px',
-      'sm': '8px', 
-      'md': '12px',
-      'lg': '16px',
-      'xl': '32px',
-      'full': '50px'
-    }
-    return radiusMap[radius as keyof typeof radiusMap] || '50px'
   }
 
   private adjustColor(color: string, percent: number): string {
@@ -1182,53 +1542,6 @@ class ChatSeller {
   }
 
   // ✅ API PUBLIQUE
-  async sendMessage(message: string, conversationId?: string | null, options?: any): Promise<any> {
-    try {
-      const payload = {
-        shopId: this.config.shopId,
-        message,
-        conversationId: conversationId || this.conversationId,
-        productInfo: {
-          id: this.config.productId,
-          name: this.config.productName,
-          price: this.config.productPrice,
-          url: this.config.productUrl
-        },
-        visitorId: `visitor_${Date.now()}`,
-        isFirstMessage: options?.isFirstMessage || false
-      }
-
-      const url = `${this.config.apiUrl}/api/v1/public/chat`
-      console.log('📤 [API] Envoi message:', url)
-
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      })
-
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status} - ${response.statusText}`)
-      }
-
-      const result = await response.json()
-      console.log('📥 [API] Réponse:', result.success)
-
-      return result
-
-    } catch (error) {
-      console.error('❌ [API] Erreur:', error)
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Erreur inconnue'
-      }
-    }
-  }
-
-  // ✅ MÉTHODES PUBLIQUES
   show() {
     if (this.widgetElement) {
       this.widgetElement.style.display = 'block'
@@ -1250,8 +1563,53 @@ class ChatSeller {
       this.modalElement.remove()
       this.modalElement = null
     }
+    const styles = document.getElementById('chatseller-styles')
+    if (styles) styles.remove()
     this.isInitialized = false
-    console.log('🧹 [WIDGET] Détruit complètement')
+    this.cssInjected = false
+  }
+
+  // ✅ NOUVEAU : GESTION LOCALSTORAGE
+  saveConversation(messages: any[], conversationId: string | null) {
+    try {
+      const conversationData = {
+        messages,
+        conversationId,
+        timestamp: new Date().toISOString(),
+        shopId: this.config.shopId
+      }
+      localStorage.setItem(`chatseller-conversation-${this.config.shopId}`, JSON.stringify(conversationData))
+      console.log('💾 Conversation sauvegardée')
+    } catch (error) {
+      console.warn('⚠️ Erreur sauvegarde conversation:', error)
+    }
+  }
+
+  loadConversation() {
+    try {
+      const saved = localStorage.getItem(`chatseller-conversation-${this.config.shopId}`)
+      if (saved) {
+        const data = JSON.parse(saved)
+        console.log('📂 Conversation restaurée')
+        return data
+      }
+    } catch (error) {
+      console.warn('⚠️ Erreur chargement conversation:', error)
+    }
+    return null
+  }
+
+  resetConversation() {
+    try {
+      localStorage.removeItem(`chatseller-conversation-${this.config.shopId}`)
+      console.log('🔄 Conversation réinitialisée')
+      // Recharger le widget
+      if (this.vueApp && (window as any).ChatSellerWidget) {
+        (window as any).ChatSellerWidget.resetChat()
+      }
+    } catch (error) {
+      console.warn('⚠️ Erreur reset conversation:', error)
+    }
   }
 
   get isReady(): boolean {
@@ -1259,47 +1617,41 @@ class ChatSeller {
   }
 
   get version(): string {
-    return '1.4.0'
+    return '1.5.0'
   }
 }
 
-// ✅ EXPORT ET AUTO-INIT OPTIMISÉ POUR SHOPIFY
-const chatSeller = new ChatSeller()
-
-// ✅ AUTO-INIT SÉCURISÉ POUR SHOPIFY
-document.addEventListener('DOMContentLoaded', () => {
-  if ((window as any).ChatSellerConfig && !chatSeller.isReady) {
-    chatSeller.init((window as any).ChatSellerConfig)
-  }
-})
-
-// ✅ FALLBACK POUR SHOPIFY (chargement asynchrone)
-if (document.readyState === 'complete' || document.readyState === 'interactive') {
-  setTimeout(() => {
-    if ((window as any).ChatSellerConfig && !chatSeller.isReady) {
-      chatSeller.init((window as any).ChatSellerConfig)
-    }
-  }, 1000)
-}
-
-// ✅ SUPPORT SHOPIFY SECTIONS DYNAMIQUES
-if (typeof (window as any).Shopify !== 'undefined' || window.location.hostname.includes('myshopify.com')) {
-  document.addEventListener('shopify:section:load', () => {
-    setTimeout(() => {
+// ✅ INITIALISATION AUTOMATIQUE POUR WIDGET EMBEDDABLE
+(() => {
+  const chatSeller = new ChatSeller()
+  
+  // ✅ EXPOSITION GLOBALE IMMÉDIATE
+  if (typeof window !== 'undefined') {
+    (window as any).ChatSeller = chatSeller
+    
+    // ✅ AUTO-INIT INTELLIGENT
+    const autoInit = () => {
       if ((window as any).ChatSellerConfig && !chatSeller.isReady) {
         chatSeller.init((window as any).ChatSellerConfig)
       }
-    }, 500)
-  })
-}
+    }
+    
+    // ✅ GESTION MULTI-ÉTAT DU DOM
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', autoInit)
+    } else if (document.readyState === 'interactive' || document.readyState === 'complete') {
+      // DOM déjà chargé, init immédiate
+      setTimeout(autoInit, 100)
+    }
+    
+    console.log('✅ ChatSeller widget chargé - version 1.5.0')
+  }
+})()
 
+// ✅ DÉCLARATIONS TYPESCRIPT
 declare global {
   interface Window {
     ChatSeller: ChatSeller
     ChatSellerConfig?: ChatSellerConfig
   }
 }
-
-window.ChatSeller = chatSeller
-
-export default chatSeller
