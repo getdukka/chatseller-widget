@@ -50,11 +50,11 @@
         </div>
       </div>
 
-      <!-- ✅ ZONE DE CHAT -->
+      <!-- ✅ ZONE DE CHAT STYLE WHATSAPP -->
       <div ref="messagesContainer" class="cs-messages-area-desktop" :style="messagesAreaStyle">
         <div class="cs-messages-list" :style="messagesListStyle">
           
-          <!-- ✅ MESSAGES ALIGNÉS STYLE -->
+          <!-- ✅ MESSAGES ALIGNÉS WHATSAPP STYLE -->
           <div
             v-for="message in messages"
             :key="message.id"
@@ -139,7 +139,7 @@
         <!-- ✅ FOOTER CORRIGÉ - DEUX COLONNES -->
         <div class="cs-footer-info" :style="footerInfoStyle">
           <span class="cs-powered-by" :style="poweredByStyle">
-            Powered by <strong :style="{ color: primaryColor }">ChatSeller</strong>
+            Propulsé par <strong :style="{ color: primaryColor }">ChatSeller</strong>
           </span>
           <span class="cs-security" :style="securityStyle">🔒 Conversations sécurisées</span>
         </div>
@@ -272,9 +272,9 @@
         <!-- ✅ FOOTER MOBILE CORRIGÉ -->
         <div class="cs-mobile-footer" :style="mobileFooterStyle">
           <span class="cs-mobile-powered" :style="poweredByStyle">
-            Powered by <strong :style="{ color: primaryColor }">ChatSeller</strong>
+            Propulsé par <strong :style="{ color: primaryColor }">ChatSeller</strong>
           </span>
-          <span class="cs-mobile-security" :style="securityStyle">🔒 Conversations sécurisées</span>
+          <span class="cs-mobile-security" :style="securityStyle">🔒 Sécurisé</span>
         </div>
       </div>
     </div>
@@ -914,7 +914,7 @@ Comment puis-je vous aider aujourd'hui ? 😊`
     }
     messages.value.push(aiMessage)
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('❌ Erreur message d\'accueil:', error)
   }
 }
@@ -955,7 +955,7 @@ const sendMessage = async () => {
       throw new Error(response.error || 'Erreur API inconnue')
     }
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('❌ [WIDGET] Erreur envoi message:', error)
     
     const aiMessage: Message = {
@@ -1003,6 +1003,9 @@ const sendApiMessage = async (message: string) => {
   const apiUrl = configData.value.apiUrl || 'https://chatseller-api-production.up.railway.app'
   const endpoint = `${apiUrl}/api/v1/public/chat`
   
+  console.log('📤 [API CALL] Endpoint:', endpoint)
+  console.log('📤 [API CALL] ShopId:', configData.value.shopId)
+  
   const payload = {
     shopId: configData.value.shopId || 'demo',
     message,
@@ -1017,25 +1020,42 @@ const sendApiMessage = async (message: string) => {
     isFirstMessage: messages.value.length <= 2
   }
 
+  console.log('📤 [API CALL] Payload complet:', payload)
+
   try {
+    console.log('🌐 [API CALL] Début appel API...')
+    
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'Origin': window.location.origin
       },
       body: JSON.stringify(payload)
     })
 
+    console.log('📥 [API CALL] Statut réponse:', response.status)
+    console.log('📥 [API CALL] Headers réponse:', Object.fromEntries(response.headers.entries()))
+
     if (!response.ok) {
       const errorText = await response.text()
+      console.error('❌ [API CALL] Erreur HTTP:', response.status, errorText)
       throw new Error(`API Error: ${response.status} - ${errorText}`)
     }
 
     const result = await response.json()
+    console.log('✅ [API CALL] Réponse API reçue:', result)
+    
     return result
   } catch (error) {
     console.error('❌ [WIDGET API] Network Error:', error)
+    console.error('❌ [WIDGET API] Error details:', {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      endpoint,
+      payload
+    })
     throw error
   }
 }
@@ -1106,7 +1126,8 @@ const adjustColor = (color: string, percent: number): string => {
     }
     
     return `rgb(${adjust(r)}, ${adjust(g)}, ${adjust(b)})`
-  } catch (error) {
+  } catch (error: unknown) {
+    console.warn('⚠️ Erreur ajustement couleur:', error)
     return color
   }
 }
@@ -1118,7 +1139,8 @@ const hexToRgb = (hex: string): string => {
     const g = parseInt(color.substr(2, 2), 16)
     const b = parseInt(color.substr(4, 2), 16)
     return `${r}, ${g}, ${b}`
-  } catch (error) {
+  } catch (error: unknown) {
+    console.warn('⚠️ Erreur conversion hex vers rgb:', error)
     return '236, 72, 153'
   }
 }
