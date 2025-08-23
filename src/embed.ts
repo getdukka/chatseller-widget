@@ -195,6 +195,14 @@ class ChatSeller {
   display: block !important;
   opacity: 1 !important;
   visibility: visible !important;
+  position: relative !important;
+  z-index: 999999 !important;
+  pointer-events: none !important;
+  /* ✅ AJOUT : Forces supplémentaires pour Shopify */
+  min-width: 20px !important;
+  max-width: 20px !important;
+  min-height: 20px !important;
+  max-height: 20px !important;
 }
 
 .cs-chat-trigger-button svg path {
@@ -203,6 +211,35 @@ class ChatSeller {
   stroke-width: 2 !important;
   stroke-linecap: round !important;
   stroke-linejoin: round !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  pointer-events: none !important;
+}
+
+/* ✅ PROTECTION ANTI-OVERRIDE SHOPIFY/AUTRES THEMES */
+.cs-chat-trigger-button svg,
+.cs-chat-trigger-button svg * {
+  transition: none !important;
+  transform: none !important;
+  animation: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+.cs-chat-trigger-button:hover svg {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* ✅ SPECIFIQUE SHOPIFY - NEUTRALISER LEURS OVERRIDES */
+.shopify-section .cs-chat-trigger-button svg,
+.product-form .cs-chat-trigger-button svg,
+[class*="product"] .cs-chat-trigger-button svg {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 /* ✅ MODAL OVERLAY - PROTECTION MAXIMALE */
@@ -1458,38 +1495,57 @@ class ChatSeller {
           user-select: none !important;
         "
       >
+        <!-- ✅ ICÔNE SVG INLINE FORCÉE -->
         <svg 
           width="20" 
           height="20" 
+          viewBox="0 0 24 24" 
           fill="none" 
           stroke="currentColor" 
-          viewBox="0 0 24 24" 
+          stroke-width="2" 
+          stroke-linecap="round" 
+          stroke-linejoin="round"
           style="
             flex-shrink: 0 !important; 
             display: block !important; 
             opacity: 1 !important; 
             visibility: visible !important;
-            stroke-width: 2 !important;
-            stroke-linecap: round !important;
-            stroke-linejoin: round !important;
+            position: relative !important;
+            z-index: 1 !important;
+            pointer-events: none !important;
+            min-width: 20px !important;
+            max-width: 20px !important;
+            min-height: 20px !important;
+            max-height: 20px !important;
           "
           xmlns="http://www.w3.org/2000/svg"
         >
           <path 
-            stroke-linecap="round" 
-            stroke-linejoin="round" 
-            stroke-width="2" 
             d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.906-1.479L3 21l2.521-5.094A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
             style="
-              fill: none !important;
-              stroke: currentColor !important;
-              stroke-width: 2 !important;
-              stroke-linecap: round !important;
-              stroke-linejoin: round !important;
+              opacity: 1 !important;
+              visibility: visible !important;
+              display: block !important;
+              pointer-events: none !important;
             "
-          ></path>
+          />
         </svg>
-        <span style="flex: 1; display: block;">${buttonText}</span>
+        <!-- ✅ TEXTE DU BOUTON -->
+        <span style="
+          flex: 1; 
+          display: block !important; 
+          text-align: center !important;
+          opacity: 1 !important;
+          visibility: visible !important;
+          font-size: inherit !important;
+          font-weight: inherit !important;
+          color: inherit !important;
+        ">${buttonText}</span>
       </button>
     `
 
@@ -1638,57 +1694,194 @@ class ChatSeller {
 
   private initVueWidget(): void {
     try {
-      console.log('🎨 [INIT VUE] Initialisation composant Vue...')
+      console.log('🎨 [INIT VUE] Initialisation composant Vue avec persistance...')
       
       if (!this.modalElement) {
         throw new Error('Modal element non trouvé pour Vue')
       }
       
-      // ✅ CORRECTION : Configuration avec couleur appropriée
+      // ✅ DÉTECTION AUTOMATIQUE PRODUIT AMÉLIORÉE  
+      const currentProduct = this.detectCurrentProduct()
+      if (currentProduct) {
+        // Vérifier si le produit a changé
+        const hasProductChanged = this.config.productName !== currentProduct.name ||
+                                 this.config.productId !== currentProduct.id
+        
+        if (hasProductChanged) {
+          console.log('🔄 [PRODUCT CHANGE] Produit changé détecté')
+          this.handleProductChange(currentProduct)
+        } else {
+          // Mettre à jour la config avec les infos actuelles
+          this.config.productName = currentProduct.name
+          this.config.productPrice = currentProduct.price
+          this.config.productUrl = currentProduct.url || window.location.href
+        }
+      }
+      
+      // ✅ CONFIGURATION COMPLÈTE AVEC PERSISTANCE
       const widgetConfig = {
         shopId: this.config.shopId,
         apiUrl: this.config.apiUrl,
         agentConfig: this.config.agentConfig || {
-          name: 'Anna',
-          title: 'Vendeuse IA'
+          name: 'Rose',
+          title: 'Vendeuse'
         },
-        primaryColor: this.config.primaryColor, // ✅ COULEUR DYNAMIQUE
+        primaryColor: this.config.primaryColor,
         buttonText: this.config.buttonText,
         borderRadius: this.config.borderRadius,
         language: this.config.language,
         productId: this.config.productId,
         productName: this.config.productName,
         productPrice: this.config.productPrice,
-        productUrl: this.config.productUrl
+        productUrl: this.config.productUrl || window.location.href
       }
 
-      console.log('⚙️ [INIT VUE] Configuration widget:', widgetConfig)
+      console.log('⚙️ [INIT VUE] Configuration widget avec persistance:', {
+        shopId: widgetConfig.shopId,
+        agent: widgetConfig.agentConfig.name,
+        product: widgetConfig.productName,
+        hasPersistence: true
+      })
 
       this.vueApp = createApp(ChatSellerWidget, {
         config: widgetConfig
       })
 
-      // ✅ AJOUT : Exposer méthodes de fermeture au global
+      // ✅ EXPOSER MÉTHODES GLOBALES AVEC PERSISTANCE
       if (typeof window !== 'undefined') {
         (window as any).ChatSeller = {
           ...((window as any).ChatSeller || {}),
+          
+          // Méthodes de base
           closeChat: () => this.closeChat(),
+          
+          // ✅ NOUVEAU : Méthodes de persistance
           saveConversation: (messages: any[], conversationId: string) => {
-            this.conversationData = { messages, conversationId, timestamp: Date.now() }
+            this.saveConversation(messages, conversationId)
           },
-          loadConversation: () => this.conversationData,
+          
+          loadConversation: () => {
+            return this.loadConversation()
+          },
+          
           resetConversation: () => {
-            this.conversationData = null
-          }
+            this.resetConversation()
+          },
+          
+          // ✅ NOUVEAU : Gestion changement produit
+          updateProduct: (productInfo: any) => {
+            this.handleProductChange(productInfo)
+          },
+          
+          // Debug et status
+          getConversationStatus: () => ({
+            currentKey: this.currentConversationKey,
+            hasHistory: this.conversationHistory.size > 0,
+            currentProduct: {
+              id: this.config.productId,
+              name: this.config.productName,
+              url: this.config.productUrl
+            }
+          })
         }
       }
 
       this.vueApp.mount(this.modalElement)
-      console.log('✅ [INIT VUE] Composant Vue monté avec succès')
+      console.log('✅ [INIT VUE] Composant Vue monté avec système de persistance')
 
     } catch (error) {
       console.error('❌ [INIT VUE] Erreur initialisation Vue:', error)
       throw error
+    }
+  }
+
+  // ✅ NOUVELLE FONCTION : Détection produit améliorée
+  private detectCurrentProduct(): any {
+    try {
+      console.log('🔍 [PRODUCT DETECT] Détection produit en cours...')
+      
+      let detectedProduct: any = {
+        id: this.config.productId,
+        name: this.config.productName,
+        price: this.config.productPrice,
+        url: this.config.productUrl || window.location.href
+      }
+
+      // ✅ DÉTECTION SHOPIFY AVANCÉE
+      if ((window as any).ShopifyAnalytics?.meta?.product) {
+        const shopifyProduct = (window as any).ShopifyAnalytics.meta.product
+        detectedProduct = {
+          id: shopifyProduct.id?.toString() || detectedProduct.id,
+          name: shopifyProduct.title || detectedProduct.name,
+          price: shopifyProduct.price ? shopifyProduct.price / 100 : detectedProduct.price,
+          url: window.location.href
+        }
+        console.log('✅ [PRODUCT DETECT] Shopify détecté:', detectedProduct.name)
+        return detectedProduct
+      }
+      
+      // ✅ DÉTECTION WOOCOMMERCE
+      const wooProduct = document.querySelector('.woocommerce-product')
+      if (wooProduct) {
+        const wooTitle = wooProduct.querySelector('.product_title, .entry-title')
+        if (wooTitle?.textContent?.trim()) {
+          detectedProduct.name = wooTitle.textContent.trim()
+          console.log('✅ [PRODUCT DETECT] WooCommerce détecté:', detectedProduct.name)
+        }
+      }
+
+      // ✅ DÉTECTION GÉNÉRIQUE PAR SÉLECTEURS
+      if (!detectedProduct.name || detectedProduct.name === 'undefined') {
+        const titleSelectors = [
+          '.product__title',
+          '.product-form__title', 
+          'h1.product-title',
+          '.product-single__title',
+          'h1[class*="product"]',
+          '.product-title h1',
+          '.product-info__title'
+        ]
+        
+        for (const selector of titleSelectors) {
+          const element = document.querySelector(selector)
+          if (element?.textContent?.trim()) {
+            detectedProduct.name = element.textContent.trim()
+            console.log(`✅ [PRODUCT DETECT] Générique détecté via ${selector}:`, detectedProduct.name)
+            break
+          }
+        }
+      }
+
+      // ✅ DÉTECTION PRIX
+      if (!detectedProduct.price) {
+        const priceSelectors = [
+          '.price__current',
+          '.product-form__price .price',
+          '.money',
+          '.price-current',
+          '.product-price'
+        ]
+        
+        for (const selector of priceSelectors) {
+          const element = document.querySelector(selector)
+          if (element?.textContent?.trim()) {
+            const priceText = element.textContent.trim()
+            const priceMatch = priceText.match(/[\d,]+(?:[.,]\d{2})?/)
+            if (priceMatch) {
+              detectedProduct.price = parseFloat(priceMatch[0].replace(',', '.'))
+              console.log(`✅ [PRODUCT DETECT] Prix détecté:`, detectedProduct.price)
+              break
+            }
+          }
+        }
+      }
+
+      console.log('🔍 [PRODUCT DETECT] Résultat final:', detectedProduct)
+      return detectedProduct.name ? detectedProduct : null
+
+    } catch (error) {
+      console.warn('⚠️ [PRODUCT DETECT] Erreur détection produit:', error)
+      return null
     }
   }
 
@@ -1773,6 +1966,8 @@ class ChatSeller {
     
     console.log('✅ [FALLBACK WIDGET] Widget de fallback créé')
   }
+
+  
 
   // ✅ CORRECTION MAJEURE : Méthode closeChat qui permet la réouverture
   closeChat() {
@@ -1918,63 +2113,274 @@ class ChatSeller {
     this.refresh()
   }
 
+  // ✅ STRUCTURE CONVERSATION
+  private conversationHistory: Map<string, any> = new Map()
+  private currentConversationKey: string | null = null
+
+  // ✅ GÉNÉRER CLÉ CONVERSATION INTELLIGENTE
+  private generateConversationKey(): string {
+    const shopId = this.config.shopId
+    const productId = this.config.productId || 'general'
+    const productName = this.config.productName || 'general'
+    
+    // Clé basée sur shopId + produit (ID ou nom normalisé)
+    const normalizedProduct = productId !== 'general' 
+      ? productId 
+      : productName.toLowerCase().replace(/[^a-z0-9]/g, '-').substring(0, 50)
+    
+    return `${shopId}-${normalizedProduct}`
+  }
+
   // ✅ GESTION LOCALSTORAGE ROBUSTE AVEC PERSISTANCE AMÉLIORÉE
   saveConversation(messages: any[], conversationId: string | null) {
     try {
+      if (!this.currentConversationKey) {
+        this.currentConversationKey = this.generateConversationKey()
+      }
+
       const conversationData = {
         messages,
         conversationId,
         timestamp: new Date().toISOString(),
         shopId: this.config.shopId,
         productInfo: {
+          id: this.config.productId,
           name: this.config.productName,
           price: this.config.productPrice,
-          url: this.config.productUrl
+          url: this.config.productUrl || window.location.href
+        },
+        userAgent: navigator.userAgent,
+        lastActivity: Date.now()
+      }
+      
+      // ✅ SAUVEGARDE LOCALE ET NAVIGATEUR
+      this.conversationHistory.set(this.currentConversationKey, conversationData)
+      
+      // ✅ SAUVEGARDE LOCALSTORAGE AVEC NETTOYAGE AUTO
+      try {
+        const storageKey = `chatseller-conv-${this.currentConversationKey}`
+        localStorage.setItem(storageKey, JSON.stringify(conversationData))
+        
+        // ✅ NETTOYAGE CONVERSATIONS ANCIENNES (>7 jours)
+        this.cleanupOldConversations()
+        
+        console.log('💾 [PERSISTENCE] Conversation sauvegardée:', {
+          key: this.currentConversationKey,
+          messages: messages.length,
+          product: conversationData.productInfo.name
+        })
+      } catch (storageError) {
+        console.warn('⚠️ [PERSISTENCE] LocalStorage failed, using memory only:', storageError)
+      }
+      
+    } catch (error) {
+      console.warn('⚠️ [PERSISTENCE] Erreur sauvegarde conversation:', error)
+    }
+  }
+
+  loadConversation(): any {
+    try {
+      const requestedKey = this.generateConversationKey()
+      console.log('📂 [PERSISTENCE] Recherche conversation:', requestedKey)
+
+      // ✅ PRIORITÉ 1 : Conversation en mémoire
+      if (this.conversationHistory.has(requestedKey)) {
+        const memoryConv = this.conversationHistory.get(requestedKey)
+        if (this.isConversationValid(memoryConv)) {
+          this.currentConversationKey = requestedKey
+          console.log('📂 [PERSISTENCE] Conversation trouvée en mémoire')
+          return memoryConv
+        }
+      }
+
+      // ✅ PRIORITÉ 2 : LocalStorage
+      try {
+        const storageKey = `chatseller-conv-${requestedKey}`
+        const stored = localStorage.getItem(storageKey)
+        if (stored) {
+          const data = JSON.parse(stored)
+          if (this.isConversationValid(data)) {
+            this.conversationHistory.set(requestedKey, data)
+            this.currentConversationKey = requestedKey
+            console.log('📂 [PERSISTENCE] Conversation restaurée depuis localStorage')
+            return data
+          }
+        }
+      } catch (storageError) {
+        console.warn('⚠️ [PERSISTENCE] Erreur lecture localStorage:', storageError)
+      }
+
+      // ✅ PRIORITÉ 3 : Recherche conversation similaire (même shop, produit différent)
+      const similarConv = this.findSimilarConversation()
+      if (similarConv) {
+        console.log('📂 [PERSISTENCE] Conversation similaire trouvée, création nouvelle session')
+        // Ne pas restaurer mais notifier qu'il y a un historique
+        return {
+          isNewProductConversation: true,
+          previousProduct: similarConv.productInfo?.name,
+          suggestedMessage: `Je vois que nous avons déjà échangé au sujet de "${similarConv.productInfo?.name}". Aujourd'hui vous regardez "${this.config.productName}". Comment puis-je vous aider ?`
+        }
+      }
+
+      console.log('📂 [PERSISTENCE] Aucune conversation trouvée, nouvelle session')
+      return null
+
+    } catch (error) {
+      console.warn('⚠️ [PERSISTENCE] Erreur chargement conversation:', error)
+      return null
+    }
+  }
+
+  // ✅ VALIDATION CONVERSATION
+  private isConversationValid(conversation: any): boolean {
+    if (!conversation || !conversation.messages || !Array.isArray(conversation.messages)) {
+      return false
+    }
+
+    // ✅ Vérifier que la conversation n'est pas trop ancienne (7 jours)
+    const maxAge = 7 * 24 * 60 * 60 * 1000 // 7 jours
+    const age = Date.now() - (conversation.lastActivity || 0)
+    
+    if (age > maxAge) {
+      console.log('⏰ [PERSISTENCE] Conversation trop ancienne:', age / (24 * 60 * 60 * 1000), 'jours')
+      return false
+    }
+
+    // ✅ Vérifier cohérence produit (optionnel, peut changer)
+    const currentProduct = this.config.productName || this.config.productId
+    const savedProduct = conversation.productInfo?.name || conversation.productInfo?.id
+
+    return true // Conversation valide
+  }
+
+  // ✅ RECHERCHE CONVERSATION SIMILAIRE
+  private findSimilarConversation(): any {
+    try {
+      const currentShop = this.config.shopId
+      
+      // Chercher dans localStorage toutes les conversations du même shop
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i)
+        if (key && key.startsWith(`chatseller-conv-${currentShop}-`)) {
+          try {
+            const stored = localStorage.getItem(key)
+            if (stored) {
+              const data = JSON.parse(stored)
+              if (data.shopId === currentShop && data.messages && data.messages.length > 0) {
+                return data
+              }
+            }
+          } catch (e) {
+            console.warn('⚠️ Erreur lecture conversation:', key, e)
+          }
         }
       }
       
-      // ✅ SAUVEGARDE LOCALE ET EN INSTANCE
-      this.conversationData = conversationData
-      
-      const key = `chatseller-conversation-${this.config.shopId}`
-      localStorage.setItem(key, JSON.stringify(conversationData))
-      console.log('💾 [STORAGE] Conversation sauvegardée:', key)
+      return null
     } catch (error) {
-      console.warn('⚠️ [STORAGE] Erreur sauvegarde conversation:', error)
+      console.warn('⚠️ [PERSISTENCE] Erreur recherche similaire:', error)
+      return null
     }
   }
 
-  loadConversation() {
+  // ✅ NETTOYAGE CONVERSATIONS ANCIENNES
+  private cleanupOldConversations(): void {
     try {
-      // ✅ PRIORITÉ À LA CONVERSATION EN INSTANCE
-      if (this.conversationData) {
-        console.log('📂 [STORAGE] Conversation restaurée depuis instance')
-        return this.conversationData
+      const maxAge = 7 * 24 * 60 * 60 * 1000 // 7 jours
+      const currentTime = Date.now()
+      
+      // Nettoyer localStorage
+      const keysToRemove: string[] = []
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i)
+        if (key && key.startsWith('chatseller-conv-')) {
+          try {
+            const stored = localStorage.getItem(key)
+            if (stored) {
+              const data = JSON.parse(stored)
+              const age = currentTime - (data.lastActivity || 0)
+              if (age > maxAge) {
+                keysToRemove.push(key)
+              }
+            }
+          } catch (e) {
+            keysToRemove.push(key) // Supprimer les conversations corrompues
+          }
+        }
       }
       
-      const key = `chatseller-conversation-${this.config.shopId}`
-      const saved = localStorage.getItem(key)
-      if (saved) {
-        const data = JSON.parse(saved)
-        this.conversationData = data
-        console.log('📂 [STORAGE] Conversation restaurée depuis localStorage:', key)
-        return data
+      // Supprimer les conversations anciennes
+      keysToRemove.forEach(key => {
+        try {
+          localStorage.removeItem(key)
+          console.log('🧹 [CLEANUP] Conversation ancienne supprimée:', key)
+        } catch (e) {
+          console.warn('⚠️ [CLEANUP] Erreur suppression:', key, e)
+        }
+      })
+      
+      // Nettoyer mémoire
+      this.conversationHistory.forEach((value, key) => {
+        const age = currentTime - (value.lastActivity || 0)
+        if (age > maxAge) {
+          this.conversationHistory.delete(key)
+        }
+      })
+      
+      if (keysToRemove.length > 0) {
+        console.log(`🧹 [CLEANUP] ${keysToRemove.length} conversations anciennes nettoyées`)
       }
+      
     } catch (error) {
-      console.warn('⚠️ [STORAGE] Erreur chargement conversation:', error)
+      console.warn('⚠️ [CLEANUP] Erreur nettoyage:', error)
     }
-    return null
   }
 
+  // ✅ RESET CONVERSATION (BOUTON RESET)
   resetConversation() {
     try {
-      this.conversationData = null
-      const key = `chatseller-conversation-${this.config.shopId}`
-      localStorage.removeItem(key)
-      console.log('🔄 [STORAGE] Conversation réinitialisée:', key)
+      if (this.currentConversationKey) {
+        // Supprimer de localStorage
+        const storageKey = `chatseller-conv-${this.currentConversationKey}`
+        localStorage.removeItem(storageKey)
+        
+        // Supprimer de mémoire
+        this.conversationHistory.delete(this.currentConversationKey)
+        
+        console.log('🔄 [RESET] Conversation réinitialisée:', this.currentConversationKey)
+      }
+      
+      // Réinitialiser état
+      this.currentConversationKey = null
+      
     } catch (error) {
-      console.warn('⚠️ [STORAGE] Erreur reset conversation:', error)
+      console.warn('⚠️ [RESET] Erreur reset conversation:', error)
     }
+  }
+
+  // ✅ CHANGER DE PRODUIT (LOGIQUE INTELLIGENTE)
+  handleProductChange(newProductInfo: any) {
+    console.log('🔄 [PRODUCT CHANGE] Changement de produit détecté:', {
+      from: this.config.productName,
+      to: newProductInfo.name
+    })
+    
+    // Sauvegarder conversation actuelle si elle existe
+    if (this.currentConversationKey && this.conversationHistory.has(this.currentConversationKey)) {
+      console.log('💾 [PRODUCT CHANGE] Sauvegarde de la conversation précédente')
+      // La conversation reste accessible, mais on va créer une nouvelle clé
+    }
+    
+    // Mettre à jour config produit
+    this.config.productId = newProductInfo.id
+    this.config.productName = newProductInfo.name
+    this.config.productPrice = newProductInfo.price
+    this.config.productUrl = newProductInfo.url
+    
+    // Générer nouvelle clé de conversation
+    this.currentConversationKey = null
+    
+    console.log('✅ [PRODUCT CHANGE] Nouveau contexte produit configuré')
   }
 
   // ✅ GETTERS PUBLICS

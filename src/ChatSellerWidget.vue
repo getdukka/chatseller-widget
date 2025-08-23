@@ -923,30 +923,69 @@ const securityStyle = computed((): CSSProperties => ({
 // ✅ FONCTIONS
 const sendWelcomeMessage = async () => {
   try {
-    // ✅ CHARGEMENT CONVERSATION SAUVEGARDÉE
+    console.log('👋 [WELCOME] Début initialisation message d\'accueil...')
+    
+    // ✅ CHARGEMENT CONVERSATION SAUVEGARDÉE PRIORITAIRE
     if (typeof window !== 'undefined' && (window as any).ChatSeller) {
       const savedConversation = (window as any).ChatSeller.loadConversation()
-      if (savedConversation && savedConversation.messages && savedConversation.messages.length > 0) {
-        messages.value = savedConversation.messages
-        conversationId.value = savedConversation.conversationId
-        console.log('📂 Conversation restaurée:', savedConversation.messages.length, 'messages')
-        return
+      
+      if (savedConversation) {
+        // ✅ CAS 1 : CONVERSATION NORMALE SAUVEGARDÉE
+        if (savedConversation.messages && savedConversation.messages.length > 0) {
+          messages.value = savedConversation.messages.map((msg: any) => ({
+            ...msg,
+            timestamp: new Date(msg.timestamp)
+          }))
+          conversationId.value = savedConversation.conversationId
+          console.log('📂 [WELCOME] Conversation restaurée:', {
+            messages: messages.value.length,
+            product: savedConversation.productInfo?.name,
+            conversationId: conversationId.value
+          })
+          return
+        }
+        
+        // ✅ CAS 2 : NOUVEAU PRODUIT MAIS HISTORIQUE EXISTANT
+        else if (savedConversation.isNewProductConversation) {
+          console.log('🔄 [WELCOME] Nouveau produit détecté, personnalisation message')
+          
+          const personalizedWelcome = savedConversation.suggestedMessage || 
+            `Je vois que nous avons déjà échangé ! Aujourd'hui vous regardez ${productInfo.value?.name || 'un nouveau produit'}. Comment puis-je vous aider ? 😊`
+          
+          const aiMessage: Message = {
+            id: uuidv4(),
+            role: 'assistant',
+            content: personalizedWelcome,
+            timestamp: new Date()
+          }
+          messages.value.push(aiMessage)
+          console.log('✅ [WELCOME] Message personnalisé pour nouveau produit')
+          return
+        }
       }
     }
 
+    // ✅ CAS 3 : PREMIÈRE VISITE - MESSAGE STANDARD
+    console.log('🆕 [WELCOME] Première visite, création message standard')
+    
     let welcomeMessage = ''
     
     if (configData.value.agentConfig?.welcomeMessage) {
       welcomeMessage = configData.value.agentConfig.welcomeMessage
     } else {
+      const localAgentName = agentName.value || 'Rose'
+      const agentTitle = configData.value.agentConfig?.title || 'Vendeuse'
+      
       if (productInfo.value?.name) {
-        welcomeMessage = `Bonjour ! 👋 Je suis ${agentName.value}, votre ${agentTitle.value}.
+        welcomeMessage = `Salut ! 👋 Je suis ${agentName}, votre ${agentTitle}.
 
-Je vois que vous vous intéressez à **${productInfo.value.name}**. Comment puis-je vous aider aujourd'hui ? 😊`
+Je vois que vous vous intéressez à **${productInfo.value.name}**. C'est un excellent choix ! 💫
+
+Comment puis-je vous aider avec ce produit ? 😊`
       } else {
-        welcomeMessage = `Bonjour ! 👋 Je suis ${agentName.value}, votre ${agentTitle.value}.
+        welcomeMessage = `Salut ! 👋 Je suis ${agentName}, votre ${agentTitle}.
 
-Comment puis-je vous aider aujourd'hui ? 😊`
+Quel produit vous intéresse aujourd'hui ? Je serais ravie de vous renseigner ! 😊`
       }
     }
 
@@ -957,9 +996,20 @@ Comment puis-je vous aider aujourd'hui ? 😊`
       timestamp: new Date()
     }
     messages.value.push(aiMessage)
+    
+    console.log('✅ [WELCOME] Message d\'accueil créé pour première visite')
 
   } catch (error: unknown) {
-    console.error('❌ Erreur message d\'accueil:', error)
+    console.error('❌ [WELCOME] Erreur message d\'accueil:', error)
+    
+    // ✅ FALLBACK EN CAS D'ERREUR
+    const fallbackMessage: Message = {
+      id: uuidv4(),
+      role: 'assistant',
+      content: `Bonjour ! Je suis là pour vous aider. Comment puis-je vous renseigner ? 😊`,
+      timestamp: new Date()
+    }
+    messages.value.push(fallbackMessage)
   }
 }
 
@@ -1207,32 +1257,132 @@ onMounted(() => {
   console.log('🎨 [WIDGET VUE] Composant monté avec couleur:', primaryColor.value)
   sendWelcomeMessage()
   
-  // ✅ GESTION MOBILE VIEWPORT
+  // ✅ GESTION MOBILE VIEWPORT AMÉLIORÉE
   if (isMobile.value && typeof window !== 'undefined') {
-    const metaViewport = document.querySelector('meta[name="viewport"]')
-    if (metaViewport) {
-      metaViewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover')
-    }
+    console.log('📱 [MOBILE] Configuration viewport plein écran...')
     
-    // ✅ AJOUTER CSS POUR MOBILE PLEIN ÉCRAN
-    const style = document.createElement('style')
-    style.textContent = `
+    // ✅ 1. MÉTAVIEWPORT DYNAMIQUE
+    let metaViewport = document.querySelector('meta[name="viewport"]')
+    if (!metaViewport) {
+      metaViewport = document.createElement('meta')
+      metaViewport.setAttribute('name', 'viewport')
+      document.head.appendChild(metaViewport)
+    }
+    metaViewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover')
+    
+    // ✅ 2. CSS MOBILE PLEIN ÉCRAN FORCÉ
+    const mobileStyle = document.createElement('style')
+    mobileStyle.id = 'chatseller-mobile-fullscreen'
+    mobileStyle.textContent = `
+      /* ✅ MOBILE PLEIN ÉCRAN STRICT */
       html.cs-modal-open,
       body.cs-modal-open {
         overflow: hidden !important;
         position: fixed !important;
         width: 100% !important;
         height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        top: 0 !important;
+        left: 0 !important;
+      }
+      
+      /* ✅ MODAL MOBILE PLEIN ÉCRAN */
+      .cs-chat-modal-overlay {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        height: 100dvh !important; /* Dynamic viewport height */
+        margin: 0 !important;
+        padding: 0 !important;
+        z-index: 2147483647 !important;
+      }
+      
+      /* ✅ CONTAINER MOBILE EXACT */
+      @media (max-width: 767px) {
+        .cs-chat-container-mobile {
+          position: fixed !important;
+          top: 0 !important;
+          left: 0 !important;
+          width: 100vw !important;
+          height: 100vh !important;
+          height: 100dvh !important;
+          max-width: 100vw !important;
+          max-height: 100vh !important;
+          max-height: 100dvh !important;
+          border-radius: 0 !important;
+          border: none !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          z-index: 2147483647 !important;
+        }
+        
+        .cs-chat-modal-overlay {
+          align-items: stretch !important;
+          justify-content: stretch !important;
+          padding: 0 !important;
+        }
+      }
+      
+      /* ✅ SAFE AREA IPHONE */
+      @supports (padding: max(0px)) {
+        .cs-mobile-header {
+          padding-top: calc(env(safe-area-inset-top) + 16px) !important;
+        }
+        
+        .cs-mobile-input-section {
+          padding-bottom: calc(env(safe-area-inset-bottom) + 16px) !important;
+        }
+      }
+      
+      /* ✅ GESTION CLAVIER MOBILE */
+      @media (max-width: 767px) {
+        .cs-mobile-input-container input:focus {
+          transform: translateZ(0) !important;
+          -webkit-transform: translateZ(0) !important;
+        }
+        
+        /* Empêcher le zoom sur focus */
+        input[type="text"] {
+          font-size: 16px !important;
+        }
       }
     `
-    document.head.appendChild(style)
+    document.head.appendChild(mobileStyle)
     
+    // ✅ 3. CLASSES FORCÉES POUR BODY
     document.documentElement.classList.add('cs-modal-open')
     document.body.classList.add('cs-modal-open')
     
+    // ✅ 4. GESTION CLAVIER MOBILE
+    const mobileInput = document.querySelector('.cs-mobile-message-input')
+    if (mobileInput) {
+      mobileInput.addEventListener('focus', () => {
+        // Scroll vers le haut pour éviter les problèmes de viewport
+        setTimeout(() => {
+          window.scrollTo(0, 0)
+        }, 100)
+      })
+      
+      mobileInput.addEventListener('blur', () => {
+        window.scrollTo(0, 0)
+      })
+    }
+    
+    console.log('✅ [MOBILE] Configuration plein écran terminée')
+    
+    // ✅ 5. NETTOYAGE AU DÉMONTAGE
     return () => {
       document.documentElement.classList.remove('cs-modal-open')
       document.body.classList.remove('cs-modal-open')
+      const mobileStyleEl = document.getElementById('chatseller-mobile-fullscreen')
+      if (mobileStyleEl) {
+        mobileStyleEl.remove()
+      }
     }
   }
 })
