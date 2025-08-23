@@ -1,4 +1,4 @@
-<!-- src/ChatSellerWidget.vue - VERSION TYPESCRIPT CORRIGÉE -->
+<!-- src/ChatSellerWidget.vue - VERSION CORRIGÉE FINALE -->
 <template>
   <div class="cs-chatseller-widget-vue">
     <!-- ✅ INTERFACE DESKTOP -->
@@ -101,45 +101,43 @@
         </div>
       </div>
 
-      <!-- ✅ INPUT SECTION -->
+      <!-- ✅ INPUT SECTION CORRIGÉE -->
       <div class="cs-input-section-desktop" :style="inputSectionStyle">
         <div class="cs-input-container" :style="inputContainerStyle">
-          <div class="cs-input-wrapper" :style="inputWrapperStyle">
-            <input
-              v-model="currentMessage"
-              @keypress.enter="sendMessage"
-              :placeholder="inputPlaceholder"
-              class="cs-message-input"
-              :style="messageInputStyle"
-              :disabled="isTyping || isLoading"
-            />
-            
-            <button
-              @click="handleVoiceMessage"
-              class="cs-voice-button"
-              :style="voiceButtonStyle"
-              title="Message vocal"
-            >
-              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
-              </svg>
-            </button>
-            
-            <button
-              @click="sendMessage"
-              :disabled="!currentMessage.trim() || isTyping || isLoading"
-              class="cs-send-button"
-              :style="sendButtonStyle"
-            >
-              <svg v-if="!isTyping" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-              </svg>
-              <div v-else class="cs-loading-spinner" :style="loadingSpinnerStyle"></div>
-            </button>
-          </div>
+          <input
+            v-model="currentMessage"
+            @keypress.enter="sendMessage"
+            :placeholder="inputPlaceholder"
+            class="cs-message-input"
+            :style="messageInputStyle"
+            :disabled="isTyping || isLoading"
+          />
+          
+          <button
+            @click="handleVoiceMessage"
+            class="cs-voice-button"
+            :style="voiceButtonStyle"
+            title="Message vocal"
+          >
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+            </svg>
+          </button>
+          
+          <button
+            @click="sendMessage"
+            :disabled="!currentMessage.trim() || isTyping || isLoading"
+            class="cs-send-button"
+            :style="sendButtonStyle"
+          >
+            <svg v-if="!isTyping" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+            </svg>
+            <div v-else class="cs-loading-spinner" :style="loadingSpinnerStyle"></div>
+          </button>
         </div>
         
-        <!-- ✅ FOOTER -->
+        <!-- ✅ FOOTER CORRIGÉ - DEUX LIGNES -->
         <div class="cs-footer-info" :style="footerInfoStyle">
           <span class="cs-powered-by">Propulsé par <strong :style="{ color: primaryColor }">ChatSeller</strong></span>
           <span class="cs-security">🔒 Conversations sécurisées</span>
@@ -147,7 +145,7 @@
       </div>
     </div>
 
-    <!-- ✅ INTERFACE MOBILE -->
+    <!-- ✅ INTERFACE MOBILE PLEIN ÉCRAN -->
     <div 
       v-else
       class="cs-chat-container-mobile"
@@ -237,9 +235,9 @@
         </div>
       </div>
 
-      <!-- Input mobile -->
-      <div class="cs-mobile-input-section" :style="inputSectionStyle">
-        <div class="cs-mobile-input-container" :style="inputContainerStyle">
+      <!-- ✅ INPUT MOBILE CORRIGÉ -->
+      <div class="cs-mobile-input-section" :style="mobileInputSectionStyle">
+        <div class="cs-mobile-input-container" :style="mobileInputContainerStyle">
           <input
             v-model="currentMessage"
             @keypress.enter="sendMessage"
@@ -273,7 +271,7 @@
           </button>
         </div>
         
-        <!-- ✅ FOOTER MOBILE -->
+        <!-- ✅ FOOTER MOBILE CORRIGÉ -->
         <div class="cs-mobile-footer" :style="mobileFooterStyle">
           <span class="cs-mobile-powered">Propulsé par <strong :style="{ color: primaryColor }">ChatSeller</strong></span>
           <span class="cs-mobile-security">🔒 Sécurisé</span>
@@ -388,7 +386,8 @@ const inputPlaceholder = computed(() => {
   return `Tapez votre message...`
 })
 
-// ✅ STYLES COMPUTED AVEC TYPES CORRECTS
+// ✅ STYLES COMPUTED AVEC DIMENSIONS CORRIGÉES
+
 const headerStyle = computed((): CSSProperties => ({
   padding: '20px',
   color: '#ffffff',
@@ -403,10 +402,11 @@ const headerStyle = computed((): CSSProperties => ({
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
 }))
 
+// ✅ CORRECTION PRINCIPALE : Largeur desktop 650px
 const desktopContainerStyle = computed((): CSSProperties => ({
-  width: '520px', // ✅ AUGMENTÉ de 450px à 520px
-  height: '700px', // ✅ AUGMENTÉ de 650px à 700px
-  maxHeight: '90vh', // ✅ AUGMENTÉ de 85vh à 90vh
+  width: '650px', // ✅ CHANGÉ de 520px à 650px
+  height: '700px',
+  maxHeight: '90vh',
   maxWidth: '95vw',
   background: '#ffffff',
   borderRadius: '24px',
@@ -420,9 +420,10 @@ const desktopContainerStyle = computed((): CSSProperties => ({
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
 }))
 
+// ✅ CORRECTION PRINCIPALE : Mobile plein écran
 const mobileContainerStyle = computed((): CSSProperties => ({
-  width: '100%',
-  height: '100vh', // ✅ CHANGÉ de 100% à 100vh pour vraiment tout l'écran
+  width: '100vw', // ✅ Plein écran
+  height: '100vh', // ✅ Plein écran
   background: '#ffffff',
   display: 'flex',
   flexDirection: 'column',
@@ -430,7 +431,7 @@ const mobileContainerStyle = computed((): CSSProperties => ({
   margin: '0',
   padding: '0',
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  position: 'fixed', // ✅ AJOUTÉ pour éviter le scroll avec le clavier
+  position: 'fixed', // ✅ Position fixe pour éviter scroll
   top: '0',
   left: '0',
   zIndex: '999999'
@@ -511,8 +512,8 @@ const agentStatusStyle = computed((): CSSProperties => ({
   gap: '6px',
   fontWeight: '500',
   fontFamily: 'inherit',
-  flexWrap: 'wrap', // ✅ PERMET LE RETOUR À LA LIGNE
-  minWidth: '80px' // ✅ ASSURE QUE "En ligne" reste visible
+  flexWrap: 'wrap',
+  minWidth: '80px'
 }))
 
 const mobileStatusStyle = computed((): CSSProperties => ({
@@ -720,33 +721,34 @@ const inputSectionStyle = computed((): CSSProperties => ({
   flexShrink: '0'
 }))
 
+// ✅ CORRECTION PRINCIPALE : Input container prend toute la largeur
 const inputContainerStyle = computed((): CSSProperties => ({
   display: 'flex',
   alignItems: 'center',
-  gap: '8px', // ✅ RÉDUIT l'écart pour plus de place pour l'input
+  gap: '8px',
   margin: '0 0 16px 0'
 }))
 
-const inputWrapperStyle = computed((): CSSProperties => ({
-  flex: '1',
+// ✅ CORRECTION : Style mobile input container
+const mobileInputContainerStyle = computed((): CSSProperties => ({
   display: 'flex',
   alignItems: 'center',
-  background: '#f8fafc',
-  border: '2px solid #e2e8f0',
-  borderRadius: '25px',
-  padding: '0 18px',
-  minHeight: '52px'
+  gap: '8px',
+  margin: '0 0 12px 0',
+  padding: '0 16px'
 }))
 
 const messageInputStyle = computed((): CSSProperties => ({
-  flex: '1',
-  background: 'transparent',
-  border: 'none',
-  outline: 'none',
-  padding: '14px 0',
+  flex: '1', // ✅ Prend toute la largeur disponible
+  background: '#f8fafc',
+  border: '2px solid #e2e8f0',
+  borderRadius: '25px',
+  padding: '14px 18px',
   fontSize: '14px',
   color: '#374151',
-  fontFamily: 'inherit'
+  fontFamily: 'inherit',
+  outline: 'none',
+  transition: 'all 0.2s ease'
 }))
 
 const voiceButtonStyle = computed((): CSSProperties => ({
@@ -754,9 +756,9 @@ const voiceButtonStyle = computed((): CSSProperties => ({
   border: 'none',
   color: '#9ca3af',
   cursor: 'pointer',
-  padding: '6px', // ✅ RÉDUIT de 8px à 6px
+  padding: '6px',
   borderRadius: '50%',
-  width: '32px', // ✅ RÉDUIT de 36px à 32px
+  width: '32px',
   height: '32px',
   display: 'flex',
   alignItems: 'center',
@@ -764,7 +766,7 @@ const voiceButtonStyle = computed((): CSSProperties => ({
 }))
 
 const sendButtonStyle = computed((): CSSProperties => ({
-  width: '44px', // ✅ RÉDUIT de 48px à 44px
+  width: '44px',
   height: '44px',
   background: primaryColor.value,
   border: 'none',
@@ -787,37 +789,47 @@ const loadingSpinnerStyle = computed((): CSSProperties => ({
   animation: 'cs-spin 1s linear infinite'
 }))
 
+// ✅ CORRECTION PRINCIPALE : Footer sur 2 lignes
 const footerInfoStyle = computed((): CSSProperties => ({
   display: 'flex',
-  flexDirection: 'column', // ✅ CHANGÉ de row à column pour deux lignes
-  alignItems: 'center', // ✅ CENTRÉ
+  flexDirection: 'column',
+  alignItems: 'center',
   justifyContent: 'center',
   fontSize: '11px',
   color: '#9ca3af',
-  gap: '4px', // ✅ RÉDUIT l'espacement entre les lignes
+  gap: '4px',
   textAlign: 'center'
 }))
 
 const mobileFooterStyle = computed((): CSSProperties => ({
   display: 'flex',
-  flexDirection: 'column', // ✅ CHANGÉ pour deux lignes aussi
+  flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
   fontSize: '10px',
   color: '#9ca3af',
   marginTop: '12px',
   gap: '4px',
-  textAlign: 'center'
+  textAlign: 'center',
+  padding: '0 16px'
+}))
+
+// ✅ CORRECTION : Mobile input section sans conflits
+const mobileInputSectionStyle = computed((): CSSProperties => ({
+  borderTop: '1px solid #e5e7eb',
+  background: '#ffffff',
+  flexShrink: '0',
+  paddingTop: '16px',
+  paddingBottom: '16px'
 }))
 
 // ✅ FONCTIONS
 const sendWelcomeMessage = async () => {
   try {
-    // ✅ VÉRIFIER D'ABORD S'IL Y A UNE CONVERSATION SAUVEGARDÉE
+    // Vérifier s'il y a une conversation sauvegardée
     if (typeof window !== 'undefined' && (window as any).ChatSeller) {
       const savedConversation = (window as any).ChatSeller.loadConversation()
       if (savedConversation && savedConversation.messages && savedConversation.messages.length > 0) {
-        // ✅ RESTAURER LA CONVERSATION EXISTANTE
         messages.value = savedConversation.messages
         conversationId.value = savedConversation.conversationId
         console.log('📂 Conversation restaurée:', savedConversation.messages.length, 'messages')
@@ -825,7 +837,7 @@ const sendWelcomeMessage = async () => {
       }
     }
 
-    // ✅ SINON, ENVOYER LE MESSAGE D'ACCUEIL
+    // Sinon, envoyer le message d'accueil
     let welcomeMessage = ''
     
     if (configData.value.agentConfig?.welcomeMessage) {
@@ -907,7 +919,7 @@ const sendMessage = async () => {
     await nextTick()
     scrollToBottom()
     
-    // ✅ SAUVEGARDER LA CONVERSATION APRÈS CHAQUE MESSAGE
+    // Sauvegarder la conversation
     if (typeof window !== 'undefined' && (window as any).ChatSeller) {
       (window as any).ChatSeller.saveConversation(messages.value, conversationId.value)
     }
@@ -920,7 +932,6 @@ const handleVoiceMessage = () => {
 }
 
 const resetChat = () => {
-  // ✅ UTILISER LA MÉTHODE RESET DE L'EMBED POUR SUPPRIMER LE LOCALSTORAGE
   if (typeof window !== 'undefined' && (window as any).ChatSeller) {
     (window as any).ChatSeller.resetConversation()
   }
@@ -933,7 +944,7 @@ const resetChat = () => {
 
 const closeChat = () => {
   if (typeof window !== 'undefined' && (window as any).ChatSeller) {
-    (window as any).ChatSeller.destroy()
+    (window as any).ChatSeller.closeChat() // ✅ CHANGÉ : Ne plus destroy, juste fermer
   }
 }
 
@@ -1075,7 +1086,7 @@ watch(messages, () => {
     scrollToBottom()
   })
   
-  // ✅ SAUVEGARDER AUTOMATIQUEMENT À CHAQUE CHANGEMENT
+  // Sauvegarder automatiquement
   if (typeof window !== 'undefined' && (window as any).ChatSeller) {
     (window as any).ChatSeller.saveConversation(messages.value, conversationId.value)
   }
@@ -1085,7 +1096,7 @@ onMounted(() => {
   console.log('🎨 [WIDGET VUE] Composant monté')
   sendWelcomeMessage()
   
-  // ✅ GESTION MOBILE ANTI-SCROLL CLAVIER (comme WhatsApp)
+  // Gestion mobile anti-scroll clavier (comme WhatsApp)
   if (isMobile.value && typeof window !== 'undefined') {
     // Empêcher le zoom sur focus input
     const metaViewport = document.querySelector('meta[name="viewport"]')

@@ -1,4 +1,4 @@
-// src/embed.ts - SCRIPT D'EMBEDDING CORRIGÉ AVEC CSS INJECTION
+// src/embed.ts - VERSION CORRIGÉE
 
 // ✅ POLYFILLS CRITIQUES POUR LE NAVIGATEUR
 if (typeof global === 'undefined') {
@@ -35,7 +35,7 @@ export interface ChatSellerConfig {
 }
 
 class ChatSeller {
-  private config: ChatSellerConfig
+  public config: ChatSellerConfig // ✅ CHANGÉ DE PRIVATE À PUBLIC
   private widgetElement: HTMLElement | null = null
   private isInitialized = false
   private isOpen = false
@@ -145,7 +145,7 @@ class ChatSeller {
   isolation: isolate !important;
 }
 
-/* ✅ BOUTON TRIGGER ULTRA-VISIBLE */
+/* ✅ BOUTON TRIGGER ULTRA-VISIBLE AVEC ICÔNE */
 .cs-chat-trigger-button {
   width: 100% !important;
   padding: 16px 24px !important;
@@ -224,9 +224,9 @@ class ChatSeller {
 
 /* ✅ CONTAINERS PRINCIPAUX */
 .cs-chat-container-desktop {
-  width: 450px !important;
-  height: 650px !important;
-  max-height: 85vh !important;
+  width: 650px !important;
+  height: 700px !important;
+  max-height: 90vh !important;
   max-width: 95vw !important;
   background: #ffffff !important;
   border-radius: 24px !important;
@@ -250,8 +250,8 @@ class ChatSeller {
 }
 
 .cs-chat-container-mobile {
-  width: 100% !important;
-  height: 100% !important;
+  width: 100vw !important;
+  height: 100vh !important;
   background: #ffffff !important;
   display: flex !important;
   flex-direction: column !important;
@@ -264,8 +264,10 @@ class ChatSeller {
   padding: 0 !important;
   border: none !important;
   border-radius: 0 !important;
-  position: relative !important;
-  z-index: 1 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  z-index: 999999 !important;
 }
 
 /* ✅ HEADERS ULTRA-RENFORCÉS */
@@ -376,6 +378,8 @@ class ChatSeller {
   font-family: inherit !important;
   padding: 0 !important;
   border: none !important;
+  flex-wrap: wrap !important;
+  min-width: 80px !important;
 }
 
 .cs-mobile-status-text {
@@ -757,46 +761,35 @@ class ChatSeller {
   z-index: 2 !important;
 }
 
+.cs-mobile-input-section {
+  padding-bottom: 16px !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
 .cs-input-container,
 .cs-mobile-input-container {
   display: flex !important;
   align-items: center !important;
-  gap: 12px !important;
+  gap: 8px !important;
   margin: 0 0 16px 0 !important;
   padding: 0 !important;
   border: none !important;
   background: transparent !important;
 }
 
-.cs-input-wrapper {
-  flex: 1 !important;
-  display: flex !important;
-  align-items: center !important;
-  background: #f8fafc !important;
-  border: 2px solid #e2e8f0 !important;
-  border-radius: 25px !important;
-  padding: 0 18px !important;
-  transition: all 0.2s ease !important;
-  min-height: 52px !important;
-  margin: 0 !important;
-  position: relative !important;
-  overflow: hidden !important;
-}
-
-.cs-input-wrapper:focus-within {
-  background: #ffffff !important;
-  border-color: #EC4899 !important;
-  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1) !important;
-  transform: translateY(-1px) !important;
+.cs-mobile-input-container {
+  margin: 0 0 12px 0 !important;
+  padding: 0 16px !important;
 }
 
 .cs-message-input,
 .cs-mobile-message-input {
   flex: 1 !important;
-  background: transparent !important;
-  border: none !important;
-  outline: none !important;
-  padding: 14px 0 !important;
+  background: #f8fafc !important;
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 25px !important;
+  padding: 14px 18px !important;
   font-size: 14px !important;
   color: #374151 !important;
   font-family: inherit !important;
@@ -806,8 +799,17 @@ class ChatSeller {
   font-weight: 400 !important;
   margin: 0 !important;
   text-decoration: none !important;
+  outline: none !important;
   appearance: none !important;
   -webkit-appearance: none !important;
+  transition: all 0.2s ease !important;
+}
+
+.cs-message-input:focus,
+.cs-mobile-message-input:focus {
+  background: #ffffff !important;
+  border-color: #EC4899 !important;
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1) !important;
 }
 
 .cs-message-input::placeholder,
@@ -826,14 +828,14 @@ class ChatSeller {
   border: none !important;
   color: #9ca3af !important;
   cursor: pointer !important;
-  padding: 8px !important;
+  padding: 6px !important;
   border-radius: 50% !important;
   transition: all 0.2s ease !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  width: 36px !important;
-  height: 36px !important;
+  width: 32px !important;
+  height: 32px !important;
   margin: 0 !important;
   outline: none !important;
   font-family: inherit !important;
@@ -848,8 +850,8 @@ class ChatSeller {
 /* ✅ BOUTONS SEND */
 .cs-send-button,
 .cs-mobile-send {
-  width: 48px !important;
-  height: 48px !important;
+  width: 44px !important;
+  height: 44px !important;
   background: #EC4899 !important;
   border: none !important;
   border-radius: 50% !important;
@@ -898,34 +900,39 @@ class ChatSeller {
   display: block !important;
 }
 
-/* ✅ FOOTER */
+/* ✅ FOOTER CORRIGÉ */
 .cs-footer-info {
   display: flex !important;
-  justify-content: space-between !important;
+  flex-direction: column !important;
   align-items: center !important;
+  justify-content: center !important;
   font-size: 11px !important;
   color: #9ca3af !important;
-  gap: 12px !important;
+  gap: 4px !important;
   margin: 0 !important;
   padding: 0 !important;
   border: none !important;
   background: transparent !important;
   font-family: inherit !important;
   line-height: 1.3 !important;
+  text-align: center !important;
 }
 
 .cs-mobile-footer {
   display: flex !important;
-  justify-content: space-between !important;
+  flex-direction: column !important;
   align-items: center !important;
+  justify-content: center !important;
   font-size: 10px !important;
   color: #9ca3af !important;
   margin-top: 12px !important;
-  padding: 0 !important;
+  padding: 0 16px !important;
   border: none !important;
   background: transparent !important;
   font-family: inherit !important;
   line-height: 1.3 !important;
+  text-align: center !important;
+  gap: 4px !important;
 }
 
 .cs-powered-by,
@@ -958,6 +965,28 @@ class ChatSeller {
   text-decoration: none !important;
 }
 
+/* ✅ SCROLLBARS */
+.cs-messages-area-desktop::-webkit-scrollbar,
+.cs-messages-area-mobile::-webkit-scrollbar {
+  width: 4px !important;
+}
+
+.cs-messages-area-desktop::-webkit-scrollbar-track,
+.cs-messages-area-mobile::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+.cs-messages-area-desktop::-webkit-scrollbar-thumb,
+.cs-messages-area-mobile::-webkit-scrollbar-thumb {
+  background: rgba(236, 72, 153, 0.3) !important;
+  border-radius: 2px !important;
+}
+
+.cs-messages-area-desktop::-webkit-scrollbar-thumb:hover,
+.cs-messages-area-mobile::-webkit-scrollbar-thumb:hover {
+  background: rgba(236, 72, 153, 0.5) !important;
+}
+
 /* ✅ RESPONSIVE */
 @media (max-width: 767px) {
   .cs-chat-container-desktop {
@@ -970,10 +999,6 @@ class ChatSeller {
   
   .cs-chat-modal-overlay {
     padding: 0 !important;
-  }
-  
-  .cs-mobile-input-container {
-    margin: 0 0 12px 0 !important;
   }
 }
 
@@ -1013,63 +1038,8 @@ class ChatSeller {
   }
 }
 
-/* ✅ CLASSE RACINE COMPOSANT VUE */
-.cs-chatseller-widget-vue {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-  color: #374151 !important;
-  line-height: 1.5 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: none !important;
-  background: transparent !important;
-}
-
-@keyframes cs-typing-animation {
-  0%, 60%, 100% {
-    transform: translateY(0) !important;
-  }
-  30% {
-    transform: translateY(-6px) !important;
-  }
-}
-
-@keyframes cs-spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-@keyframes cs-fadeIn {
-  0% { opacity: 0; transform: scale(0.96); }
-  100% { opacity: 1; transform: scale(1); }
-}
-
-@keyframes cs-message-appear {
-  0% { 
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  100% { 
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ✅ TRANSITIONS VUE */
-.cs-modal-enter-active {
-  animation: cs-fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.cs-modal-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.cs-modal-enter-from,
-.cs-modal-leave-to {
-  opacity: 0;
-}
-
 .cs-chat-container-desktop {
-  animation: cs-fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: cs-fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 /* ✅ PROTECTION FINALE ANTI-SHOPIFY */
@@ -1108,24 +1078,6 @@ class ChatSeller {
   background-clip: padding-box !important;
 }
 
-.cs-chat-modal-overlay {
-  display: flex !important;
-}
-
-.cs-chat-container-desktop,
-.cs-chat-container-mobile {
-  display: flex !important;
-}
-
-.cs-desktop-header,
-.cs-mobile-header,
-.cs-messages-area-desktop,
-.cs-messages-area-mobile,
-.cs-input-section-desktop,
-.cs-mobile-input-section {
-  display: flex !important;
-}
-
 /* ✅ PRINT MEDIA */
 @media print {
   .cs-chatseller-widget,
@@ -1136,7 +1088,8 @@ class ChatSeller {
     `
   }
 
-  private cleanupExistingWidgets(): void {
+  // ✅ CHANGÉ DE PRIVATE À PUBLIC pour permettre l'accès depuis l'extérieur
+  public cleanupExistingWidgets(): void {
     const selectors = [
       '#chatseller-widget',
       '#chatseller-modal',
@@ -1150,7 +1103,8 @@ class ChatSeller {
     })
   }
 
-  private detectProductInfo(): boolean {
+  // ✅ CHANGÉ DE PRIVATE À PUBLIC pour permettre l'accès depuis l'extérieur
+  public detectProductInfo(): boolean {
     try {
       console.log('🔍 Détection produit...')
       
@@ -1158,7 +1112,7 @@ class ChatSeller {
       let detectedPrice = this.config.productPrice
       let detectedId = this.config.productId
 
-      // ✅ DÉTECTION SHOPIFY
+      // ✅ DÉTECTION SHOPIFY AVANCÉE
       const shopifyProduct = (window as any).ShopifyAnalytics?.meta?.product
       if (shopifyProduct && shopifyProduct.title) {
         detectedName = shopifyProduct.title
@@ -1167,14 +1121,17 @@ class ChatSeller {
         console.log('✅ Produit Shopify détecté:', detectedName)
       }
       
-      // ✅ SÉLECTEURS DE TITRE
+      // ✅ SÉLECTEURS DE TITRE ÉTENDUS
       if (!detectedName) {
         const titleSelectors = [
           '.product__title',
           '.product-form__title', 
           'h1.product-title',
           '.product-single__title',
-          'h1[class*="product"]'
+          'h1[class*="product"]',
+          '.product-title h1',
+          '.product-info__title',
+          '.product-detail-title'
         ]
         
         for (const selector of titleSelectors) {
@@ -1187,13 +1144,16 @@ class ChatSeller {
         }
       }
 
-      // ✅ SÉLECTEURS DE PRIX
+      // ✅ SÉLECTEURS DE PRIX ÉTENDUS
       if (!detectedPrice) {
         const priceSelectors = [
           '.price__current',
           '.product-form__price .price',
           '.money',
-          '.price-current'
+          '.price-current',
+          '.product-price',
+          '.price .money',
+          '[data-product-price]'
         ]
         
         for (const selector of priceSelectors) {
@@ -1240,12 +1200,16 @@ class ChatSeller {
   private insertWidgetAtPosition(container: HTMLElement): void {
     const position = this.config.position || 'above-cta'
     
+    // ✅ SÉLECTEURS CTA ÉTENDUS
     const ctaSelectors = [
       '.product-form__buttons',
       'form[action*="/cart/add"] button[type="submit"]',
       '.product-form button[name="add"]',
       '.add-to-cart',
-      'button[name="add"]'
+      'button[name="add"]',
+      '.product-form__cart-submit',
+      '.btn.product-form__cart-submit',
+      '.shopify-payment-button'
     ]
     
     let targetElement = null
@@ -1275,17 +1239,25 @@ class ChatSeller {
       }
     }
     
-    // ✅ FALLBACK
-    const productForm = document.querySelector('form[action*="/cart/add"]') || 
-                       document.querySelector('.product-form')
+    // ✅ FALLBACKS ÉTENDUS
+    const fallbackSelectors = [
+      'form[action*="/cart/add"]',
+      '.product-form',
+      '.product-single',
+      '.product-details',
+      '.main-content'
+    ]
     
-    if (productForm) {
-      try {
-        productForm.appendChild(container)
-        console.log('✅ Widget inséré dans le formulaire')
-        return
-      } catch (error) {
-        console.warn('⚠️ Erreur insertion form:', error)
+    for (const selector of fallbackSelectors) {
+      const fallbackElement = document.querySelector(selector)
+      if (fallbackElement) {
+        try {
+          fallbackElement.appendChild(container)
+          console.log(`✅ Widget inséré via fallback: ${selector}`)
+          return
+        } catch (error) {
+          console.warn('⚠️ Erreur insertion fallback:', error)
+        }
       }
     }
     
@@ -1302,7 +1274,9 @@ class ChatSeller {
     const buttonText = this.config.buttonText || 'Parler à la vendeuse'
     const primaryColor = this.config.primaryColor || '#EC4899'
     const darkerColor = this.adjustColor(primaryColor, -15)
+    const borderRadius = this.getBorderRadiusValue(this.config.borderRadius || 'full')
 
+    // ✅ BOUTON AVEC ICÔNE ET CONFIGURATION DYNAMIQUE
     this.widgetElement.innerHTML = `
       <button 
         id="chatseller-trigger-btn"
@@ -1313,7 +1287,7 @@ class ChatSeller {
           background: linear-gradient(135deg, ${primaryColor} 0%, ${darkerColor} 100%) !important;
           color: white !important;
           border: none !important;
-          border-radius: 50px !important;
+          border-radius: ${borderRadius} !important;
           font-size: 15px !important;
           font-weight: 600 !important;
           cursor: pointer !important;
@@ -1352,14 +1326,18 @@ class ChatSeller {
     }
   }
 
+  // ✅ CORRECTION PRINCIPALE : Le bouton ne disparaît JAMAIS
   private openChat() {
-    if (this.isOpen) return
-
-    this.isOpen = true
-    console.log('💬 Ouverture chat')
+    console.log('💬 Ouverture chat, état actuel:', { isOpen: this.isOpen, modalExists: !!this.modalElement })
     
-    // ✅ NE PLUS CACHER LE BOUTON - IL RESTE VISIBLE
-    // Le bouton widget reste accessible pour revenir au chat
+    // Si modal déjà ouvert, ne rien faire
+    if (this.isOpen && this.modalElement) {
+      console.log('🔄 Modal déjà ouvert')
+      return
+    }
+    
+    // ✅ LE BOUTON RESTE TOUJOURS VISIBLE - NE JAMAIS LE CACHER
+    this.isOpen = true
     
     try {
       this.createVueChatModal()
@@ -1443,7 +1421,6 @@ class ChatSeller {
   }
 
   private createFallbackModal() {
-    // ✅ FALLBACK SIMPLE EN CAS D'ÉCHEC VUE
     const agentName = this.config.agentConfig?.name || 'Anna'
     const primaryColor = this.config.primaryColor || '#EC4899'
 
@@ -1481,8 +1458,7 @@ class ChatSeller {
   }
 
   private createFallbackWidget() {
-    // ✅ FALLBACK SI INIT ÉCHOUE COMPLÈTEMENT
-    console.log('🛡️ Création widget de fallback')
+    console.log('🔧 ChatSeller: Création widget de fallback')
     
     const container = document.createElement('div')
     container.className = 'cs-chatseller-widget'
@@ -1490,19 +1466,28 @@ class ChatSeller {
       <div style="
         background: #f3f4f6; padding: 12px; border-radius: 8px;
         text-align: center; font-size: 14px; color: #666;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       ">
         ⚠️ Widget ChatSeller en cours de chargement...
       </div>
     `
     
-    const targetElement = document.querySelector('.product-form__buttons')
+    const targetElement = document.querySelector('.product-form__buttons') ||
+                         document.querySelector('.product-form') ||
+                         document.querySelector('form[action*="/cart/add"]')
+    
     if (targetElement) {
       targetElement.insertBefore(container, targetElement.firstChild)
+    } else {
+      document.body.appendChild(container)
     }
   }
 
-  private closeChat() {
+  // ✅ MÉTHODE : Fermer le chat SANS détruire le bouton
+  closeChat() {
+    console.log('❌ Fermeture chat')
     this.isOpen = false
+    
     if (this.modalElement) {
       if (this.vueApp) {
         this.vueApp.unmount()
@@ -1511,6 +1496,20 @@ class ChatSeller {
       this.modalElement.remove()
       this.modalElement = null
     }
+    
+    // ✅ LE BOUTON RESTE TOUJOURS VISIBLE
+  }
+
+  private getBorderRadiusValue(radius: string): string {
+    const radiusMap = {
+      'none': '0px',
+      'sm': '8px',
+      'md': '12px',
+      'lg': '16px',
+      'xl': '24px',
+      'full': '50px'
+    }
+    return radiusMap[radius as keyof typeof radiusMap] || '50px'
   }
 
   private adjustColor(color: string, percent: number): string {
@@ -1555,6 +1554,7 @@ class ChatSeller {
   }
 
   destroy() {
+    console.log('🗑️ Destruction complète du widget')
     this.cleanupExistingWidgets()
     if (this.modalElement) {
       if (this.vueApp) {
@@ -1569,7 +1569,7 @@ class ChatSeller {
     this.cssInjected = false
   }
 
-  // ✅ NOUVEAU : GESTION LOCALSTORAGE
+  // ✅ GESTION LOCALSTORAGE
   saveConversation(messages: any[], conversationId: string | null) {
     try {
       const conversationData = {
@@ -1603,10 +1603,6 @@ class ChatSeller {
     try {
       localStorage.removeItem(`chatseller-conversation-${this.config.shopId}`)
       console.log('🔄 Conversation réinitialisée')
-      // Recharger le widget
-      if (this.vueApp && (window as any).ChatSellerWidget) {
-        (window as any).ChatSellerWidget.resetChat()
-      }
     } catch (error) {
       console.warn('⚠️ Erreur reset conversation:', error)
     }
@@ -1640,18 +1636,75 @@ class ChatSeller {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', autoInit)
     } else if (document.readyState === 'interactive' || document.readyState === 'complete') {
-      // DOM déjà chargé, init immédiate
       setTimeout(autoInit, 100)
+    }
+    
+    // ✅ SUPPORT SHOPIFY SECTIONS DYNAMIQUES AVANCÉ
+    if (typeof window !== 'undefined') {
+      // Détecter si on est sur Shopify
+      if ((window as any).Shopify || document.querySelector('[data-shopify]') || window.location.hostname.includes('myshopify.com')) {
+        console.log('🛍️ ChatSeller: Mode Shopify activé')
+        
+        // Écouter les changements de section Shopify
+        document.addEventListener('shopify:section:load', function(event) {
+          console.log('🔄 ChatSeller: Section Shopify rechargée')
+          setTimeout(() => {
+            if (!chatSeller.isReady) {
+              autoInit()
+            }
+          }, 1000)
+        })
+        
+        document.addEventListener('shopify:section:unload', function(event) {
+          console.log('🗑️ ChatSeller: Section Shopify déchargée')
+          chatSeller.cleanupExistingWidgets()
+        })
+        
+        // Écouter les changements de variantes
+        document.addEventListener('variant:change', function() {
+          console.log('🔄 ChatSeller: Variante changée')
+          if (chatSeller.config?.autoDetectProduct) {
+            chatSeller.detectProductInfo()
+          }
+        })
+        
+        // ✅ GESTION SPA SHOPIFY (AJAX)
+        let currentUrl = window.location.href
+        setInterval(() => {
+          if (window.location.href !== currentUrl) {
+            currentUrl = window.location.href
+            console.log('🔄 ChatSeller: URL changée (SPA), rechargement widget')
+            chatSeller.cleanupExistingWidgets()
+            setTimeout(autoInit, 700)
+          }
+        }, 2000)
+      }
     }
     
     console.log('✅ ChatSeller widget chargé - version 1.5.0')
   }
 })()
 
-// ✅ DÉCLARATIONS TYPESCRIPT
+// ✅ DÉCLARATIONS TYPESCRIPT ÉTENDUES
 declare global {
   interface Window {
     ChatSeller: ChatSeller
     ChatSellerConfig?: ChatSellerConfig
+    // ✅ AJOUT DES TYPES SHOPIFY POUR CORRIGER L'ERREUR
+    Shopify?: {
+      [key: string]: any
+    }
+    ShopifyAnalytics?: {
+      meta?: {
+        product?: {
+          id: number
+          title: string
+          price: number
+          [key: string]: any
+        }
+        [key: string]: any
+      }
+      [key: string]: any
+    }
   }
 }

@@ -1,4 +1,4 @@
-/* src/style.css - STYLES CSS OPTIMISÉS POUR VUE + SHOPIFY */
+/* src/style.css - CSS COMPLET DE PRODUCTION AVEC TOUTES LES CORRECTIONS */
 
 /* ✅ RESET GLOBAL ULTRA-RENFORCÉ POUR ISOLATION SHOPIFY */
 .cs-chatseller-widget,
@@ -37,7 +37,59 @@
   isolation: isolate !important;
 }
 
-/* ✅ MODAL OVERLAY ULTRA-PROTÉGÉ */
+/* ✅ BOUTON TRIGGER ULTRA-VISIBLE AVEC ICÔNE */
+.cs-chat-trigger-button {
+  width: 100% !important;
+  padding: 16px 24px !important;
+  background: linear-gradient(135deg, #EC4899 0%, #BE185D 100%) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 50px !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 8px 25px rgba(236, 72, 153, 0.3) !important;
+  font-family: inherit !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  outline: none !important;
+  min-height: 56px !important;
+  margin: 0 !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: relative !important;
+  z-index: 999999 !important;
+}
+
+.cs-chat-trigger-button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 35px rgba(236, 72, 153, 0.4) !important;
+}
+
+.cs-chat-trigger-button:active {
+  transform: translateY(0) !important;
+  box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3) !important;
+}
+
+.cs-chat-trigger-button:focus {
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.3), 0 8px 25px rgba(236, 72, 153, 0.3) !important;
+}
+
+.cs-chat-trigger-button svg {
+  width: 20px !important;
+  height: 20px !important;
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 2 !important;
+  flex-shrink: 0 !important;
+}
+
+/* ✅ MODAL OVERLAY - PROTECTION MAXIMALE */
 .cs-chat-modal-overlay {
   position: fixed !important;
   top: 0 !important;
@@ -54,28 +106,29 @@
   align-items: center !important;
   justify-content: center !important;
   padding: 20px !important;
+  margin: 0 !important;
+  border: none !important;
+  font-family: inherit !important;
   opacity: 1 !important;
   visibility: visible !important;
   pointer-events: auto !important;
-  font-family: inherit !important;
-  margin: 0 !important;
-  border: none !important;
-  outline: none !important;
   contain: layout style !important;
   overflow: hidden !important;
 }
 
-.cs-chat-modal-overlay.cs-mobile {
-  padding: 0 !important;
-  align-items: stretch !important;
-  justify-content: stretch !important;
+@media (max-width: 767px) {
+  .cs-chat-modal-overlay {
+    padding: 0 !important;
+    align-items: stretch !important;
+    justify-content: stretch !important;
+  }
 }
 
 /* ✅ CONTAINERS PRINCIPAUX */
 .cs-chat-container-desktop {
-  width: 450px !important;
-  height: 650px !important;
-  max-height: 85vh !important;
+  width: 650px !important;
+  height: 700px !important;
+  max-height: 90vh !important;
   max-width: 95vw !important;
   background: #ffffff !important;
   border-radius: 24px !important;
@@ -99,8 +152,8 @@
 }
 
 .cs-chat-container-mobile {
-  width: 100% !important;
-  height: 100% !important;
+  width: 100vw !important;
+  height: 100vh !important;
   background: #ffffff !important;
   display: flex !important;
   flex-direction: column !important;
@@ -113,8 +166,10 @@
   padding: 0 !important;
   border: none !important;
   border-radius: 0 !important;
-  position: relative !important;
-  z-index: 1 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  z-index: 999999 !important;
 }
 
 /* ✅ HEADERS ULTRA-RENFORCÉS */
@@ -173,7 +228,8 @@
   border: 2px solid rgba(255, 255, 255, 0.3) !important;
 }
 
-.cs-avatar-image {
+.cs-agent-avatar img,
+.cs-mobile-avatar img {
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;
@@ -224,6 +280,8 @@
   font-family: inherit !important;
   padding: 0 !important;
   border: none !important;
+  flex-wrap: wrap !important;
+  min-width: 80px !important;
 }
 
 .cs-mobile-status-text {
@@ -591,7 +649,7 @@
 .cs-typing-dot:nth-child(3),
 .cs-mobile-dot:nth-child(3) { animation-delay: 0.4s !important; }
 
-/* ✅ INPUT SECTION */
+/* ✅ INPUT SECTION CORRIGÉE */
 .cs-input-section-desktop,
 .cs-mobile-input-section {
   padding: 20px !important;
@@ -609,11 +667,16 @@
 .cs-mobile-input-container {
   display: flex !important;
   align-items: center !important;
-  gap: 12px !important;
+  gap: 8px !important;
   margin: 0 0 16px 0 !important;
   padding: 0 !important;
   border: none !important;
   background: transparent !important;
+}
+
+.cs-mobile-input-container {
+  margin: 0 0 12px 0 !important;
+  padding: 0 16px !important;
 }
 
 .cs-input-wrapper {
@@ -674,14 +737,14 @@
   border: none !important;
   color: #9ca3af !important;
   cursor: pointer !important;
-  padding: 8px !important;
+  padding: 6px !important;
   border-radius: 50% !important;
   transition: all 0.2s ease !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  width: 36px !important;
-  height: 36px !important;
+  width: 32px !important;
+  height: 32px !important;
   margin: 0 !important;
   outline: none !important;
   font-family: inherit !important;
@@ -696,8 +759,8 @@
 /* ✅ BOUTONS SEND */
 .cs-send-button,
 .cs-mobile-send {
-  width: 48px !important;
-  height: 48px !important;
+  width: 44px !important;
+  height: 44px !important;
   background: #EC4899 !important;
   border: none !important;
   border-radius: 50% !important;
@@ -746,34 +809,39 @@
   display: block !important;
 }
 
-/* ✅ FOOTER */
+/* ✅ FOOTER CORRIGÉ - DEUX LIGNES */
 .cs-footer-info {
   display: flex !important;
-  justify-content: space-between !important;
+  flex-direction: column !important;
   align-items: center !important;
+  justify-content: center !important;
   font-size: 11px !important;
   color: #9ca3af !important;
-  gap: 12px !important;
+  gap: 4px !important;
   margin: 0 !important;
   padding: 0 !important;
   border: none !important;
   background: transparent !important;
   font-family: inherit !important;
   line-height: 1.3 !important;
+  text-align: center !important;
 }
 
 .cs-mobile-footer {
   display: flex !important;
-  justify-content: space-between !important;
+  flex-direction: column !important;
   align-items: center !important;
+  justify-content: center !important;
   font-size: 10px !important;
   color: #9ca3af !important;
   margin-top: 12px !important;
-  padding: 0 !important;
+  padding: 0 16px !important;
   border: none !important;
   background: transparent !important;
   font-family: inherit !important;
   line-height: 1.3 !important;
+  text-align: center !important;
+  gap: 4px !important;
 }
 
 .cs-powered-by,
@@ -833,6 +901,31 @@
   color: rgba(255, 255, 255, 0.9) !important;
 }
 
+/* ✅ FORMATAGE MESSAGE */
+.cs-message-text strong,
+.cs-mobile-message-text strong {
+  font-weight: 600 !important;
+  color: inherit !important;
+  font-family: inherit !important;
+  background: transparent !important;
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-decoration: none !important;
+}
+
+.cs-message-text em,
+.cs-mobile-message-text em {
+  font-style: italic !important;
+  color: inherit !important;
+  font-family: inherit !important;
+  background: transparent !important;
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-decoration: none !important;
+}
+
 /* ✅ SCROLLBARS */
 .cs-messages-area-desktop::-webkit-scrollbar,
 .cs-messages-area-mobile::-webkit-scrollbar {
@@ -868,9 +961,12 @@
   .cs-chat-modal-overlay {
     padding: 0 !important;
   }
-  
-  .cs-mobile-input-container {
-    margin: 0 0 12px 0 !important;
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .cs-chat-container-desktop {
+    width: 580px !important;
+    height: 650px !important;
   }
 }
 
@@ -928,31 +1024,6 @@
   animation: cs-fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ✅ FORMATAGE MESSAGE */
-.cs-message-text strong,
-.cs-mobile-message-text strong {
-  font-weight: 600 !important;
-  color: inherit !important;
-  font-family: inherit !important;
-  background: transparent !important;
-  border: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  text-decoration: none !important;
-}
-
-.cs-message-text em,
-.cs-mobile-message-text em {
-  font-style: italic !important;
-  color: inherit !important;
-  font-family: inherit !important;
-  background: transparent !important;
-  border: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  text-decoration: none !important;
-}
-
 /* ✅ PROTECTION FINALE ANTI-SHOPIFY */
 .cs-chatseller-widget {
   contain: layout style !important;
@@ -965,7 +1036,6 @@
   letter-spacing: normal !important;
   word-spacing: normal !important;
   text-shadow: none !important;
-  box-shadow: none !important;
   filter: none !important;
   clip: unset !important;
   clip-path: none !important;
@@ -1008,10 +1078,94 @@
   display: flex !important;
 }
 
+/* ✅ FALLBACK STYLES */
+.cs-chatseller-fallback {
+  position: relative !important;
+  z-index: 999999 !important;
+  display: block !important;
+  margin: 8px 0 !important;
+  width: 100% !important;
+  background: #f3f4f6 !important;
+  padding: 12px !important;
+  border-radius: 8px !important;
+  text-align: center !important;
+  font-size: 14px !important;
+  color: #666 !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  border: 1px solid #e5e7eb !important;
+}
+
 /* ✅ PRINT MEDIA */
 @media print {
   .cs-chatseller-widget,
-  .cs-chat-modal-overlay {
+  .cs-chat-modal-overlay,
+  .cs-chatseller-fallback {
     display: none !important;
+  }
+}
+
+/* ✅ DARK MODE SUPPORT */
+@media (prefers-color-scheme: dark) {
+  .cs-messages-area-desktop {
+    background: linear-gradient(to bottom, #1f2937 0%, #111827 100%) !important;
+  }
+  
+  .cs-messages-area-mobile {
+    background: #1f2937 !important;
+  }
+  
+  .cs-assistant-text,
+  .cs-mobile-assistant-text {
+    background: #374151 !important;
+    color: #f9fafb !important;
+    border-color: #4b5563 !important;
+  }
+  
+  .cs-chat-container-desktop,
+  .cs-chat-container-mobile {
+    background: #111827 !important;
+  }
+}
+
+/* ✅ ACCESSIBILITÉ */
+@media (prefers-reduced-motion: reduce) {
+  .cs-chat-trigger-button,
+  .cs-send-button,
+  .cs-mobile-send,
+  .cs-action-button,
+  .cs-mobile-reset,
+  .cs-close-button,
+  .cs-mobile-close {
+    transition: none !important;
+  }
+  
+  .cs-typing-dot,
+  .cs-mobile-dot {
+    animation: none !important;
+  }
+  
+  .cs-status-dot {
+    animation: none !important;
+  }
+  
+  .cs-chat-container-desktop {
+    animation: none !important;
+  }
+}
+
+/* ✅ HIGH CONTRAST SUPPORT */
+@media (prefers-contrast: high) {
+  .cs-chat-trigger-button {
+    border: 2px solid #ffffff !important;
+  }
+  
+  .cs-assistant-text,
+  .cs-mobile-assistant-text {
+    border: 2px solid #000000 !important;
+  }
+  
+  .cs-user-text,
+  .cs-mobile-user-text {
+    border: 2px solid #ffffff !important;
   }
 }
