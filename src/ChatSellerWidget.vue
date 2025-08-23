@@ -1,4 +1,4 @@
-<!-- src/ChatSellerWidget.vue - VERSION CORRIGÉE COMPLÈTE -->
+<!-- src/ChatSellerWidget.vue - VERSION CORRIGÉE COMPLÈTE ✅ -->
 <template>
   <div class="cs-chatseller-widget-vue">
     <!-- ✅ INTERFACE DESKTOP -->
@@ -8,7 +8,7 @@
       :style="desktopContainerStyle"
     >
       
-      <!-- ✅ HEADER CORRIGÉ - PRODUIT SUR MÊME LIGNE -->
+      <!-- ✅ HEADER CORRIGÉ - COULEUR DYNAMIQUE -->
       <div class="cs-desktop-header" :style="headerStyle">
         <div class="cs-agent-info" :style="agentInfoStyle">
           <div class="cs-agent-avatar" :style="avatarStyle">
@@ -18,7 +18,6 @@
               :style="avatarImageStyle"
               @error="handleAvatarError"
             >
-            <!-- ✅ SUPPRIMÉ : Indicateur vert dans l'avatar -->
           </div>
           <div class="cs-agent-details">
             <h3 class="cs-agent-name" :style="agentNameStyle">{{ agentName }} - {{ agentTitle }}</h3>
@@ -73,12 +72,12 @@
               </div>
             </div>
 
-            <!-- ✅ MESSAGE UTILISATEUR - ALIGNÉ À DROITE AVEC "VOUS" -->
+            <!-- ✅ MESSAGE UTILISATEUR - COULEUR DYNAMIQUE -->
             <div v-else class="cs-user-bubble" :style="userBubbleStyle">
               <div class="cs-message-text cs-user-text" :style="userTextStyle">
                 <div class="cs-you-label-in-bubble" :style="youLabelInBubbleStyle">Vous</div>
                 <div>{{ message.content }}</div>
-                <div class="cs-message-time" :style="messageTimeStyle">{{ formatTime(message.timestamp) }}</div>
+                <div class="cs-message-time" :style="messageTimeUserStyle">{{ formatTime(message.timestamp) }}</div>
               </div>
             </div>
           </div>
@@ -112,6 +111,7 @@
             :disabled="isTyping || isLoading"
           />
           
+          <!-- ✅ BOUTON MICRO EN GRIS -->
           <button
             @click="handleVoiceMessage"
             class="cs-voice-button"
@@ -123,6 +123,7 @@
             </svg>
           </button>
           
+          <!-- ✅ BOUTON SEND COULEUR DYNAMIQUE -->
           <button
             @click="sendMessage"
             :disabled="!currentMessage.trim() || isTyping || isLoading"
@@ -146,15 +147,15 @@
       </div>
     </div>
 
-    <!-- ✅ INTERFACE MOBILE IDENTIQUE MAIS ADAPTÉE -->
+    <!-- ✅ INTERFACE MOBILE PLEIN ÉCRAN CORRIGÉE -->
     <div 
       v-else
       class="cs-chat-container-mobile"
       :style="mobileContainerStyle"
     >
       
-      <!-- Header Mobile -->
-      <div class="cs-mobile-header" :style="headerStyle">
+      <!-- ✅ Header Mobile avec Safe Area -->
+      <div class="cs-mobile-header" :style="mobileHeaderStyle">
         <div class="cs-mobile-agent-info" :style="agentInfoStyle">
           <div class="cs-mobile-avatar" :style="mobileAvatarStyle">
             <img :src="agentAvatar" :alt="agentName" :style="avatarImageStyle" @error="handleAvatarError">
@@ -187,7 +188,7 @@
         </div>
       </div>
 
-      <!-- Messages mobile -->
+      <!-- ✅ Messages mobile plein écran -->
       <div ref="mobileMessagesContainer" class="cs-messages-area-mobile" :style="mobileMessagesAreaStyle">
         <div class="cs-mobile-messages-list" :style="messagesListStyle">
           <div
@@ -207,11 +208,12 @@
               </div>
             </div>
 
+            <!-- ✅ Message utilisateur couleur dynamique -->
             <div v-else class="cs-mobile-user-bubble" :style="userBubbleStyle">
               <div class="cs-mobile-message-text cs-mobile-user-text" :style="userTextStyle">
                 <div class="cs-you-label-in-bubble" :style="youLabelInBubbleStyle">Vous</div>
                 <div>{{ message.content }}</div>
-                <div class="cs-mobile-message-time" :style="messageTimeStyle">{{ formatTime(message.timestamp) }}</div>
+                <div class="cs-mobile-message-time" :style="messageTimeUserStyle">{{ formatTime(message.timestamp) }}</div>
               </div>
             </div>
           </div>
@@ -233,7 +235,7 @@
         </div>
       </div>
 
-      <!-- Input Mobile -->
+      <!-- ✅ Input Mobile avec Safe Area -->
       <div class="cs-mobile-input-section" :style="mobileInputSectionStyle">
         <div class="cs-mobile-input-container" :style="mobileInputContainerStyle">
           <input
@@ -245,6 +247,7 @@
             :disabled="isTyping || isLoading"
           />
           
+          <!-- ✅ Bouton micro gris -->
           <button
             @click="handleVoiceMessage"
             class="cs-mobile-voice"
@@ -256,6 +259,7 @@
             </svg>
           </button>
           
+          <!-- ✅ Bouton send couleur dynamique -->
           <button
             @click="sendMessage"
             :disabled="!currentMessage.trim() || isTyping"
@@ -317,7 +321,7 @@ const props = withDefaults(defineProps<Props>(), {
       name: 'Anna',
       title: 'Vendeuse IA'
     },
-    primaryColor: '#EC4899',
+    primaryColor: '#8B5CF6', // ✅ COULEUR CORRIGÉE - Violet par défaut
     buttonText: 'Parler à la vendeuse',
     language: 'fr'
   })
@@ -341,7 +345,7 @@ const mobileMessagesContainer = ref<HTMLElement>()
 const messagesEndRef = ref<HTMLElement>()
 const mobileMessagesEndRef = ref<HTMLElement>()
 
-// ✅ COMPUTED
+// ✅ COMPUTED AVEC COULEUR DYNAMIQUE
 const configData = computed(() => props.config || {})
 
 const isMobile = computed(() => {
@@ -363,7 +367,7 @@ const agentAvatar = computed(() => {
   if (configData.value.agentConfig?.avatar) {
     return configData.value.agentConfig.avatar
   }
-  const color = (configData.value.primaryColor || '#EC4899').replace('#', '')
+  const color = (configData.value.primaryColor || '#8B5CF6').replace('#', '')
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(agentName.value)}&background=${color}&color=fff&size=128`
 })
 
@@ -379,18 +383,19 @@ const productInfo = computed(() => {
   return null
 })
 
-const primaryColor = computed(() => configData.value.primaryColor || '#EC4899')
+// ✅ COULEUR PRIMAIRE DYNAMIQUE
+const primaryColor = computed(() => configData.value.primaryColor || '#8B5CF6')
 
 const inputPlaceholder = computed(() => {
   return `Tapez votre message...`
 })
 
-// ✅ STYLES COMPUTED CORRIGÉS POUR LAYOUT WHATSAPP
+// ✅ STYLES COMPUTED CORRIGÉS AVEC COULEUR DYNAMIQUE
 
 const headerStyle = computed((): CSSProperties => ({
   padding: '20px',
   color: '#ffffff',
-  background: `linear-gradient(135deg, ${primaryColor.value} 0%, ${adjustColor(primaryColor.value, -15)} 100%)`,
+  background: `linear-gradient(135deg, ${primaryColor.value} 0%, ${adjustColor(primaryColor.value, -15)} 100%)`, // ✅ COULEUR DYNAMIQUE
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
@@ -399,6 +404,25 @@ const headerStyle = computed((): CSSProperties => ({
   margin: '0',
   border: 'none',
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+}))
+
+// ✅ HEADER MOBILE AVEC SAFE AREA
+const mobileHeaderStyle = computed((): CSSProperties => ({
+  padding: 'calc(env(safe-area-inset-top) + 16px) 20px 16px 20px',
+  color: '#ffffff',
+  background: `linear-gradient(135deg, ${primaryColor.value} 0%, ${adjustColor(primaryColor.value, -15)} 100%)`, // ✅ COULEUR DYNAMIQUE
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  flexShrink: '0',
+  minHeight: 'calc(75px + env(safe-area-inset-top))',
+  margin: '0',
+  border: 'none',
+  zIndex: '2',
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  textAlign: 'left',
+  position: 'relative',
+  overflow: 'hidden'
 }))
 
 const desktopContainerStyle = computed((): CSSProperties => ({
@@ -418,9 +442,10 @@ const desktopContainerStyle = computed((): CSSProperties => ({
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
 }))
 
+// ✅ MOBILE PLEIN ÉCRAN AVEC DYNAMIC VIEWPORT HEIGHT
 const mobileContainerStyle = computed((): CSSProperties => ({
   width: '100vw',
-  height: '100vh',
+  height: '100dvh', // ✅ Dynamic viewport height pour mobile (remplace 100vh)
   background: '#ffffff',
   display: 'flex',
   flexDirection: 'column',
@@ -431,7 +456,7 @@ const mobileContainerStyle = computed((): CSSProperties => ({
   position: 'fixed',
   top: '0',
   left: '0',
-  zIndex: '999999'
+  zIndex: '2147483647'
 }))
 
 const agentInfoStyle = computed((): CSSProperties => ({
@@ -620,6 +645,7 @@ const messagesAreaStyle = computed((): CSSProperties => ({
   minHeight: '0'
 }))
 
+// ✅ MOBILE MESSAGES AREA AVEC SAFE AREA
 const mobileMessagesAreaStyle = computed((): CSSProperties => ({
   flex: '1',
   background: '#f0f2f5',
@@ -629,7 +655,8 @@ const mobileMessagesAreaStyle = computed((): CSSProperties => ({
   flexDirection: 'column',
   color: '#374151',
   fontFamily: 'inherit',
-  minHeight: '0'
+  minHeight: '0',
+  paddingBottom: 'calc(16px + env(safe-area-inset-bottom))'
 }))
 
 const messagesListStyle = computed((): CSSProperties => ({
@@ -678,13 +705,14 @@ const assistantTextStyle = computed((): CSSProperties => ({
   position: 'relative'
 }))
 
+// ✅ BULLE UTILISATEUR AVEC COULEUR DYNAMIQUE
 const userTextStyle = computed((): CSSProperties => ({
   borderRadius: '18px',
   padding: '10px 14px',
   fontSize: '14px',
   lineHeight: '1.4',
   margin: '0',
-  background: '#25d366',
+  background: primaryColor.value, // ✅ COULEUR DYNAMIQUE
   color: '#ffffff',
   border: 'none',
   boxShadow: 'none',
@@ -693,11 +721,11 @@ const userTextStyle = computed((): CSSProperties => ({
   position: 'relative'
 }))
 
-// ✅ NOMS DANS LES BULLES
+// ✅ NOM AGENT DANS LA BULLE AVEC COULEUR DYNAMIQUE
 const agentNameInBubbleStyle = computed((): CSSProperties => ({
   fontWeight: '700',
   fontSize: '13px',
-  color: primaryColor.value,
+  color: primaryColor.value, // ✅ COULEUR DYNAMIQUE
   margin: '0 0 2px 0',
   display: 'block',
   fontFamily: 'inherit'
@@ -727,6 +755,16 @@ const messageTimeStyle = computed((): CSSProperties => ({
   margin: '4px 0 0 0',
   textAlign: 'right',
   opacity: '0.8',
+  fontFamily: 'inherit'
+}))
+
+// ✅ HEURE MESSAGE UTILISATEUR EN BLANC
+const messageTimeUserStyle = computed((): CSSProperties => ({
+  fontSize: '11px',
+  color: 'rgba(255, 255, 255, 0.8)', // ✅ BLANC AVEC OPACITÉ
+  margin: '4px 0 0 0',
+  textAlign: 'right',
+  opacity: '1',
   fontFamily: 'inherit'
 }))
 
@@ -764,12 +802,15 @@ const inputContainerStyle = computed((): CSSProperties => ({
   padding: '0'
 }))
 
+// ✅ INPUT MOBILE AVEC SAFE AREA
 const mobileInputSectionStyle = computed((): CSSProperties => ({
   borderTop: '1px solid #e5e7eb',
   background: '#ffffff',
   flexShrink: '0',
   paddingTop: '16px',
-  paddingBottom: '16px',
+  paddingBottom: 'calc(16px + env(safe-area-inset-bottom))', // ✅ Safe area bottom
+  paddingLeft: '0',
+  paddingRight: '0',
   margin: '0',
   fontFamily: 'inherit'
 }))
@@ -796,8 +837,9 @@ const messageInputStyle = computed((): CSSProperties => ({
   margin: '0'
 }))
 
+// ✅ BOUTON MICRO EN GRIS
 const voiceButtonStyle = computed((): CSSProperties => ({
-  background: primaryColor.value,
+  background: '#6B7280', // ✅ GRIS
   border: 'none',
   color: '#ffffff',
   cursor: 'pointer',
@@ -813,10 +855,11 @@ const voiceButtonStyle = computed((): CSSProperties => ({
   outline: 'none'
 }))
 
+// ✅ BOUTON SEND AVEC COULEUR DYNAMIQUE
 const sendButtonStyle = computed((): CSSProperties => ({
   width: '44px',
   height: '44px',
-  background: primaryColor.value,
+  background: primaryColor.value, // ✅ COULEUR DYNAMIQUE
   border: 'none',
   borderRadius: '50%',
   color: '#ffffff',
@@ -880,6 +923,7 @@ const securityStyle = computed((): CSSProperties => ({
 // ✅ FONCTIONS
 const sendWelcomeMessage = async () => {
   try {
+    // ✅ CHARGEMENT CONVERSATION SAUVEGARDÉE
     if (typeof window !== 'undefined' && (window as any).ChatSeller) {
       const savedConversation = (window as any).ChatSeller.loadConversation()
       if (savedConversation && savedConversation.messages && savedConversation.messages.length > 0) {
@@ -971,6 +1015,7 @@ const sendMessage = async () => {
     await nextTick()
     scrollToBottom()
     
+    // ✅ SAUVEGARDE CONVERSATION
     if (typeof window !== 'undefined' && (window as any).ChatSeller) {
       (window as any).ChatSeller.saveConversation(messages.value, conversationId.value)
     }
@@ -999,6 +1044,7 @@ const closeChat = () => {
   }
 }
 
+// ✅ API CALL CORRIGÉE AVEC MEILLEURE GESTION ERREURS
 const sendApiMessage = async (message: string) => {
   const apiUrl = configData.value.apiUrl || 'https://chatseller-api-production.up.railway.app'
   const endpoint = `${apiUrl}/api/v1/public/chat`
@@ -1036,7 +1082,6 @@ const sendApiMessage = async (message: string) => {
     })
 
     console.log('📥 [API CALL] Statut réponse:', response.status)
-    console.log('📥 [API CALL] Headers réponse:', Object.fromEntries(response.headers.entries()))
 
     if (!response.ok) {
       const errorText = await response.text()
@@ -1050,12 +1095,6 @@ const sendApiMessage = async (message: string) => {
     return result
   } catch (error) {
     console.error('❌ [WIDGET API] Network Error:', error)
-    console.error('❌ [WIDGET API] Error details:', {
-      message: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
-      endpoint,
-      payload
-    })
     throw error
   }
 }
@@ -1141,7 +1180,7 @@ const hexToRgb = (hex: string): string => {
     return `${r}, ${g}, ${b}`
   } catch (error: unknown) {
     console.warn('⚠️ Erreur conversion hex vers rgb:', error)
-    return '236, 72, 153'
+    return '139, 92, 246'
   }
 }
 
@@ -1165,24 +1204,74 @@ watch(messages, () => {
 }, { deep: true })
 
 onMounted(() => {
-  console.log('🎨 [WIDGET VUE] Composant monté')
+  console.log('🎨 [WIDGET VUE] Composant monté avec couleur:', primaryColor.value)
   sendWelcomeMessage()
   
+  // ✅ GESTION MOBILE VIEWPORT
   if (isMobile.value && typeof window !== 'undefined') {
     const metaViewport = document.querySelector('meta[name="viewport"]')
     if (metaViewport) {
-      metaViewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no')
+      metaViewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover')
     }
     
-    document.body.style.overflow = 'hidden'
-    document.body.style.position = 'fixed'
-    document.body.style.width = '100%'
+    // ✅ AJOUTER CSS POUR MOBILE PLEIN ÉCRAN
+    const style = document.createElement('style')
+    style.textContent = `
+      html.cs-modal-open,
+      body.cs-modal-open {
+        overflow: hidden !important;
+        position: fixed !important;
+        width: 100% !important;
+        height: 100% !important;
+      }
+    `
+    document.head.appendChild(style)
+    
+    document.documentElement.classList.add('cs-modal-open')
+    document.body.classList.add('cs-modal-open')
     
     return () => {
-      document.body.style.overflow = ''
-      document.body.style.position = ''
-      document.body.style.width = ''
+      document.documentElement.classList.remove('cs-modal-open')
+      document.body.classList.remove('cs-modal-open')
     }
   }
 })
 </script>
+
+<style scoped>
+/* ✅ ANIMATIONS CSS DANS LE COMPONENT */
+@keyframes cs-pulse-status {
+  0%, 100% { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+  50% { 
+    opacity: 0.7; 
+    transform: scale(1.1); 
+  }
+}
+
+@keyframes cs-typing-animation {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  30% {
+    transform: translateY(-6px);
+    opacity: 1;
+  }
+}
+
+@keyframes cs-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.cs-typing-dot:nth-child(1) { animation-delay: 0s; }
+.cs-typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.cs-typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+.cs-mobile-dot:nth-child(1) { animation-delay: 0s; }
+.cs-mobile-dot:nth-child(2) { animation-delay: 0.2s; }
+.cs-mobile-dot:nth-child(3) { animation-delay: 0.4s; }
+</style>

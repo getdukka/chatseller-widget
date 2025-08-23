@@ -1,4 +1,4 @@
-// src/embed.ts 
+// src/embed.ts - VERSION COMPLÈTE RESTAURÉE ✅
 
 // ✅ POLYFILLS CRITIQUES POUR LE NAVIGATEUR
 if (typeof global === 'undefined') {
@@ -42,13 +42,14 @@ class ChatSeller {
   private modalElement: HTMLElement | null = null
   private vueApp: any = null
   private cssInjected = false
+  private conversationData: any = null // ✅ AJOUT : Persistance conversation
 
   constructor() {
     this.config = {
       shopId: '',
       apiUrl: 'https://chatseller-api-production.up.railway.app',
       theme: 'modern',
-      primaryColor: '#226cebff',
+      primaryColor: '#8B5CF6', // ✅ CORRECTION : Violet par défaut
       position: 'above-cta',
       buttonText: 'Parler au vendeur',
       borderRadius: 'full',
@@ -108,8 +109,13 @@ class ChatSeller {
   }
 
   private getCompleteCSS(): string {
+    // ✅ UTILISER LA COULEUR CONFIGURÉE DYNAMIQUEMENT
+    const primaryColor = this.config.primaryColor || '#8B5CF6'
+    const darkerColor = this.adjustColor(primaryColor, -15)
+    const rgbColor = this.hexToRgb(primaryColor)
+    
     return `
-/* ✅ CHATSELLER WIDGET - CSS COMPLET AVEC CORRECTIONS LAYOUT */
+/* ✅ CHATSELLER WIDGET - CSS COMPLET CORRIGÉ AVEC COULEURS DYNAMIQUES */
 .cs-chatseller-widget,
 .cs-chatseller-widget *,
 .cs-chatseller-widget *::before,
@@ -144,11 +150,11 @@ class ChatSeller {
   isolation: isolate !important;
 }
 
-/* ✅ BOUTON TRIGGER AVEC ICÔNE VISIBLE */
+/* ✅ BOUTON TRIGGER AVEC ICÔNE CORRIGÉE ET COULEUR DYNAMIQUE */
 .cs-chat-trigger-button {
   width: 100% !important;
   padding: 16px 24px !important;
-  background: linear-gradient(135deg, #EC4899 0%, #BE185D 100%) !important;
+  background: linear-gradient(135deg, ${primaryColor} 0%, ${darkerColor} 100%) !important;
   color: white !important;
   border: none !important;
   border-radius: 50px !important;
@@ -156,7 +162,7 @@ class ChatSeller {
   font-weight: 600 !important;
   cursor: pointer !important;
   transition: all 0.3s ease !important;
-  box-shadow: 0 8px 25px rgba(236, 72, 153, 0.3) !important;
+  box-shadow: 0 8px 25px rgba(${rgbColor}, 0.3) !important;
   font-family: inherit !important;
   display: flex !important;
   align-items: center !important;
@@ -175,9 +181,10 @@ class ChatSeller {
 
 .cs-chat-trigger-button:hover {
   transform: translateY(-2px) !important;
-  box-shadow: 0 12px 35px rgba(236, 72, 153, 0.4) !important;
+  box-shadow: 0 12px 35px rgba(${rgbColor}, 0.4) !important;
 }
 
+/* ✅ CORRECTION : Styles SVG forcés avec couleur dynamique */
 .cs-chat-trigger-button svg {
   width: 20px !important;
   height: 20px !important;
@@ -185,6 +192,17 @@ class ChatSeller {
   stroke: currentColor !important;
   stroke-width: 2 !important;
   flex-shrink: 0 !important;
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.cs-chat-trigger-button svg path {
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 2 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
 }
 
 /* ✅ MODAL OVERLAY - PROTECTION MAXIMALE */
@@ -213,11 +231,18 @@ class ChatSeller {
   contain: layout style !important;
 }
 
+/* ✅ CORRECTION : Mobile plein écran forcé */
 @media (max-width: 767px) {
   .cs-chat-modal-overlay {
     padding: 0 !important;
     align-items: stretch !important;
     justify-content: stretch !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important; /* ✅ Dynamic viewport height pour mobile */
   }
 }
 
@@ -249,9 +274,10 @@ class ChatSeller {
   animation: cs-fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
+/* ✅ CORRECTION : Mobile plein écran strict */
 .cs-chat-container-mobile {
   width: 100vw !important;
-  height: 100vh !important;
+  height: 100dvh !important; /* ✅ Dynamic viewport height */
   background: #ffffff !important;
   display: flex !important;
   flex-direction: column !important;
@@ -267,15 +293,15 @@ class ChatSeller {
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
-  z-index: 999999 !important;
+  z-index: 2147483647 !important;
 }
 
-/* ✅ HEADERS CORRIGÉS - PRODUIT SUR MÊME LIGNE */
+/* ✅ HEADERS CORRIGÉS - COULEUR DYNAMIQUE */
 .cs-desktop-header,
 .cs-mobile-header {
   padding: 20px !important;
   color: #ffffff !important;
-  background: linear-gradient(135deg, #EC4899 0%, #BE185D 100%) !important;
+  background: linear-gradient(135deg, ${primaryColor} 0%, ${darkerColor} 100%) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
@@ -290,9 +316,10 @@ class ChatSeller {
   text-align: left !important;
 }
 
+/* ✅ CORRECTION : Mobile safe area */
 .cs-mobile-header {
-  padding: 16px 20px !important;
-  min-height: 75px !important;
+  padding: calc(env(safe-area-inset-top) + 16px) 20px 16px 20px !important;
+  min-height: calc(75px + env(safe-area-inset-top)) !important;
 }
 
 /* ✅ AGENT INFO */
@@ -426,12 +453,6 @@ class ChatSeller {
   max-width: 200px !important;
   flex-shrink: 1 !important;
   min-width: 0 !important;
-}
-
-.cs-product-info-header,
-.cs-mobile-product-info {
-  font-size: 13px !important;
-  opacity: 0.9 !important;
 }
 
 /* ✅ BOUTONS HEADER */
@@ -625,11 +646,11 @@ class ChatSeller {
   color: #1f2937 !important;
 }
 
-/* ✅ NOM AGENT DANS BULLE */
+/* ✅ NOM AGENT DANS BULLE AVEC COULEUR DYNAMIQUE */
 .cs-agent-name-in-bubble {
   font-weight: 700 !important;
   font-size: 13px !important;
-  color: #ec4899 !important;
+  color: ${primaryColor} !important;
   margin: 0 0 2px 0 !important;
   display: block !important;
   font-family: inherit !important;
@@ -644,10 +665,10 @@ class ChatSeller {
   font-family: inherit !important;
 }
 
-/* ✅ TEXTE UTILISATEUR AVEC "VOUS" INTÉGRÉ */
+/* ✅ TEXTE UTILISATEUR AVEC "VOUS" INTÉGRÉ ET COULEUR DYNAMIQUE */
 .cs-user-text,
 .cs-mobile-user-text {
-  background: #25d366 !important;
+  background: ${primaryColor} !important;
   color: #ffffff !important;
   margin-left: auto !important;
 }
@@ -737,7 +758,7 @@ class ChatSeller {
 }
 
 .cs-mobile-input-section {
-  padding-bottom: 16px !important;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom)) !important;
   padding-left: 0 !important;
   padding-right: 0 !important;
 }
@@ -783,8 +804,8 @@ class ChatSeller {
 .cs-message-input:focus,
 .cs-mobile-message-input:focus {
   background: #ffffff !important;
-  border-color: #EC4899 !important;
-  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1) !important;
+  border-color: ${primaryColor} !important;
+  box-shadow: 0 0 0 3px rgba(${rgbColor}, 0.1) !important;
 }
 
 .cs-message-input::placeholder,
@@ -796,10 +817,10 @@ class ChatSeller {
   font-weight: normal !important;
 }
 
-/* ✅ BOUTONS VOICE ET SEND */
+/* ✅ BOUTONS VOICE ET SEND AVEC COULEURS DYNAMIQUES */
 .cs-voice-button,
 .cs-mobile-voice {
-  background: #EC4899 !important;
+  background: #6B7280 !important; /* ✅ GRIS POUR MICRO */
   border: none !important;
   color: #ffffff !important;
   cursor: pointer !important;
@@ -818,7 +839,7 @@ class ChatSeller {
 
 .cs-voice-button:hover,
 .cs-mobile-voice:hover {
-  background: #D946EF !important;
+  background: #4B5563 !important;
   transform: scale(1.05) !important;
 }
 
@@ -826,7 +847,7 @@ class ChatSeller {
 .cs-mobile-send {
   width: 44px !important;
   height: 44px !important;
-  background: #EC4899 !important;
+  background: ${primaryColor} !important; /* ✅ COULEUR DYNAMIQUE */
   border: none !important;
   border-radius: 50% !important;
   color: #ffffff !important;
@@ -836,7 +857,7 @@ class ChatSeller {
   justify-content: center !important;
   transition: all 0.2s ease !important;
   flex-shrink: 0 !important;
-  box-shadow: 0 4px 14px rgba(236, 72, 153, 0.4) !important;
+  box-shadow: 0 4px 14px rgba(${rgbColor}, 0.4) !important;
   transform: translateY(0) !important;
   margin: 0 !important;
   padding: 0 !important;
@@ -852,8 +873,8 @@ class ChatSeller {
 .cs-send-button:hover:not(:disabled),
 .cs-mobile-send:hover:not(:disabled) {
   transform: translateY(-1px) !important;
-  box-shadow: 0 6px 18px rgba(236, 72, 153, 0.5) !important;
-  background: #D946EF !important;
+  box-shadow: 0 6px 18px rgba(${rgbColor}, 0.5) !important;
+  background: ${darkerColor} !important;
 }
 
 .cs-send-button:disabled,
@@ -940,7 +961,7 @@ class ChatSeller {
   flex-shrink: 0 !important;
 }
 
-/* ✅ SCROLLBARS CUSTOMISÉES */
+/* ✅ SCROLLBARS CUSTOMISÉES AVEC COULEUR DYNAMIQUE */
 .cs-messages-area-desktop::-webkit-scrollbar,
 .cs-messages-area-mobile::-webkit-scrollbar {
   width: 4px !important;
@@ -953,13 +974,13 @@ class ChatSeller {
 
 .cs-messages-area-desktop::-webkit-scrollbar-thumb,
 .cs-messages-area-mobile::-webkit-scrollbar-thumb {
-  background: rgba(236, 72, 153, 0.3) !important;
+  background: rgba(${rgbColor}, 0.3) !important;
   border-radius: 2px !important;
 }
 
 .cs-messages-area-desktop::-webkit-scrollbar-thumb:hover,
 .cs-messages-area-mobile::-webkit-scrollbar-thumb:hover {
-  background: rgba(236, 72, 153, 0.5) !important;
+  background: rgba(${rgbColor}, 0.5) !important;
 }
 
 /* ✅ RESPONSIVE QUERIES */
@@ -1090,6 +1111,27 @@ class ChatSeller {
 
 .cs-chatseller-widget button:not([type="submit"]):not([type="button"]):not([type="reset"]) {
   type: button !important;
+}
+
+/* ✅ PROTECTION MOBILE VIEWPORT */
+@media (max-width: 767px) {
+  html.cs-modal-open,
+  body.cs-modal-open {
+    overflow: hidden !important;
+    position: fixed !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  
+  .cs-chat-container-mobile {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    max-height: none !important;
+    border-radius: 0 !important;
+  }
 }
 
 /* ✅ PRINT MEDIA */
@@ -1321,13 +1363,11 @@ class ChatSeller {
           } else if (position === 'below-cta') {
             targetParent.insertBefore(container, targetElement.nextSibling)
           } else if (position === 'beside-cta') {
-            // ✅ CAST VERS HTMLElement POUR ACCÉDER AU STYLE
             if (targetElement instanceof HTMLElement) {
               targetElement.style.display = 'flex'
               targetElement.style.gap = '10px'
               targetElement.appendChild(container)
             } else {
-              // Fallback si ce n'est pas un HTMLElement
               targetParent.insertBefore(container, targetElement.nextSibling)
             }
           } else {
@@ -1379,11 +1419,11 @@ class ChatSeller {
     if (!this.widgetElement) return
 
     const buttonText = this.config.buttonText || 'Parler à la vendeuse'
-    const primaryColor = this.config.primaryColor || '#EC4899'
+    const primaryColor = this.config.primaryColor || '#8B5CF6'
     const darkerColor = this.adjustColor(primaryColor, -15)
     const borderRadius = this.getBorderRadiusValue(this.config.borderRadius || 'full')
 
-    // ✅ BOUTON AVEC ICÔNE CORRIGÉE ET SVG INTÉGRÉ
+    // ✅ BOUTON AVEC ICÔNE CORRIGÉE - SVG INLINE FORCÉ
     this.widgetElement.innerHTML = `
       <button 
         id="chatseller-trigger-btn"
@@ -1401,7 +1441,7 @@ class ChatSeller {
           font-weight: 600 !important;
           cursor: pointer !important;
           transition: all 0.3s ease !important;
-          box-shadow: 0 8px 25px rgba(236, 72, 153, 0.3) !important;
+          box-shadow: 0 8px 25px rgba(${this.hexToRgb(primaryColor)}, 0.3) !important;
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
           display: flex !important;
           align-items: center !important;
@@ -1424,7 +1464,15 @@ class ChatSeller {
           fill="none" 
           stroke="currentColor" 
           viewBox="0 0 24 24" 
-          style="flex-shrink: 0; display: block;"
+          style="
+            flex-shrink: 0 !important; 
+            display: block !important; 
+            opacity: 1 !important; 
+            visibility: visible !important;
+            stroke-width: 2 !important;
+            stroke-linecap: round !important;
+            stroke-linejoin: round !important;
+          "
           xmlns="http://www.w3.org/2000/svg"
         >
           <path 
@@ -1432,6 +1480,13 @@ class ChatSeller {
             stroke-linejoin="round" 
             stroke-width="2" 
             d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.906-1.479L3 21l2.521-5.094A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"
+            style="
+              fill: none !important;
+              stroke: currentColor !important;
+              stroke-width: 2 !important;
+              stroke-linecap: round !important;
+              stroke-linejoin: round !important;
+            "
           ></path>
         </svg>
         <span style="flex: 1; display: block;">${buttonText}</span>
@@ -1453,15 +1508,16 @@ class ChatSeller {
         this.openChat()
       })
       
-      // Hover effect
+      // Hover effect avec couleur dynamique
+      const rgbColor = this.hexToRgb(primaryColor)
       newBtn.addEventListener('mouseenter', () => {
         newBtn.style.transform = 'translateY(-2px)'
-        newBtn.style.boxShadow = '0 12px 35px rgba(236, 72, 153, 0.4)'
+        newBtn.style.boxShadow = `0 12px 35px rgba(${rgbColor}, 0.4)`
       })
       
       newBtn.addEventListener('mouseleave', () => {
         newBtn.style.transform = 'translateY(0)'
-        newBtn.style.boxShadow = '0 8px 25px rgba(236, 72, 153, 0.3)'
+        newBtn.style.boxShadow = `0 8px 25px rgba(${rgbColor}, 0.3)`
       })
     }
   }
@@ -1473,6 +1529,12 @@ class ChatSeller {
       modalExists: !!this.modalElement,
       vueAppExists: !!this.vueApp 
     })
+    
+    // ✅ SI DÉJÀ OUVERT, NE RIEN FAIRE
+    if (this.isOpen && this.modalElement && this.vueApp) {
+      console.log('ℹ️ [OPEN CHAT] Chat déjà ouvert, ignore')
+      return
+    }
     
     // ✅ FERMER LE MODAL EXISTANT S'IL Y EN A UN PROPREMENT
     if (this.modalElement || this.isOpen) {
@@ -1491,6 +1553,12 @@ class ChatSeller {
   private proceedWithChatOpening() {
     console.log('🚀 [OPEN CHAT] Procédure d\'ouverture...')
     this.isOpen = true
+    
+    // ✅ AJOUT : Protection mobile viewport
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      document.documentElement.classList.add('cs-modal-open')
+      document.body.classList.add('cs-modal-open')
+    }
     
     try {
       this.createVueChatModal()
@@ -1539,6 +1607,7 @@ class ChatSeller {
       this.modalElement.style.padding = '0px !important'
       this.modalElement.style.alignItems = 'stretch !important'
       this.modalElement.style.justifyContent = 'stretch !important'
+      this.modalElement.style.height = '100dvh !important' // ✅ Dynamic viewport height
     }
 
     document.body.appendChild(this.modalElement)
@@ -1575,6 +1644,7 @@ class ChatSeller {
         throw new Error('Modal element non trouvé pour Vue')
       }
       
+      // ✅ CORRECTION : Configuration avec couleur appropriée
       const widgetConfig = {
         shopId: this.config.shopId,
         apiUrl: this.config.apiUrl,
@@ -1582,7 +1652,7 @@ class ChatSeller {
           name: 'Anna',
           title: 'Vendeuse IA'
         },
-        primaryColor: this.config.primaryColor,
+        primaryColor: this.config.primaryColor, // ✅ COULEUR DYNAMIQUE
         buttonText: this.config.buttonText,
         borderRadius: this.config.borderRadius,
         language: this.config.language,
@@ -1598,6 +1668,21 @@ class ChatSeller {
         config: widgetConfig
       })
 
+      // ✅ AJOUT : Exposer méthodes de fermeture au global
+      if (typeof window !== 'undefined') {
+        (window as any).ChatSeller = {
+          ...((window as any).ChatSeller || {}),
+          closeChat: () => this.closeChat(),
+          saveConversation: (messages: any[], conversationId: string) => {
+            this.conversationData = { messages, conversationId, timestamp: Date.now() }
+          },
+          loadConversation: () => this.conversationData,
+          resetConversation: () => {
+            this.conversationData = null
+          }
+        }
+      }
+
       this.vueApp.mount(this.modalElement)
       console.log('✅ [INIT VUE] Composant Vue monté avec succès')
 
@@ -1609,7 +1694,7 @@ class ChatSeller {
 
   private createFallbackModal() {
     const agentName = this.config.agentConfig?.name || 'Anna'
-    const primaryColor = this.config.primaryColor || '#EC4899'
+    const primaryColor = this.config.primaryColor || '#8B5CF6'
 
     console.log('🔧 [FALLBACK] Création modal de fallback...')
 
@@ -1695,7 +1780,13 @@ class ChatSeller {
     
     this.isOpen = false
     
-    // ✅ DÉMONTAGE PROPRE DE VUE
+    // ✅ SUPPRESSION MOBILE VIEWPORT CLASSES
+    if (typeof window !== 'undefined') {
+      document.documentElement.classList.remove('cs-modal-open')
+      document.body.classList.remove('cs-modal-open')
+    }
+    
+    // ✅ DÉMONTAGE PROPRE DE VUE SANS DESTRUCTION
     if (this.vueApp) {
       try {
         console.log('🎨 [CLOSE CHAT] Démontage application Vue...')
@@ -1755,6 +1846,19 @@ class ChatSeller {
     }
   }
 
+  private hexToRgb(hex: string): string {
+    try {
+      const color = hex.replace('#', '')
+      const r = parseInt(color.substr(0, 2), 16)
+      const g = parseInt(color.substr(2, 2), 16)
+      const b = parseInt(color.substr(4, 2), 16)
+      return `${r}, ${g}, ${b}`
+    } catch (error: unknown) {
+      console.warn('⚠️ Erreur conversion hex vers rgb:', error)
+      return '139, 92, 246' // Fallback violet
+    }
+  }
+
   private async waitForDOM(): Promise<void> {
     return new Promise((resolve) => {
       if (document.readyState === 'loading') {
@@ -1792,6 +1896,7 @@ class ChatSeller {
     this.isInitialized = false
     this.cssInjected = false
     this.widgetElement = null
+    this.conversationData = null
     
     console.log('✅ [DESTROY] Widget détruit complètement')
   }
@@ -1813,7 +1918,7 @@ class ChatSeller {
     this.refresh()
   }
 
-  // ✅ GESTION LOCALSTORAGE ROBUSTE
+  // ✅ GESTION LOCALSTORAGE ROBUSTE AVEC PERSISTANCE AMÉLIORÉE
   saveConversation(messages: any[], conversationId: string | null) {
     try {
       const conversationData = {
@@ -1827,6 +1932,10 @@ class ChatSeller {
           url: this.config.productUrl
         }
       }
+      
+      // ✅ SAUVEGARDE LOCALE ET EN INSTANCE
+      this.conversationData = conversationData
+      
       const key = `chatseller-conversation-${this.config.shopId}`
       localStorage.setItem(key, JSON.stringify(conversationData))
       console.log('💾 [STORAGE] Conversation sauvegardée:', key)
@@ -1837,11 +1946,18 @@ class ChatSeller {
 
   loadConversation() {
     try {
+      // ✅ PRIORITÉ À LA CONVERSATION EN INSTANCE
+      if (this.conversationData) {
+        console.log('📂 [STORAGE] Conversation restaurée depuis instance')
+        return this.conversationData
+      }
+      
       const key = `chatseller-conversation-${this.config.shopId}`
       const saved = localStorage.getItem(key)
       if (saved) {
         const data = JSON.parse(saved)
-        console.log('📂 [STORAGE] Conversation restaurée:', key)
+        this.conversationData = data
+        console.log('📂 [STORAGE] Conversation restaurée depuis localStorage:', key)
         return data
       }
     } catch (error) {
@@ -1852,6 +1968,7 @@ class ChatSeller {
 
   resetConversation() {
     try {
+      this.conversationData = null
       const key = `chatseller-conversation-${this.config.shopId}`
       localStorage.removeItem(key)
       console.log('🔄 [STORAGE] Conversation réinitialisée:', key)
@@ -1866,7 +1983,7 @@ class ChatSeller {
   }
 
   get version(): string {
-    return '1.5.2'
+    return '1.5.3' // ✅ Version mise à jour
   }
 
   get currentConfig(): ChatSellerConfig {
@@ -1889,6 +2006,7 @@ class ChatSeller {
       hasModal: !!this.modalElement,
       hasVueApp: !!this.vueApp,
       hasWidget: !!this.widgetElement,
+      hasConversation: !!this.conversationData,
       config: this.config,
       version: this.version
     }
@@ -1976,7 +2094,7 @@ class ChatSeller {
           const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
               if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-                // Vérifier si du nouveau contenu produit a été ajouté
+                // Vérifier si du nouveau contuit produit a été ajouté
                 const hasProductContent = Array.from(mutation.addedNodes).some(node => {
                   if (node.nodeType === Node.ELEMENT_NODE) {
                     const element = node as Element
@@ -2029,7 +2147,7 @@ class ChatSeller {
       }
     })
     
-    console.log('✅ [CHATSELLER] Widget chargé - version 1.5.2')
+    console.log('✅ [CHATSELLER] Widget chargé - version 1.5.3')
     
     // ✅ EXPOSER FONCTIONS DE DEBUG EN DÉVELOPPEMENT
     if (process.env.NODE_ENV === 'development' || (window as any).ChatSellerConfig?.debug) {

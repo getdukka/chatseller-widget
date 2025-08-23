@@ -24,6 +24,8 @@
     "type-check": "vue-tsc --noEmit --skipLibCheck",
     "preview": "vite preview --host 0.0.0.0 --port 3000",
     "clean": "rm -rf dist .vite",
+    "deploy": "npm run build && vercel --prod",
+    "deploy:preview": "npm run build && vercel",
     "test-build": "npm run build && node test-build.js",
     "start": "npm run dev",
     "serve": "npm run preview"
