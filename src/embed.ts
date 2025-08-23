@@ -1,4 +1,4 @@
-// src/embed.ts - VERSION COMPLÈTE RESTAURÉE ✅
+// src/embed.ts - VERSION COMPLÈTE RESTAURÉE + CORRECTIONS ICÔNE ✅
 
 // ✅ POLYFILLS CRITIQUES POUR LE NAVIGATEUR
 if (typeof global === 'undefined') {
@@ -42,7 +42,7 @@ class ChatSeller {
   private modalElement: HTMLElement | null = null
   private vueApp: any = null
   private cssInjected = false
-  private conversationData: any = null // ✅ AJOUT : Persistance conversation
+  private conversationData: any = null // ✅ RESTAURÉ : Persistance conversation
 
   constructor() {
     this.config = {
@@ -109,13 +109,13 @@ class ChatSeller {
   }
 
   private getCompleteCSS(): string {
-    // ✅ UTILISER LA COULEUR CONFIGURÉE DYNAMIQUEMENT
+    // ✅ RESTAURÉ : UTILISER LA COULEUR CONFIGURÉE DYNAMIQUEMENT
     const primaryColor = this.config.primaryColor || '#8B5CF6'
     const darkerColor = this.adjustColor(primaryColor, -15)
     const rgbColor = this.hexToRgb(primaryColor)
     
     return `
-/* ✅ CHATSELLER WIDGET - CSS COMPLET CORRIGÉ AVEC COULEURS DYNAMIQUES */
+/* ✅ CHATSELLER WIDGET - CSS COMPLET RESTAURÉ AVEC CORRECTIONS ICÔNE */
 .cs-chatseller-widget,
 .cs-chatseller-widget *,
 .cs-chatseller-widget *::before,
@@ -150,7 +150,7 @@ class ChatSeller {
   isolation: isolate !important;
 }
 
-/* ✅ BOUTON TRIGGER AVEC ICÔNE CORRIGÉE ET COULEUR DYNAMIQUE */
+/* ✅ CORRECTION MAJEURE : BOUTON TRIGGER AVEC ICÔNE FORCÉE ET COULEUR DYNAMIQUE */
 .cs-chat-trigger-button {
   width: 100% !important;
   padding: 16px 24px !important;
@@ -184,7 +184,7 @@ class ChatSeller {
   box-shadow: 0 12px 35px rgba(${rgbColor}, 0.4) !important;
 }
 
-/* ✅ CORRECTION : Styles SVG forcés avec couleur dynamique */
+/* ✅ CORRECTION MAJEURE : Styles SVG forcés avec !important maximal pour corriger icône manquante */
 .cs-chat-trigger-button svg {
   width: 20px !important;
   height: 20px !important;
@@ -203,6 +203,8 @@ class ChatSeller {
   max-width: 20px !important;
   min-height: 20px !important;
   max-height: 20px !important;
+  color: white !important;
+  stroke: white !important;
 }
 
 .cs-chat-trigger-button svg path {
@@ -215,6 +217,8 @@ class ChatSeller {
   visibility: visible !important;
   display: block !important;
   pointer-events: none !important;
+  color: white !important;
+  stroke: white !important;
 }
 
 /* ✅ PROTECTION ANTI-OVERRIDE SHOPIFY/AUTRES THEMES */
@@ -1240,7 +1244,7 @@ class ChatSeller {
       let detectedPrice = this.config.productPrice
       let detectedId = this.config.productId
 
-      // ✅ DÉTECTION SHOPIFY AVANCÉE
+      // ✅ RESTAURÉ : DÉTECTION SHOPIFY AVANCÉE
       const shopifyProduct = (window as any).ShopifyAnalytics?.meta?.product
       if (shopifyProduct && shopifyProduct.title) {
         detectedName = shopifyProduct.title
@@ -1249,7 +1253,7 @@ class ChatSeller {
         console.log('✅ Produit Shopify détecté:', detectedName)
       }
       
-      // ✅ SÉLECTEURS DE TITRE ÉTENDUS
+      // ✅ RESTAURÉ : SÉLECTEURS DE TITRE ÉTENDUS
       if (!detectedName) {
         const titleSelectors = [
           '.product__title',
@@ -1276,7 +1280,7 @@ class ChatSeller {
         }
       }
 
-      // ✅ SÉLECTEURS DE PRIX ÉTENDUS
+      // ✅ RESTAURÉ : SÉLECTEURS DE PRIX ÉTENDUS
       if (!detectedPrice) {
         const priceSelectors = [
           '.price__current',
@@ -1306,7 +1310,7 @@ class ChatSeller {
         }
       }
 
-      // ✅ DÉTECTION WOOCOMMERCE
+      // ✅ RESTAURÉ : DÉTECTION WOOCOMMERCE
       const wooProduct = document.querySelector('.woocommerce-product')
       if (wooProduct && !detectedName) {
         const wooTitle = wooProduct.querySelector('.product_title, .entry-title')
@@ -1353,7 +1357,7 @@ class ChatSeller {
   private insertWidgetAtPosition(container: HTMLElement): void {
     const position = this.config.position || 'above-cta'
     
-    // ✅ SÉLECTEURS CTA ÉTENDUS POUR SHOPIFY + WOOCOMMERCE + AUTRES
+    // ✅ RESTAURÉ : SÉLECTEURS CTA ÉTENDUS POUR SHOPIFY + WOOCOMMERCE + AUTRES
     const ctaSelectors = [
       // Shopify
       '.product-form__buttons',
@@ -1419,7 +1423,7 @@ class ChatSeller {
       }
     }
     
-    // ✅ FALLBACKS ÉTENDUS
+    // ✅ RESTAURÉ : FALLBACKS ÉTENDUS
     const fallbackSelectors = [
       'form[action*="/cart/add"]',
       '.product-form',
@@ -1445,7 +1449,7 @@ class ChatSeller {
       }
     }
     
-    // ✅ FALLBACK FINAL
+    // ✅ RESTAURÉ : FALLBACK FINAL
     if (!this.config.disableFallback) {
       console.log('⚠️ Fallback final: insertion body')
       document.body.appendChild(container)
@@ -1460,7 +1464,7 @@ class ChatSeller {
     const darkerColor = this.adjustColor(primaryColor, -15)
     const borderRadius = this.getBorderRadiusValue(this.config.borderRadius || 'full')
 
-    // ✅ BOUTON AVEC ICÔNE CORRIGÉE - SVG INLINE FORCÉ
+    // ✅ CORRECTION MAJEURE : BOUTON AVEC ICÔNE FORCÉE - SVG INLINE STRICT
     this.widgetElement.innerHTML = `
       <button 
         id="chatseller-trigger-btn"
@@ -1495,13 +1499,13 @@ class ChatSeller {
           user-select: none !important;
         "
       >
-        <!-- ✅ ICÔNE SVG INLINE FORCÉE -->
+        <!-- ✅ CORRECTION ICÔNE : SVG INLINE FORCÉ AVEC PROTECTION MAXIMALE -->
         <svg 
           width="20" 
           height="20" 
           viewBox="0 0 24 24" 
           fill="none" 
-          stroke="currentColor" 
+          stroke="white" 
           stroke-width="2" 
           stroke-linecap="round" 
           stroke-linejoin="round"
@@ -1511,19 +1515,21 @@ class ChatSeller {
             opacity: 1 !important; 
             visibility: visible !important;
             position: relative !important;
-            z-index: 1 !important;
+            z-index: 999999 !important;
             pointer-events: none !important;
             min-width: 20px !important;
             max-width: 20px !important;
             min-height: 20px !important;
             max-height: 20px !important;
+            color: white !important;
+            stroke: white !important;
           "
           xmlns="http://www.w3.org/2000/svg"
         >
           <path 
             d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.906-1.479L3 21l2.521-5.094A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"
             fill="none"
-            stroke="currentColor"
+            stroke="white"
             stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -1532,6 +1538,8 @@ class ChatSeller {
               visibility: visible !important;
               display: block !important;
               pointer-events: none !important;
+              color: white !important;
+              stroke: white !important;
             "
           />
         </svg>
@@ -1544,12 +1552,12 @@ class ChatSeller {
           visibility: visible !important;
           font-size: inherit !important;
           font-weight: inherit !important;
-          color: inherit !important;
+          color: white !important;
         ">${buttonText}</span>
       </button>
     `
 
-    // ✅ EVENT LISTENER ROBUSTE
+    // ✅ RESTAURÉ : EVENT LISTENER ROBUSTE
     const triggerBtn = this.widgetElement.querySelector('#chatseller-trigger-btn') as HTMLElement
     if (triggerBtn) {
       // Supprimer les anciens listeners
@@ -1578,7 +1586,7 @@ class ChatSeller {
     }
   }
 
-  // ✅ CORRECTION MAJEURE : Méthode openChat qui gère la réouverture
+  // ✅ RESTAURÉ : CORRECTION MAJEURE : Méthode openChat qui gère la réouverture
   private openChat() {
     console.log('💬 [OPEN CHAT] Tentative ouverture, état actuel:', { 
       isOpen: this.isOpen, 
@@ -1610,7 +1618,7 @@ class ChatSeller {
     console.log('🚀 [OPEN CHAT] Procédure d\'ouverture...')
     this.isOpen = true
     
-    // ✅ AJOUT : Protection mobile viewport
+    // ✅ RESTAURÉ : AJOUT : Protection mobile viewport
     if (typeof window !== 'undefined' && window.innerWidth < 768) {
       document.documentElement.classList.add('cs-modal-open')
       document.body.classList.add('cs-modal-open')
@@ -1626,7 +1634,7 @@ class ChatSeller {
   }
 
   private createVueChatModal() {
-    // ✅ NETTOYAGE PRÉVENTIF RENFORCÉ
+    // ✅ RESTAURÉ : NETTOYAGE PRÉVENTIF RENFORCÉ
     this.cleanupModalElements()
 
     console.log('🎨 [CREATE MODAL] Création du modal Vue...')
@@ -1636,7 +1644,7 @@ class ChatSeller {
     this.modalElement.className = 'cs-chat-modal-overlay'
     this.modalElement.setAttribute('data-chatseller', 'vue-modal')
 
-    // ✅ STYLES INLINE POUR FORCER L'AFFICHAGE
+    // ✅ RESTAURÉ : STYLES INLINE POUR FORCER L'AFFICHAGE
     this.modalElement.style.cssText = `
       position: fixed !important;
       top: 0 !important;
@@ -1658,7 +1666,7 @@ class ChatSeller {
       pointer-events: auto !important;
     `
 
-    // ✅ GESTION MOBILE
+    // ✅ RESTAURÉ : GESTION MOBILE
     if (typeof window !== 'undefined' && window.innerWidth < 768) {
       this.modalElement.style.padding = '0px !important'
       this.modalElement.style.alignItems = 'stretch !important'
@@ -1700,7 +1708,7 @@ class ChatSeller {
         throw new Error('Modal element non trouvé pour Vue')
       }
       
-      // ✅ DÉTECTION AUTOMATIQUE PRODUIT AMÉLIORÉE  
+      // ✅ RESTAURÉ : DÉTECTION AUTOMATIQUE PRODUIT AMÉLIORÉE  
       const currentProduct = this.detectCurrentProduct()
       if (currentProduct) {
         // Vérifier si le produit a changé
@@ -1718,7 +1726,7 @@ class ChatSeller {
         }
       }
       
-      // ✅ CONFIGURATION COMPLÈTE AVEC PERSISTANCE
+      // ✅ RESTAURÉ : CONFIGURATION COMPLÈTE AVEC PERSISTANCE
       const widgetConfig = {
         shopId: this.config.shopId,
         apiUrl: this.config.apiUrl,
@@ -1747,7 +1755,7 @@ class ChatSeller {
         config: widgetConfig
       })
 
-      // ✅ EXPOSER MÉTHODES GLOBALES AVEC PERSISTANCE
+      // ✅ RESTAURÉ : EXPOSER MÉTHODES GLOBALES AVEC PERSISTANCE
       if (typeof window !== 'undefined') {
         (window as any).ChatSeller = {
           ...((window as any).ChatSeller || {}),
@@ -1755,7 +1763,7 @@ class ChatSeller {
           // Méthodes de base
           closeChat: () => this.closeChat(),
           
-          // ✅ NOUVEAU : Méthodes de persistance
+          // ✅ RESTAURÉ : NOUVEAU : Méthodes de persistance
           saveConversation: (messages: any[], conversationId: string) => {
             this.saveConversation(messages, conversationId)
           },
@@ -1768,7 +1776,7 @@ class ChatSeller {
             this.resetConversation()
           },
           
-          // ✅ NOUVEAU : Gestion changement produit
+          // ✅ RESTAURÉ : NOUVEAU : Gestion changement produit
           updateProduct: (productInfo: any) => {
             this.handleProductChange(productInfo)
           },
@@ -1795,7 +1803,7 @@ class ChatSeller {
     }
   }
 
-  // ✅ NOUVELLE FONCTION : Détection produit améliorée
+  // ✅ RESTAURÉ : NOUVELLE FONCTION : Détection produit améliorée
   private detectCurrentProduct(): any {
     try {
       console.log('🔍 [PRODUCT DETECT] Détection produit en cours...')
@@ -1967,21 +1975,19 @@ class ChatSeller {
     console.log('✅ [FALLBACK WIDGET] Widget de fallback créé')
   }
 
-  
-
-  // ✅ CORRECTION MAJEURE : Méthode closeChat qui permet la réouverture
+  // ✅ RESTAURÉ : CORRECTION MAJEURE : Méthode closeChat qui permet la réouverture
   closeChat() {
     console.log('❌ [CLOSE CHAT] Début fermeture chat...')
     
     this.isOpen = false
     
-    // ✅ SUPPRESSION MOBILE VIEWPORT CLASSES
+    // ✅ RESTAURÉ : SUPPRESSION MOBILE VIEWPORT CLASSES
     if (typeof window !== 'undefined') {
       document.documentElement.classList.remove('cs-modal-open')
       document.body.classList.remove('cs-modal-open')
     }
     
-    // ✅ DÉMONTAGE PROPRE DE VUE SANS DESTRUCTION
+    // ✅ RESTAURÉ : DÉMONTAGE PROPRE DE VUE SANS DESTRUCTION
     if (this.vueApp) {
       try {
         console.log('🎨 [CLOSE CHAT] Démontage application Vue...')
@@ -1993,7 +1999,7 @@ class ChatSeller {
       this.vueApp = null
     }
     
-    // ✅ SUPPRESSION COMPLÈTE DU MODAL
+    // ✅ RESTAURÉ : SUPPRESSION COMPLÈTE DU MODAL
     if (this.modalElement) {
       try {
         console.log('🗑️ [CLOSE CHAT] Suppression élément modal...')
@@ -2005,7 +2011,7 @@ class ChatSeller {
       this.modalElement = null
     }
     
-    // ✅ NETTOYAGE SÉCURISÉ DES MODALS ORPHELINS
+    // ✅ RESTAURÉ : NETTOYAGE SÉCURISÉ DES MODALS ORPHELINS
     this.cleanupModalElements()
     
     console.log('✅ [CLOSE CHAT] Chat fermé proprement - prêt pour réouverture')
@@ -2064,7 +2070,7 @@ class ChatSeller {
     })
   }
 
-  // ✅ API PUBLIQUE ÉTENDUE
+  // ✅ RESTAURÉ : API PUBLIQUE ÉTENDUE
   show() {
     if (this.widgetElement) {
       this.widgetElement.style.display = 'block'
@@ -2113,11 +2119,11 @@ class ChatSeller {
     this.refresh()
   }
 
-  // ✅ STRUCTURE CONVERSATION
+  // ✅ RESTAURÉ : STRUCTURE CONVERSATION
   private conversationHistory: Map<string, any> = new Map()
   private currentConversationKey: string | null = null
 
-  // ✅ GÉNÉRER CLÉ CONVERSATION INTELLIGENTE
+  // ✅ RESTAURÉ : GÉNÉRER CLÉ CONVERSATION INTELLIGENTE
   private generateConversationKey(): string {
     const shopId = this.config.shopId
     const productId = this.config.productId || 'general'
@@ -2131,7 +2137,7 @@ class ChatSeller {
     return `${shopId}-${normalizedProduct}`
   }
 
-  // ✅ GESTION LOCALSTORAGE ROBUSTE AVEC PERSISTANCE AMÉLIORÉE
+  // ✅ RESTAURÉ : GESTION LOCALSTORAGE ROBUSTE AVEC PERSISTANCE AMÉLIORÉE
   saveConversation(messages: any[], conversationId: string | null) {
     try {
       if (!this.currentConversationKey) {
@@ -2231,7 +2237,7 @@ class ChatSeller {
     }
   }
 
-  // ✅ VALIDATION CONVERSATION
+  // ✅ RESTAURÉ : VALIDATION CONVERSATION
   private isConversationValid(conversation: any): boolean {
     if (!conversation || !conversation.messages || !Array.isArray(conversation.messages)) {
       return false
@@ -2246,14 +2252,10 @@ class ChatSeller {
       return false
     }
 
-    // ✅ Vérifier cohérence produit (optionnel, peut changer)
-    const currentProduct = this.config.productName || this.config.productId
-    const savedProduct = conversation.productInfo?.name || conversation.productInfo?.id
-
     return true // Conversation valide
   }
 
-  // ✅ RECHERCHE CONVERSATION SIMILAIRE
+  // ✅ RESTAURÉ : RECHERCHE CONVERSATION SIMILAIRE
   private findSimilarConversation(): any {
     try {
       const currentShop = this.config.shopId
@@ -2283,7 +2285,7 @@ class ChatSeller {
     }
   }
 
-  // ✅ NETTOYAGE CONVERSATIONS ANCIENNES
+  // ✅ RESTAURÉ : NETTOYAGE CONVERSATIONS ANCIENNES
   private cleanupOldConversations(): void {
     try {
       const maxAge = 7 * 24 * 60 * 60 * 1000 // 7 jours

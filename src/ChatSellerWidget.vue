@@ -1,4 +1,4 @@
-<!-- src/ChatSellerWidget.vue - VERSION CORRIGÉE COMPLÈTE ✅ -->
+<!-- src/ChatSellerWidget.vue - VERSION MOBILE PLEIN ÉCRAN STRICT ✅ -->
 <template>
   <div class="cs-chatseller-widget-vue">
     <!-- ✅ INTERFACE DESKTOP -->
@@ -82,10 +82,13 @@
             </div>
           </div>
 
-          <!-- ✅ INDICATEUR DE FRAPPE ALIGNÉ À GAUCHE -->
+          <!-- ✅ INDICATEUR DE FRAPPE AVEC TEXTE PERSONNALISÉ -->
           <div v-if="isTyping" class="cs-message-item cs-assistant-message" :style="messageItemStyle('assistant')">
             <div class="cs-assistant-bubble" :style="assistantBubbleStyle">
               <div class="cs-typing-content">
+                <div class="cs-typing-text" :style="typingTextStyle">
+                  {{ agentName }} est en train d'écrire...
+                </div>
                 <div class="cs-typing-indicator" :style="typingIndicatorStyle">
                   <div class="cs-typing-dot" :style="typingDotStyle"></div>
                   <div class="cs-typing-dot" :style="typingDotStyle"></div>
@@ -147,14 +150,14 @@
       </div>
     </div>
 
-    <!-- ✅ INTERFACE MOBILE PLEIN ÉCRAN CORRIGÉE -->
+    <!-- ✅ INTERFACE MOBILE PLEIN ÉCRAN STRICTE CORRIGÉE -->
     <div 
       v-else
       class="cs-chat-container-mobile"
       :style="mobileContainerStyle"
     >
       
-      <!-- ✅ Header Mobile avec Safe Area -->
+      <!-- ✅ Header Mobile avec Safe Area STRICT -->
       <div class="cs-mobile-header" :style="mobileHeaderStyle">
         <div class="cs-mobile-agent-info" :style="agentInfoStyle">
           <div class="cs-mobile-avatar" :style="mobileAvatarStyle">
@@ -164,6 +167,7 @@
             <h3 class="cs-mobile-name" :style="mobileNameStyle">{{ agentName }} - {{ agentTitle }}</h3>
             <p class="cs-mobile-status-text" :style="mobileStatusStyle">
               <span class="cs-online-section" :style="onlineSectionStyle">
+                <span class="cs-status-dot" :style="statusDotStyle"></span>
                 En ligne
               </span>
               <span v-if="productInfo" class="cs-product-separator" :style="productSeparatorStyle"> | </span>
@@ -188,7 +192,7 @@
         </div>
       </div>
 
-      <!-- ✅ Messages mobile plein écran -->
+      <!-- ✅ Messages mobile PLEIN ÉCRAN STRICT -->
       <div ref="mobileMessagesContainer" class="cs-messages-area-mobile" :style="mobileMessagesAreaStyle">
         <div class="cs-mobile-messages-list" :style="messagesListStyle">
           <div
@@ -218,10 +222,13 @@
             </div>
           </div>
 
-          <!-- Typing mobile -->
+          <!-- ✅ Typing mobile avec texte personnalisé -->
           <div v-if="isTyping" class="cs-mobile-message cs-mobile-assistant" :style="messageItemStyle('assistant')">
             <div class="cs-mobile-assistant-bubble" :style="assistantBubbleStyle">
               <div class="cs-mobile-typing">
+                <div class="cs-mobile-typing-text" :style="typingTextStyle">
+                  {{ agentName }} est en train d'écrire...
+                </div>
                 <div class="cs-mobile-typing-dots" :style="typingIndicatorStyle">
                   <div class="cs-mobile-dot" :style="typingDotStyle"></div>
                   <div class="cs-mobile-dot" :style="typingDotStyle"></div>
@@ -235,7 +242,7 @@
         </div>
       </div>
 
-      <!-- ✅ Input Mobile avec Safe Area -->
+      <!-- ✅ Input Mobile avec Safe Area STRICT -->
       <div class="cs-mobile-input-section" :style="mobileInputSectionStyle">
         <div class="cs-mobile-input-container" :style="mobileInputContainerStyle">
           <input
@@ -321,7 +328,7 @@ const props = withDefaults(defineProps<Props>(), {
       name: 'Anna',
       title: 'Vendeuse IA'
     },
-    primaryColor: '#8B5CF6', // ✅ COULEUR CORRIGÉE - Violet par défaut
+    primaryColor: '#8B5CF6',
     buttonText: 'Parler à la vendeuse',
     language: 'fr'
   })
@@ -356,11 +363,11 @@ const isMobile = computed(() => {
 })
 
 const agentName = computed(() => {
-  return configData.value.agentConfig?.name || 'Anna'
+  return configData.value.agentConfig?.name || 'Rose'
 })
 
 const agentTitle = computed(() => {
-  return configData.value.agentConfig?.title || 'Vendeuse IA'
+  return configData.value.agentConfig?.title || 'Vendeuse'
 })
 
 const agentAvatar = computed(() => {
@@ -395,7 +402,7 @@ const inputPlaceholder = computed(() => {
 const headerStyle = computed((): CSSProperties => ({
   padding: '20px',
   color: '#ffffff',
-  background: `linear-gradient(135deg, ${primaryColor.value} 0%, ${adjustColor(primaryColor.value, -15)} 100%)`, // ✅ COULEUR DYNAMIQUE
+  background: `linear-gradient(135deg, ${primaryColor.value} 0%, ${adjustColor(primaryColor.value, -15)} 100%)`,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
@@ -406,11 +413,11 @@ const headerStyle = computed((): CSSProperties => ({
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
 }))
 
-// ✅ HEADER MOBILE AVEC SAFE AREA
+// ✅ HEADER MOBILE AVEC SAFE AREA STRICT
 const mobileHeaderStyle = computed((): CSSProperties => ({
   padding: 'calc(env(safe-area-inset-top) + 16px) 20px 16px 20px',
   color: '#ffffff',
-  background: `linear-gradient(135deg, ${primaryColor.value} 0%, ${adjustColor(primaryColor.value, -15)} 100%)`, // ✅ COULEUR DYNAMIQUE
+  background: `linear-gradient(135deg, ${primaryColor.value} 0%, ${adjustColor(primaryColor.value, -15)} 100%)`,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
@@ -418,11 +425,12 @@ const mobileHeaderStyle = computed((): CSSProperties => ({
   minHeight: 'calc(75px + env(safe-area-inset-top))',
   margin: '0',
   border: 'none',
-  zIndex: '2',
+  zIndex: '10',
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
   textAlign: 'left',
   position: 'relative',
-  overflow: 'hidden'
+  overflow: 'hidden',
+  width: '100vw' // ✅ AJOUT : Force la largeur plein écran
 }))
 
 const desktopContainerStyle = computed((): CSSProperties => ({
@@ -442,10 +450,12 @@ const desktopContainerStyle = computed((): CSSProperties => ({
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
 }))
 
-// ✅ MOBILE PLEIN ÉCRAN AVEC DYNAMIC VIEWPORT HEIGHT
+// ✅ MOBILE PLEIN ÉCRAN STRICT AVEC DYNAMIC VIEWPORT HEIGHT
 const mobileContainerStyle = computed((): CSSProperties => ({
-  width: '100vw',
-  height: '100dvh', // ✅ Dynamic viewport height pour mobile (remplace 100vh)
+  width: '100vw', // ✅ FORCE : Largeur plein écran
+  height: '100dvh', // ✅ Dynamic viewport height
+  maxWidth: '100vw', // ✅ AJOUT : Largeur maximale plein écran
+  maxHeight: '100dvh', // ✅ AJOUT : Hauteur maximale plein écran
   background: '#ffffff',
   display: 'flex',
   flexDirection: 'column',
@@ -453,10 +463,14 @@ const mobileContainerStyle = computed((): CSSProperties => ({
   margin: '0',
   padding: '0',
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  position: 'fixed',
-  top: '0',
-  left: '0',
-  zIndex: '2147483647'
+  position: 'fixed', // ✅ FORCE : Position fixe
+  top: '0', // ✅ FORCE : Collé au haut
+  left: '0', // ✅ FORCE : Collé à gauche
+  right: '0', // ✅ AJOUT : Collé à droite
+  bottom: '0', // ✅ AJOUT : Collé au bas
+  zIndex: '2147483647',
+  borderRadius: '0', // ✅ FORCE : Pas de bordure arrondie en mobile
+  border: 'none'
 }))
 
 const agentInfoStyle = computed((): CSSProperties => ({
@@ -645,7 +659,7 @@ const messagesAreaStyle = computed((): CSSProperties => ({
   minHeight: '0'
 }))
 
-// ✅ MOBILE MESSAGES AREA AVEC SAFE AREA
+// ✅ MOBILE MESSAGES AREA AVEC SAFE AREA STRICT
 const mobileMessagesAreaStyle = computed((): CSSProperties => ({
   flex: '1',
   background: '#f0f2f5',
@@ -656,6 +670,8 @@ const mobileMessagesAreaStyle = computed((): CSSProperties => ({
   color: '#374151',
   fontFamily: 'inherit',
   minHeight: '0',
+  width: '100vw', // ✅ FORCE : Largeur plein écran
+  maxWidth: '100vw', // ✅ AJOUT : Largeur maximale
   paddingBottom: 'calc(16px + env(safe-area-inset-bottom))'
 }))
 
@@ -712,7 +728,7 @@ const userTextStyle = computed((): CSSProperties => ({
   fontSize: '14px',
   lineHeight: '1.4',
   margin: '0',
-  background: primaryColor.value, // ✅ COULEUR DYNAMIQUE
+  background: primaryColor.value,
   color: '#ffffff',
   border: 'none',
   boxShadow: 'none',
@@ -725,7 +741,7 @@ const userTextStyle = computed((): CSSProperties => ({
 const agentNameInBubbleStyle = computed((): CSSProperties => ({
   fontWeight: '700',
   fontSize: '13px',
-  color: primaryColor.value, // ✅ COULEUR DYNAMIQUE
+  color: primaryColor.value,
   margin: '0 0 2px 0',
   display: 'block',
   fontFamily: 'inherit'
@@ -761,10 +777,19 @@ const messageTimeStyle = computed((): CSSProperties => ({
 // ✅ HEURE MESSAGE UTILISATEUR EN BLANC
 const messageTimeUserStyle = computed((): CSSProperties => ({
   fontSize: '11px',
-  color: 'rgba(255, 255, 255, 0.8)', // ✅ BLANC AVEC OPACITÉ
+  color: 'rgba(255, 255, 255, 0.9)',
   margin: '4px 0 0 0',
   textAlign: 'right',
   opacity: '1',
+  fontFamily: 'inherit'
+}))
+
+// ✅ TYPING INDICATOR AVEC TEXTE PERSONNALISÉ
+const typingTextStyle = computed((): CSSProperties => ({
+  fontSize: '13px',
+  color: '#6b7280',
+  fontStyle: 'italic',
+  marginBottom: '8px',
   fontFamily: 'inherit'
 }))
 
@@ -802,7 +827,7 @@ const inputContainerStyle = computed((): CSSProperties => ({
   padding: '0'
 }))
 
-// ✅ INPUT MOBILE AVEC SAFE AREA
+// ✅ INPUT MOBILE AVEC SAFE AREA STRICT
 const mobileInputSectionStyle = computed((): CSSProperties => ({
   borderTop: '1px solid #e5e7eb',
   background: '#ffffff',
@@ -812,7 +837,9 @@ const mobileInputSectionStyle = computed((): CSSProperties => ({
   paddingLeft: '0',
   paddingRight: '0',
   margin: '0',
-  fontFamily: 'inherit'
+  fontFamily: 'inherit',
+  width: '100vw', // ✅ FORCE : Largeur plein écran
+  maxWidth: '100vw' // ✅ AJOUT : Largeur maximale
 }))
 
 const mobileInputContainerStyle = computed((): CSSProperties => ({
@@ -839,7 +866,7 @@ const messageInputStyle = computed((): CSSProperties => ({
 
 // ✅ BOUTON MICRO EN GRIS
 const voiceButtonStyle = computed((): CSSProperties => ({
-  background: '#6B7280', // ✅ GRIS
+  background: '#6B7280',
   border: 'none',
   color: '#ffffff',
   cursor: 'pointer',
@@ -859,7 +886,7 @@ const voiceButtonStyle = computed((): CSSProperties => ({
 const sendButtonStyle = computed((): CSSProperties => ({
   width: '44px',
   height: '44px',
-  background: primaryColor.value, // ✅ COULEUR DYNAMIQUE
+  background: primaryColor.value,
   border: 'none',
   borderRadius: '50%',
   color: '#ffffff',
@@ -925,12 +952,10 @@ const sendWelcomeMessage = async () => {
   try {
     console.log('👋 [WELCOME] Début initialisation message d\'accueil...')
     
-    // ✅ CHARGEMENT CONVERSATION SAUVEGARDÉE PRIORITAIRE
     if (typeof window !== 'undefined' && (window as any).ChatSeller) {
       const savedConversation = (window as any).ChatSeller.loadConversation()
       
       if (savedConversation) {
-        // ✅ CAS 1 : CONVERSATION NORMALE SAUVEGARDÉE
         if (savedConversation.messages && savedConversation.messages.length > 0) {
           messages.value = savedConversation.messages.map((msg: any) => ({
             ...msg,
@@ -944,28 +969,26 @@ const sendWelcomeMessage = async () => {
           })
           return
         }
-        
-        // ✅ CAS 2 : NOUVEAU PRODUIT MAIS HISTORIQUE EXISTANT
         else if (savedConversation.isNewProductConversation) {
-          console.log('🔄 [WELCOME] Nouveau produit détecté, personnalisation message')
+          console.log('🔄 [WELCOME] Nouveau produit détecté, message de transition')
           
-          const personalizedWelcome = savedConversation.suggestedMessage || 
-            `Je vois que nous avons déjà échangé ! Aujourd'hui vous regardez ${productInfo.value?.name || 'un nouveau produit'}. Comment puis-je vous aider ? 😊`
+          const transitionMessage = `Re-${getTimeBasedGreeting().toLowerCase()} 👋 Nous avons déjà échangé au sujet de "${savedConversation.previousProduct}". 
+
+Je vois que vous vous intéressez maintenant à "${productInfo.value?.name}". Comment puis-je vous aider avec ce nouveau produit ? 😊`
           
           const aiMessage: Message = {
             id: uuidv4(),
             role: 'assistant',
-            content: personalizedWelcome,
+            content: transitionMessage,
             timestamp: new Date()
           }
           messages.value.push(aiMessage)
-          console.log('✅ [WELCOME] Message personnalisé pour nouveau produit')
+          console.log('✅ [WELCOME] Message de transition pour nouveau produit')
           return
         }
       }
     }
 
-    // ✅ CAS 3 : PREMIÈRE VISITE - MESSAGE STANDARD
     console.log('🆕 [WELCOME] Première visite, création message standard')
     
     let welcomeMessage = ''
@@ -974,16 +997,18 @@ const sendWelcomeMessage = async () => {
       welcomeMessage = configData.value.agentConfig.welcomeMessage
     } else {
       const localAgentName = agentName.value || 'Rose'
-      const agentTitle = configData.value.agentConfig?.title || 'Vendeuse'
+      const localAgentTitle = agentTitle.value || 'Vendeuse'
+      const greeting = getTimeBasedGreeting()
       
       if (productInfo.value?.name) {
-        welcomeMessage = `Salut ! 👋 Je suis ${agentName}, votre ${agentTitle}.
+        const productType = getProductType(productInfo.value.name)
+        welcomeMessage = `${greeting} 👋 Je suis ${localAgentName}, ${localAgentTitle} chez VIENS ON S'CONNAÎT.
 
-Je vois que vous vous intéressez à **${productInfo.value.name}**. C'est un excellent choix ! 💫
+Je vois que vous vous intéressez à notre ${productType} **"${productInfo.value.name}"**. Excellent choix ! 💫
 
-Comment puis-je vous aider avec ce produit ? 😊`
+Comment puis-je vous aider avec ce ${productType} ? 😊`
       } else {
-        welcomeMessage = `Salut ! 👋 Je suis ${agentName}, votre ${agentTitle}.
+        welcomeMessage = `${greeting} 👋 Je suis ${localAgentName}, ${localAgentTitle} chez VIENS ON S'CONNAÎT.
 
 Quel produit vous intéresse aujourd'hui ? Je serais ravie de vous renseigner ! 😊`
       }
@@ -1002,7 +1027,6 @@ Quel produit vous intéresse aujourd'hui ? Je serais ravie de vous renseigner ! 
   } catch (error: unknown) {
     console.error('❌ [WELCOME] Erreur message d\'accueil:', error)
     
-    // ✅ FALLBACK EN CAS D'ERREUR
     const fallbackMessage: Message = {
       id: uuidv4(),
       role: 'assistant',
@@ -1011,6 +1035,33 @@ Quel produit vous intéresse aujourd'hui ? Je serais ravie de vous renseigner ! 
     }
     messages.value.push(fallbackMessage)
   }
+}
+
+// ✅ HELPER : Obtenir le moment de la journée pour salutation naturelle
+const getTimeBasedGreeting = (): string => {
+  const hour = new Date().getHours()
+  
+  if (hour < 12) return 'Bonjour'
+  if (hour < 18) return 'Bonsoir'
+  return 'Bonsoir'
+}
+
+// ✅ HELPER : Déterminer le type de produit pour un message naturel
+const getProductType = (productName: string): string => {
+  if (!productName) return 'produit'
+  
+  const name = productName.toLowerCase()
+  
+  if (name.includes('jeu') || name.includes('game') || name.includes('cartes')) return 'jeu'
+  if (name.includes('livre') || name.includes('book') || name.includes('roman')) return 'livre'  
+  if (name.includes('cours') || name.includes('formation') || name.includes('training')) return 'formation'
+  if (name.includes('smartphone') || name.includes('téléphone') || name.includes('phone')) return 'smartphone'
+  if (name.includes('ordinateur') || name.includes('laptop') || name.includes('computer')) return 'ordinateur'
+  if (name.includes('vêtement') || name.includes('tshirt') || name.includes('robe')) return 'vêtement'
+  if (name.includes('service') || name.includes('consultation') || name.includes('accompagnement')) return 'service'
+  if (name.includes('bijou') || name.includes('collier') || name.includes('bracelet')) return 'bijou'
+  
+  return 'produit'
 }
 
 const sendMessage = async () => {
@@ -1065,7 +1116,6 @@ const sendMessage = async () => {
     await nextTick()
     scrollToBottom()
     
-    // ✅ SAUVEGARDE CONVERSATION
     if (typeof window !== 'undefined' && (window as any).ChatSeller) {
       (window as any).ChatSeller.saveConversation(messages.value, conversationId.value)
     }
@@ -1126,7 +1176,8 @@ const sendApiMessage = async (message: string) => {
       headers: { 
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Origin': window.location.origin
+        'Origin': window.location.origin,
+        'X-Message-Count': messages.value.filter(m => m.role === 'assistant').length.toString()
       },
       body: JSON.stringify(payload)
     })
@@ -1257,11 +1308,11 @@ onMounted(() => {
   console.log('🎨 [WIDGET VUE] Composant monté avec couleur:', primaryColor.value)
   sendWelcomeMessage()
   
-  // ✅ GESTION MOBILE VIEWPORT AMÉLIORÉE
+  // ✅ GESTION MOBILE VIEWPORT PLEIN ÉCRAN STRICTE
   if (isMobile.value && typeof window !== 'undefined') {
-    console.log('📱 [MOBILE] Configuration viewport plein écran...')
+    console.log('📱 [MOBILE] Configuration viewport plein écran STRICTE...')
     
-    // ✅ 1. MÉTAVIEWPORT DYNAMIQUE
+    // ✅ 1. MÉTAVIEWPORT DYNAMIQUE STRICT
     let metaViewport = document.querySelector('meta[name="viewport"]')
     if (!metaViewport) {
       metaViewport = document.createElement('meta')
@@ -1270,24 +1321,29 @@ onMounted(() => {
     }
     metaViewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover')
     
-    // ✅ 2. CSS MOBILE PLEIN ÉCRAN FORCÉ
+    // ✅ 2. CSS MOBILE PLEIN ÉCRAN FORCÉ STRICT
     const mobileStyle = document.createElement('style')
-    mobileStyle.id = 'chatseller-mobile-fullscreen'
+    mobileStyle.id = 'chatseller-mobile-fullscreen-strict'
     mobileStyle.textContent = `
-      /* ✅ MOBILE PLEIN ÉCRAN STRICT */
+      /* ✅ MOBILE PLEIN ÉCRAN STRICT - FORCE MAXIMALE */
       html.cs-modal-open,
       body.cs-modal-open {
         overflow: hidden !important;
         position: fixed !important;
-        width: 100% !important;
-        height: 100% !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        height: 100dvh !important;
         margin: 0 !important;
         padding: 0 !important;
         top: 0 !important;
         left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        max-width: 100vw !important;
+        max-height: 100dvh !important;
       }
       
-      /* ✅ MODAL MOBILE PLEIN ÉCRAN */
+      /* ✅ MODAL MOBILE PLEIN ÉCRAN STRICT */
       .cs-chat-modal-overlay {
         position: fixed !important;
         top: 0 !important;
@@ -1296,18 +1352,22 @@ onMounted(() => {
         bottom: 0 !important;
         width: 100vw !important;
         height: 100vh !important;
-        height: 100dvh !important; /* Dynamic viewport height */
+        height: 100dvh !important;
         margin: 0 !important;
         padding: 0 !important;
         z-index: 2147483647 !important;
+        max-width: 100vw !important;
+        max-height: 100dvh !important;
       }
       
-      /* ✅ CONTAINER MOBILE EXACT */
+      /* ✅ CONTAINER MOBILE EXACT PLEIN ÉCRAN */
       @media (max-width: 767px) {
         .cs-chat-container-mobile {
           position: fixed !important;
           top: 0 !important;
           left: 0 !important;
+          right: 0 !important;
+          bottom: 0 !important;
           width: 100vw !important;
           height: 100vh !important;
           height: 100dvh !important;
@@ -1326,9 +1386,24 @@ onMounted(() => {
           justify-content: stretch !important;
           padding: 0 !important;
         }
+        
+        .cs-mobile-header {
+          width: 100vw !important;
+          max-width: 100vw !important;
+        }
+        
+        .cs-messages-area-mobile {
+          width: 100vw !important;
+          max-width: 100vw !important;
+        }
+        
+        .cs-mobile-input-section {
+          width: 100vw !important;
+          max-width: 100vw !important;
+        }
       }
       
-      /* ✅ SAFE AREA IPHONE */
+      /* ✅ SAFE AREA IPHONE STRICT */
       @supports (padding: max(0px)) {
         .cs-mobile-header {
           padding-top: calc(env(safe-area-inset-top) + 16px) !important;
@@ -1339,14 +1414,13 @@ onMounted(() => {
         }
       }
       
-      /* ✅ GESTION CLAVIER MOBILE */
+      /* ✅ GESTION CLAVIER MOBILE STRICT */
       @media (max-width: 767px) {
         .cs-mobile-input-container input:focus {
           transform: translateZ(0) !important;
           -webkit-transform: translateZ(0) !important;
         }
         
-        /* Empêcher le zoom sur focus */
         input[type="text"] {
           font-size: 16px !important;
         }
@@ -1354,7 +1428,7 @@ onMounted(() => {
     `
     document.head.appendChild(mobileStyle)
     
-    // ✅ 3. CLASSES FORCÉES POUR BODY
+    // ✅ 3. CLASSES FORCÉES POUR BODY STRICT
     document.documentElement.classList.add('cs-modal-open')
     document.body.classList.add('cs-modal-open')
     
@@ -1362,7 +1436,6 @@ onMounted(() => {
     const mobileInput = document.querySelector('.cs-mobile-message-input')
     if (mobileInput) {
       mobileInput.addEventListener('focus', () => {
-        // Scroll vers le haut pour éviter les problèmes de viewport
         setTimeout(() => {
           window.scrollTo(0, 0)
         }, 100)
@@ -1373,13 +1446,13 @@ onMounted(() => {
       })
     }
     
-    console.log('✅ [MOBILE] Configuration plein écran terminée')
+    console.log('✅ [MOBILE] Configuration plein écran STRICTE terminée')
     
     // ✅ 5. NETTOYAGE AU DÉMONTAGE
     return () => {
       document.documentElement.classList.remove('cs-modal-open')
       document.body.classList.remove('cs-modal-open')
-      const mobileStyleEl = document.getElementById('chatseller-mobile-fullscreen')
+      const mobileStyleEl = document.getElementById('chatseller-mobile-fullscreen-strict')
       if (mobileStyleEl) {
         mobileStyleEl.remove()
       }
