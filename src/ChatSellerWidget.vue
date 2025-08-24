@@ -1,4 +1,4 @@
-<!-- src/ChatSellerWidget.vue - VERSION MOBILE PLEIN ÉCRAN STRICT ✅ -->
+<!-- src/ChatSellerWidget.vue -->
 <template>
   <div class="cs-chatseller-widget-vue">
     <!-- ✅ INTERFACE DESKTOP -->
@@ -21,7 +21,7 @@
           </div>
           <div class="cs-agent-details">
             <h3 class="cs-agent-name" :style="agentNameStyle">{{ agentName }} - {{ agentTitle }}</h3>
-            <!-- ✅ STATUS AVEC PRODUIT SUR MÊME LIGNE -->
+            <!-- ✅ STATUS AVEC PRODUIT SUR UNE SEULE LIGNE CORRIGÉE -->
             <p class="cs-agent-status" :style="agentStatusStyle">
               <span class="cs-online-section" :style="onlineSectionStyle">
                 <span class="cs-status-dot" :style="statusDotStyle"></span>
@@ -82,17 +82,17 @@
             </div>
           </div>
 
-          <!-- ✅ INDICATEUR DE FRAPPE AVEC TEXTE PERSONNALISÉ -->
+          <!-- ✅ INDICATEUR DE FRAPPE CORRIGÉ UNE LIGNE HORIZONTALE -->
           <div v-if="isTyping" class="cs-message-item cs-assistant-message" :style="messageItemStyle('assistant')">
             <div class="cs-assistant-bubble" :style="assistantBubbleStyle">
               <div class="cs-typing-content">
-                <div class="cs-typing-text" :style="typingTextStyle">
-                  {{ agentName }} est en train d'écrire...
-                </div>
                 <div class="cs-typing-indicator" :style="typingIndicatorStyle">
-                  <div class="cs-typing-dot" :style="typingDotStyle"></div>
-                  <div class="cs-typing-dot" :style="typingDotStyle"></div>
-                  <div class="cs-typing-dot" :style="typingDotStyle"></div>
+                  <span class="cs-typing-text" :style="typingTextStyle">{{ agentName }} est en train d'écrire...</span>
+                  <div class="cs-typing-dots" :style="typingDotsStyle">
+                    <div class="cs-typing-dot" :style="typingDotStyle"></div>
+                    <div class="cs-typing-dot" :style="typingDotStyle"></div>
+                    <div class="cs-typing-dot" :style="typingDotStyle"></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -150,14 +150,14 @@
       </div>
     </div>
 
-    <!-- ✅ INTERFACE MOBILE PLEIN ÉCRAN STRICTE CORRIGÉE -->
+    <!-- ✅ INTERFACE MOBILE PLEIN ÉCRAN CORRIGÉE -->
     <div 
       v-else
       class="cs-chat-container-mobile"
       :style="mobileContainerStyle"
     >
       
-      <!-- ✅ Header Mobile avec Safe Area STRICT -->
+      <!-- ✅ Header Mobile avec Safe Area -->
       <div class="cs-mobile-header" :style="mobileHeaderStyle">
         <div class="cs-mobile-agent-info" :style="agentInfoStyle">
           <div class="cs-mobile-avatar" :style="mobileAvatarStyle">
@@ -192,7 +192,7 @@
         </div>
       </div>
 
-      <!-- ✅ Messages mobile PLEIN ÉCRAN STRICT -->
+      <!-- ✅ Messages mobile CORRIGÉS -->
       <div ref="mobileMessagesContainer" class="cs-messages-area-mobile" :style="mobileMessagesAreaStyle">
         <div class="cs-mobile-messages-list" :style="messagesListStyle">
           <div
@@ -222,17 +222,17 @@
             </div>
           </div>
 
-          <!-- ✅ Typing mobile avec texte personnalisé -->
+          <!-- ✅ Typing mobile CORRIGÉ UNE LIGNE HORIZONTALE -->
           <div v-if="isTyping" class="cs-mobile-message cs-mobile-assistant" :style="messageItemStyle('assistant')">
             <div class="cs-mobile-assistant-bubble" :style="assistantBubbleStyle">
               <div class="cs-mobile-typing">
-                <div class="cs-mobile-typing-text" :style="typingTextStyle">
-                  {{ agentName }} est en train d'écrire...
-                </div>
-                <div class="cs-mobile-typing-dots" :style="typingIndicatorStyle">
-                  <div class="cs-mobile-dot" :style="typingDotStyle"></div>
-                  <div class="cs-mobile-dot" :style="typingDotStyle"></div>
-                  <div class="cs-mobile-dot" :style="typingDotStyle"></div>
+                <div class="cs-mobile-typing-indicator" :style="typingIndicatorStyle">
+                  <span class="cs-mobile-typing-text" :style="typingTextStyle">{{ agentName }} est en train d'écrire...</span>
+                  <div class="cs-mobile-typing-dots" :style="typingDotsStyle">
+                    <div class="cs-mobile-dot" :style="typingDotStyle"></div>
+                    <div class="cs-mobile-dot" :style="typingDotStyle"></div>
+                    <div class="cs-mobile-dot" :style="typingDotStyle"></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -242,12 +242,15 @@
         </div>
       </div>
 
-      <!-- ✅ Input Mobile avec Safe Area STRICT -->
+      <!-- ✅ Input Mobile avec gestion clavier CORRIGÉE -->
       <div class="cs-mobile-input-section" :style="mobileInputSectionStyle">
         <div class="cs-mobile-input-container" :style="mobileInputContainerStyle">
           <input
+            ref="mobileInput"
             v-model="currentMessage"
             @keypress.enter="sendMessage"
+            @focus="handleMobileInputFocus"
+            @blur="handleMobileInputBlur"
             :placeholder="inputPlaceholder"
             class="cs-mobile-message-input"
             :style="messageInputStyle"
@@ -325,8 +328,8 @@ const props = withDefaults(defineProps<Props>(), {
     shopId: 'demo',
     apiUrl: 'https://chatseller-api-production.up.railway.app',
     agentConfig: {
-      name: 'Anna',
-      title: 'Vendeuse IA'
+      name: 'Rose',
+      title: 'Vendeuse'
     },
     primaryColor: '#8B5CF6',
     buttonText: 'Parler à la vendeuse',
@@ -341,7 +344,7 @@ interface Message {
   timestamp: Date
 }
 
-// State
+// ✅ STATE COMPLET RESTAURÉ
 const messages = ref<Message[]>([])
 const currentMessage = ref('')
 const isTyping = ref(false)
@@ -351,6 +354,13 @@ const messagesContainer = ref<HTMLElement>()
 const mobileMessagesContainer = ref<HTMLElement>()
 const messagesEndRef = ref<HTMLElement>()
 const mobileMessagesEndRef = ref<HTMLElement>()
+const mobileInput = ref<HTMLInputElement>()
+const keyboardVisible = ref(false)
+
+// ✅ RESTAURÉ : SYSTÈME DE PERSISTANCE CONVERSATION
+const conversationHistory: Map<string, any> = new Map()
+let currentConversationKey: string | null = null
+let conversationData: any = null
 
 // ✅ COMPUTED AVEC COULEUR DYNAMIQUE
 const configData = computed(() => props.config || {})
@@ -413,7 +423,7 @@ const headerStyle = computed((): CSSProperties => ({
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
 }))
 
-// ✅ HEADER MOBILE AVEC SAFE AREA STRICT
+// ✅ HEADER MOBILE AVEC SAFE AREA
 const mobileHeaderStyle = computed((): CSSProperties => ({
   padding: 'calc(env(safe-area-inset-top) + 16px) 20px 16px 20px',
   color: '#ffffff',
@@ -430,7 +440,7 @@ const mobileHeaderStyle = computed((): CSSProperties => ({
   textAlign: 'left',
   position: 'relative',
   overflow: 'hidden',
-  width: '100vw' // ✅ AJOUT : Force la largeur plein écran
+  width: '100vw'
 }))
 
 const desktopContainerStyle = computed((): CSSProperties => ({
@@ -450,12 +460,12 @@ const desktopContainerStyle = computed((): CSSProperties => ({
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
 }))
 
-// ✅ MOBILE PLEIN ÉCRAN STRICT AVEC DYNAMIC VIEWPORT HEIGHT
+// ✅ MOBILE PLEIN ÉCRAN CORRIGÉ AVEC GESTION CLAVIER
 const mobileContainerStyle = computed((): CSSProperties => ({
-  width: '100vw', // ✅ FORCE : Largeur plein écran
-  height: '100dvh', // ✅ Dynamic viewport height
-  maxWidth: '100vw', // ✅ AJOUT : Largeur maximale plein écran
-  maxHeight: '100dvh', // ✅ AJOUT : Hauteur maximale plein écran
+  width: '100vw',
+  height: keyboardVisible.value ? '100vh' : '100dvh', // ✅ Gestion clavier
+  maxWidth: '100vw',
+  maxHeight: keyboardVisible.value ? '100vh' : '100dvh',
   background: '#ffffff',
   display: 'flex',
   flexDirection: 'column',
@@ -463,13 +473,13 @@ const mobileContainerStyle = computed((): CSSProperties => ({
   margin: '0',
   padding: '0',
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  position: 'fixed', // ✅ FORCE : Position fixe
-  top: '0', // ✅ FORCE : Collé au haut
-  left: '0', // ✅ FORCE : Collé à gauche
-  right: '0', // ✅ AJOUT : Collé à droite
-  bottom: '0', // ✅ AJOUT : Collé au bas
+  position: 'fixed',
+  top: '0',
+  left: '0',
+  right: '0',
+  bottom: '0',
   zIndex: '2147483647',
-  borderRadius: '0', // ✅ FORCE : Pas de bordure arrondie en mobile
+  borderRadius: '0',
   border: 'none'
 }))
 
@@ -531,19 +541,21 @@ const mobileNameStyle = computed((): CSSProperties => ({
   fontFamily: 'inherit'
 }))
 
-// ✅ STATUS AVEC PRODUIT SUR MÊME LIGNE
+// ✅ STATUS AVEC PRODUIT SUR UNE SEULE LIGNE CORRIGÉE
 const agentStatusStyle = computed((): CSSProperties => ({
   fontSize: '14px',
   color: 'rgba(255, 255, 255, 0.95)',
   margin: '0',
   display: 'flex',
   alignItems: 'center',
-  flexWrap: 'wrap',
   gap: '8px',
   lineHeight: '1.3',
   fontWeight: '500',
   fontFamily: 'inherit',
-  minWidth: '0'
+  minWidth: '0',
+  whiteSpace: 'nowrap', // ✅ CORRECTION : Empêche le retour à la ligne
+  overflow: 'hidden',
+  textOverflow: 'ellipsis'
 }))
 
 const mobileStatusStyle = computed((): CSSProperties => ({
@@ -552,11 +564,13 @@ const mobileStatusStyle = computed((): CSSProperties => ({
   margin: '0',
   display: 'flex',
   alignItems: 'center',
-  flexWrap: 'wrap',
   gap: '6px',
   lineHeight: '1.3',
   fontWeight: '500',
-  fontFamily: 'inherit'
+  fontFamily: 'inherit',
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis'
 }))
 
 const onlineSectionStyle = computed((): CSSProperties => ({
@@ -589,7 +603,7 @@ const productNameStyle = computed((): CSSProperties => ({
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
-  maxWidth: isMobile.value ? '150px' : '200px',
+  maxWidth: isMobile.value ? '120px' : '150px',
   flexShrink: '1',
   minWidth: '0'
 }))
@@ -659,7 +673,7 @@ const messagesAreaStyle = computed((): CSSProperties => ({
   minHeight: '0'
 }))
 
-// ✅ MOBILE MESSAGES AREA AVEC SAFE AREA STRICT
+// ✅ MOBILE MESSAGES AREA AVEC GESTION CLAVIER
 const mobileMessagesAreaStyle = computed((): CSSProperties => ({
   flex: '1',
   background: '#f0f2f5',
@@ -670,9 +684,9 @@ const mobileMessagesAreaStyle = computed((): CSSProperties => ({
   color: '#374151',
   fontFamily: 'inherit',
   minHeight: '0',
-  width: '100vw', // ✅ FORCE : Largeur plein écran
-  maxWidth: '100vw', // ✅ AJOUT : Largeur maximale
-  paddingBottom: 'calc(16px + env(safe-area-inset-bottom))'
+  width: '100vw',
+  maxWidth: '100vw',
+  paddingBottom: keyboardVisible.value ? '16px' : 'calc(16px + env(safe-area-inset-bottom))' // ✅ Gestion clavier
 }))
 
 const messagesListStyle = computed((): CSSProperties => ({
@@ -777,29 +791,37 @@ const messageTimeStyle = computed((): CSSProperties => ({
 // ✅ HEURE MESSAGE UTILISATEUR EN BLANC
 const messageTimeUserStyle = computed((): CSSProperties => ({
   fontSize: '11px',
-  color: 'rgba(255, 255, 255, 0.9)',
+  color: '#FFFFFF',
   margin: '4px 0 0 0',
   textAlign: 'right',
   opacity: '1',
   fontFamily: 'inherit'
 }))
 
-// ✅ TYPING INDICATOR AVEC TEXTE PERSONNALISÉ
+// ✅ TYPING INDICATOR CORRIGÉ UNE LIGNE HORIZONTALE
 const typingTextStyle = computed((): CSSProperties => ({
-  fontSize: '13px',
+  fontSize: '12px',
   color: '#6b7280',
   fontStyle: 'italic',
-  marginBottom: '8px',
-  fontFamily: 'inherit'
+  marginRight: '8px',
+  fontFamily: 'inherit',
+  whiteSpace: 'nowrap' // ✅ CORRECTION : Empêche retour à la ligne
 }))
 
 const typingIndicatorStyle = computed((): CSSProperties => ({
-  display: 'flex',
-  gap: '4px',
+  display: 'flex', // ✅ CORRECTION : Flexbox horizontal
+  alignItems: 'center', // ✅ CORRECTION : Centrage vertical
+  gap: '8px',
   padding: '12px 16px',
   background: '#ffffff',
   borderRadius: '18px',
   margin: '0'
+}))
+
+const typingDotsStyle = computed((): CSSProperties => ({
+  display: 'flex',
+  gap: '4px',
+  alignItems: 'center'
 }))
 
 const typingDotStyle = computed((): CSSProperties => ({
@@ -827,19 +849,19 @@ const inputContainerStyle = computed((): CSSProperties => ({
   padding: '0'
 }))
 
-// ✅ INPUT MOBILE AVEC SAFE AREA STRICT
+// ✅ INPUT MOBILE AVEC SAFE AREA ET GESTION CLAVIER
 const mobileInputSectionStyle = computed((): CSSProperties => ({
   borderTop: '1px solid #e5e7eb',
   background: '#ffffff',
   flexShrink: '0',
   paddingTop: '16px',
-  paddingBottom: 'calc(16px + env(safe-area-inset-bottom))', // ✅ Safe area bottom
+  paddingBottom: keyboardVisible.value ? '16px' : 'calc(16px + env(safe-area-inset-bottom))', // ✅ Gestion clavier
   paddingLeft: '0',
   paddingRight: '0',
   margin: '0',
   fontFamily: 'inherit',
-  width: '100vw', // ✅ FORCE : Largeur plein écran
-  maxWidth: '100vw' // ✅ AJOUT : Largeur maximale
+  width: '100vw',
+  maxWidth: '100vw'
 }))
 
 const mobileInputContainerStyle = computed((): CSSProperties => ({
@@ -947,7 +969,8 @@ const securityStyle = computed((): CSSProperties => ({
   fontFamily: 'inherit'
 }))
 
-// ✅ FONCTIONS
+// ✅ FONCTIONS COMPLÈTES RESTAURÉES
+
 const sendWelcomeMessage = async () => {
   try {
     console.log('👋 [WELCOME] Début initialisation message d\'accueil...')
@@ -974,7 +997,7 @@ const sendWelcomeMessage = async () => {
           
           const transitionMessage = `Re-${getTimeBasedGreeting().toLowerCase()} 👋 Nous avons déjà échangé au sujet de "${savedConversation.previousProduct}". 
 
-Je vois que vous vous intéressez maintenant à "${productInfo.value?.name}". Comment puis-je vous aider avec ce nouveau produit ? 😊`
+Je vois que vous vous intéressez maintenant à "${productInfo.value?.name}". Comment puis-je vous aider ? 😊`
           
           const aiMessage: Message = {
             id: uuidv4(),
@@ -999,18 +1022,19 @@ Je vois que vous vous intéressez maintenant à "${productInfo.value?.name}". Co
       const localAgentName = agentName.value || 'Rose'
       const localAgentTitle = agentTitle.value || 'Vendeuse'
       const greeting = getTimeBasedGreeting()
+      const localAgentStore = 'VIENS ON S\'CONNAÎT' // ✅ CORRECTION : Nom boutique correct
       
       if (productInfo.value?.name) {
         const productType = getProductType(productInfo.value.name)
-        welcomeMessage = `${greeting} 👋 Je suis ${localAgentName}, ${localAgentTitle} chez VIENS ON S'CONNAÎT.
+        welcomeMessage = `${greeting} 👋 Je suis ${localAgentName}, ${localAgentTitle} chez ${localAgentStore}.
 
-Je vois que vous vous intéressez à notre ${productType} **"${productInfo.value.name}"**. Excellent choix ! 💫
+Je vois que vous vous intéressez à notre ${productType} **"${productInfo.value.name}"**. C'est un excellent choix ! 💫
 
-Comment puis-je vous aider avec ce ${productType} ? 😊`
+Comment puis-je vous aider ? 😊`
       } else {
-        welcomeMessage = `${greeting} 👋 Je suis ${localAgentName}, ${localAgentTitle} chez VIENS ON S'CONNAÎT.
+        welcomeMessage = `${greeting} 👋 Je suis ${localAgentName}, ${localAgentTitle} chez ${localAgentStore}.
 
-Quel produit vous intéresse aujourd'hui ? Je serais ravie de vous renseigner ! 😊`
+En quoi puis-je vous aider ? 😊`
       }
     }
 
@@ -1030,7 +1054,7 @@ Quel produit vous intéresse aujourd'hui ? Je serais ravie de vous renseigner ! 
     const fallbackMessage: Message = {
       id: uuidv4(),
       role: 'assistant',
-      content: `Bonjour ! Je suis là pour vous aider. Comment puis-je vous renseigner ? 😊`,
+      content: `Bonjour ! Je suis là pour vous aider. En quoi puis-je vous être utile ? 😊`,
       timestamp: new Date()
     }
     messages.value.push(fallbackMessage)
@@ -1062,6 +1086,28 @@ const getProductType = (productName: string): string => {
   if (name.includes('bijou') || name.includes('collier') || name.includes('bracelet')) return 'bijou'
   
   return 'produit'
+}
+
+// ✅ GESTION MOBILE INPUT FOCUS/BLUR
+const handleMobileInputFocus = () => {
+  if (isMobile.value) {
+    keyboardVisible.value = true
+    console.log('📱 [MOBILE] Clavier affiché')
+    // Petit délai pour permettre l'animation
+    setTimeout(() => {
+      scrollToBottom()
+    }, 300)
+  }
+}
+
+const handleMobileInputBlur = () => {
+  if (isMobile.value) {
+    keyboardVisible.value = false
+    console.log('📱 [MOBILE] Clavier masqué')
+    setTimeout(() => {
+      scrollToBottom()
+    }, 100)
+  }
 }
 
 const sendMessage = async () => {
@@ -1144,7 +1190,7 @@ const closeChat = () => {
   }
 }
 
-// ✅ API CALL CORRIGÉE AVEC MEILLEURE GESTION ERREURS
+// ✅ API CALL CORRIGÉE AVEC GESTION CORS
 const sendApiMessage = async (message: string) => {
   const apiUrl = configData.value.apiUrl || 'https://chatseller-api-production.up.railway.app'
   const endpoint = `${apiUrl}/api/v1/public/chat`
@@ -1179,7 +1225,9 @@ const sendApiMessage = async (message: string) => {
         'Origin': window.location.origin,
         'X-Message-Count': messages.value.filter(m => m.role === 'assistant').length.toString()
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      mode: 'cors', // ✅ AJOUT : Mode CORS explicite
+      credentials: 'omit' // ✅ AJOUT : Pas de credentials nécessaires
     })
 
     console.log('📥 [API CALL] Statut réponse:', response.status)
@@ -1294,6 +1342,244 @@ const scrollToBottom = () => {
   }
 }
 
+// ✅ RESTAURÉ : GÉNÉRATEUR CLÉ CONVERSATION
+const generateConversationKey = (): string => {
+  const shopId = configData.value.shopId
+  const productId = configData.value.productId || 'general'
+  const productName = configData.value.productName || 'general'
+  
+  // Clé basée sur shopId + produit (ID ou nom normalisé)
+  const normalizedProduct = productId !== 'general' 
+    ? productId 
+    : productName.toLowerCase().replace(/[^a-z0-9]/g, '-').substring(0, 50)
+  
+  return `${shopId}-${normalizedProduct}`
+}
+
+// ✅ RESTAURÉ : SAUVEGARDE CONVERSATION
+const saveConversation = (messages: any[], conversationId: string | null) => {
+  try {
+    if (!currentConversationKey) {
+      currentConversationKey = generateConversationKey()
+    }
+
+    const conversationData = {
+      messages,
+      conversationId,
+      timestamp: new Date().toISOString(),
+      shopId: configData.value.shopId,
+      productInfo: {
+        id: configData.value.productId,
+        name: configData.value.productName,
+        price: configData.value.productPrice,
+        url: configData.value.productUrl || window.location.href
+      },
+      userAgent: navigator.userAgent,
+      lastActivity: Date.now()
+    }
+    
+    // ✅ SAUVEGARDE LOCALE ET NAVIGATEUR
+    conversationHistory.set(currentConversationKey, conversationData)
+    
+    // ✅ SAUVEGARDE LOCALSTORAGE AVEC NETTOYAGE AUTO
+    try {
+      const storageKey = `chatseller-conv-${currentConversationKey}`
+      localStorage.setItem(storageKey, JSON.stringify(conversationData))
+      
+      // ✅ NETTOYAGE CONVERSATIONS ANCIENNES (>7 jours)
+      cleanupOldConversations()
+      
+      console.log('💾 [PERSISTENCE] Conversation sauvegardée:', {
+        key: currentConversationKey,
+        messages: messages.length,
+        product: conversationData.productInfo.name
+      })
+    } catch (storageError) {
+      console.warn('⚠️ [PERSISTENCE] LocalStorage failed, using memory only:', storageError)
+    }
+    
+  } catch (error) {
+    console.warn('⚠️ [PERSISTENCE] Erreur sauvegarde conversation:', error)
+  }
+}
+
+// ✅ RESTAURÉ : CHARGEMENT CONVERSATION
+const loadConversation = (): any => {
+  try {
+    const requestedKey = generateConversationKey()
+    console.log('📂 [PERSISTENCE] Recherche conversation:', requestedKey)
+
+    // ✅ PRIORITÉ 1 : Conversation en mémoire
+    if (conversationHistory.has(requestedKey)) {
+      const memoryConv = conversationHistory.get(requestedKey)
+      if (isConversationValid(memoryConv)) {
+        currentConversationKey = requestedKey
+        console.log('📂 [PERSISTENCE] Conversation trouvée en mémoire')
+        return memoryConv
+      }
+    }
+
+    // ✅ PRIORITÉ 2 : LocalStorage
+    try {
+      const storageKey = `chatseller-conv-${requestedKey}`
+      const stored = localStorage.getItem(storageKey)
+      if (stored) {
+        const data = JSON.parse(stored)
+        if (isConversationValid(data)) {
+          conversationHistory.set(requestedKey, data)
+          currentConversationKey = requestedKey
+          console.log('📂 [PERSISTENCE] Conversation restaurée depuis localStorage')
+          return data
+        }
+      }
+    } catch (storageError) {
+      console.warn('⚠️ [PERSISTENCE] Erreur lecture localStorage:', storageError)
+    }
+
+    // ✅ PRIORITÉ 3 : Recherche conversation similaire (même shop, produit différent)
+    const similarConv = findSimilarConversation()
+    if (similarConv) {
+      console.log('📂 [PERSISTENCE] Conversation similaire trouvée, création nouvelle session')
+      // Ne pas restaurer mais notifier qu'il y a un historique
+      return {
+        isNewProductConversation: true,
+        previousProduct: similarConv.productInfo?.name,
+        suggestedMessage: `Je vois que nous avons déjà échangé au sujet de "${similarConv.productInfo?.name}". Aujourd'hui vous regardez "${configData.value.productName}". Comment puis-je vous aider ?`
+      }
+    }
+
+    console.log('📂 [PERSISTENCE] Aucune conversation trouvée, nouvelle session')
+    return null
+
+  } catch (error) {
+    console.warn('⚠️ [PERSISTENCE] Erreur chargement conversation:', error)
+    return null
+  }
+}
+
+// ✅ RESTAURÉ : VALIDATION CONVERSATION
+const isConversationValid = (conversation: any): boolean => {
+  if (!conversation || !conversation.messages || !Array.isArray(conversation.messages)) {
+    return false
+  }
+
+  // ✅ Vérifier que la conversation n'est pas trop ancienne (7 jours)
+  const maxAge = 7 * 24 * 60 * 60 * 1000 // 7 jours
+  const age = Date.now() - (conversation.lastActivity || 0)
+  
+  if (age > maxAge) {
+    console.log('⏰ [PERSISTENCE] Conversation trop ancienne:', age / (24 * 60 * 60 * 1000), 'jours')
+    return false
+  }
+
+  return true // Conversation valide
+}
+
+// ✅ RESTAURÉ : RECHERCHE CONVERSATION SIMILAIRE
+const findSimilarConversation = (): any => {
+  try {
+    const currentShop = configData.value.shopId
+    
+    // Chercher dans localStorage toutes les conversations du même shop
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i)
+      if (key && key.startsWith(`chatseller-conv-${currentShop}-`)) {
+        try {
+          const stored = localStorage.getItem(key)
+          if (stored) {
+            const data = JSON.parse(stored)
+            if (data.shopId === currentShop && data.messages && data.messages.length > 0) {
+              return data
+            }
+          }
+        } catch (e) {
+          console.warn('⚠️ Erreur lecture conversation:', key, e)
+        }
+      }
+    }
+    
+    return null
+  } catch (error) {
+    console.warn('⚠️ [PERSISTENCE] Erreur recherche similaire:', error)
+    return null
+  }
+}
+
+// ✅ RESTAURÉ : NETTOYAGE CONVERSATIONS ANCIENNES
+const cleanupOldConversations = (): void => {
+  try {
+    const maxAge = 7 * 24 * 60 * 60 * 1000 // 7 jours
+    const currentTime = Date.now()
+    
+    // Nettoyer localStorage
+    const keysToRemove: string[] = []
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i)
+      if (key && key.startsWith('chatseller-conv-')) {
+        try {
+          const stored = localStorage.getItem(key)
+          if (stored) {
+            const data = JSON.parse(stored)
+            const age = currentTime - (data.lastActivity || 0)
+            if (age > maxAge) {
+              keysToRemove.push(key)
+            }
+          }
+        } catch (e) {
+          keysToRemove.push(key) // Supprimer les conversations corrompues
+        }
+      }
+    }
+    
+    // Supprimer les conversations anciennes
+    keysToRemove.forEach(key => {
+      try {
+        localStorage.removeItem(key)
+        console.log('🧹 [CLEANUP] Conversation ancienne supprimée:', key)
+      } catch (e) {
+        console.warn('⚠️ [CLEANUP] Erreur suppression:', key, e)
+      }
+    })
+    
+    // Nettoyer mémoire
+    conversationHistory.forEach((value, key) => {
+      const age = currentTime - (value.lastActivity || 0)
+      if (age > maxAge) {
+        conversationHistory.delete(key)
+      }
+    })
+    
+    if (keysToRemove.length > 0) {
+      console.log(`🧹 [CLEANUP] ${keysToRemove.length} conversations anciennes nettoyées`)
+    }
+    
+  } catch (error) {
+    console.warn('⚠️ [CLEANUP] Erreur nettoyage:', error)
+  }
+}
+
+// ✅ RESTAURÉ : RESET CONVERSATION
+const resetConversation = () => {
+  try {
+    if (currentConversationKey) {
+      // Supprimer de localStorage
+      const storageKey = `chatseller-conv-${currentConversationKey}`
+      localStorage.removeItem(storageKey)
+      
+      // Supprimer de mémoire
+      conversationHistory.delete(currentConversationKey)
+      
+      console.log('🔄 [RESET] Conversation réinitialisée:', currentConversationKey)
+    }
+    
+    // Réinitialiser état
+    currentConversationKey = null
+    
+  } catch (error) {
+    console.warn('⚠️ [RESET] Erreur reset conversation:', error)
+  }
+}
+
 watch(messages, () => {
   nextTick(() => {
     scrollToBottom()
@@ -1306,13 +1592,13 @@ watch(messages, () => {
 
 onMounted(() => {
   console.log('🎨 [WIDGET VUE] Composant monté avec couleur:', primaryColor.value)
-  sendWelcomeMessage()
+  sendWelcomeMessage() // ✅ CORRECTION : Message d'accueil unique au montage
   
-  // ✅ GESTION MOBILE VIEWPORT PLEIN ÉCRAN STRICTE
+  // ✅ GESTION MOBILE VIEWPORT AMÉLIORÉE
   if (isMobile.value && typeof window !== 'undefined') {
-    console.log('📱 [MOBILE] Configuration viewport plein écran STRICTE...')
+    console.log('📱 [MOBILE] Configuration viewport améliorée...')
     
-    // ✅ 1. MÉTAVIEWPORT DYNAMIQUE STRICT
+    // ✅ MÉTAVIEWPORT DYNAMIQUE
     let metaViewport = document.querySelector('meta[name="viewport"]')
     if (!metaViewport) {
       metaViewport = document.createElement('meta')
@@ -1321,138 +1607,73 @@ onMounted(() => {
     }
     metaViewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover')
     
-    // ✅ 2. CSS MOBILE PLEIN ÉCRAN FORCÉ STRICT
+    // ✅ CSS MOBILE AMÉLIORÉ
     const mobileStyle = document.createElement('style')
-    mobileStyle.id = 'chatseller-mobile-fullscreen-strict'
+    mobileStyle.id = 'chatseller-mobile-enhanced'
     mobileStyle.textContent = `
-      /* ✅ MOBILE PLEIN ÉCRAN STRICT - FORCE MAXIMALE */
+      /* ✅ MOBILE AMÉLIORÉ AVEC GESTION CLAVIER */
       html.cs-modal-open,
       body.cs-modal-open {
         overflow: hidden !important;
         position: fixed !important;
         width: 100vw !important;
         height: 100vh !important;
-        height: 100dvh !important;
         margin: 0 !important;
         padding: 0 !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        bottom: 0 !important;
-        max-width: 100vw !important;
-        max-height: 100dvh !important;
       }
       
-      /* ✅ MODAL MOBILE PLEIN ÉCRAN STRICT */
       .cs-chat-modal-overlay {
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
-        right: 0 !important;
-        bottom: 0 !important;
         width: 100vw !important;
         height: 100vh !important;
-        height: 100dvh !important;
-        margin: 0 !important;
-        padding: 0 !important;
         z-index: 2147483647 !important;
-        max-width: 100vw !important;
-        max-height: 100dvh !important;
+        overscroll-behavior: none !important;
       }
       
-      /* ✅ CONTAINER MOBILE EXACT PLEIN ÉCRAN */
       @media (max-width: 767px) {
         .cs-chat-container-mobile {
           position: fixed !important;
           top: 0 !important;
           left: 0 !important;
-          right: 0 !important;
-          bottom: 0 !important;
           width: 100vw !important;
           height: 100vh !important;
           height: 100dvh !important;
-          max-width: 100vw !important;
-          max-height: 100vh !important;
-          max-height: 100dvh !important;
           border-radius: 0 !important;
-          border: none !important;
-          margin: 0 !important;
-          padding: 0 !important;
-          z-index: 2147483647 !important;
+          overflow: hidden !important;
         }
         
-        .cs-chat-modal-overlay {
-          align-items: stretch !important;
-          justify-content: stretch !important;
-          padding: 0 !important;
+        /* ✅ GESTION CLAVIER AMÉLIORÉE */
+        .cs-chat-container-mobile.keyboard-visible {
+          height: 100vh !important;
         }
         
-        .cs-mobile-header {
-          width: 100vw !important;
-          max-width: 100vw !important;
-        }
-        
-        .cs-messages-area-mobile {
-          width: 100vw !important;
-          max-width: 100vw !important;
-        }
-        
-        .cs-mobile-input-section {
-          width: 100vw !important;
-          max-width: 100vw !important;
-        }
-      }
-      
-      /* ✅ SAFE AREA IPHONE STRICT */
-      @supports (padding: max(0px)) {
-        .cs-mobile-header {
-          padding-top: calc(env(safe-area-inset-top) + 16px) !important;
-        }
-        
-        .cs-mobile-input-section {
-          padding-bottom: calc(env(safe-area-inset-bottom) + 16px) !important;
-        }
-      }
-      
-      /* ✅ GESTION CLAVIER MOBILE STRICT */
-      @media (max-width: 767px) {
-        .cs-mobile-input-container input:focus {
-          transform: translateZ(0) !important;
-          -webkit-transform: translateZ(0) !important;
-        }
-        
-        input[type="text"] {
-          font-size: 16px !important;
+        /* ✅ SAFE AREA IPHONE */
+        @supports (padding: max(0px)) {
+          .cs-mobile-header {
+            padding-top: calc(env(safe-area-inset-top) + 16px) !important;
+          }
+          
+          .cs-mobile-input-section:not(.keyboard-visible) {
+            padding-bottom: calc(env(safe-area-inset-bottom) + 16px) !important;
+          }
         }
       }
     `
     document.head.appendChild(mobileStyle)
     
-    // ✅ 3. CLASSES FORCÉES POUR BODY STRICT
+    // ✅ CLASSES BODY
     document.documentElement.classList.add('cs-modal-open')
     document.body.classList.add('cs-modal-open')
     
-    // ✅ 4. GESTION CLAVIER MOBILE
-    const mobileInput = document.querySelector('.cs-mobile-message-input')
-    if (mobileInput) {
-      mobileInput.addEventListener('focus', () => {
-        setTimeout(() => {
-          window.scrollTo(0, 0)
-        }, 100)
-      })
-      
-      mobileInput.addEventListener('blur', () => {
-        window.scrollTo(0, 0)
-      })
-    }
+    console.log('✅ [MOBILE] Configuration améliorée terminée')
     
-    console.log('✅ [MOBILE] Configuration plein écran STRICTE terminée')
-    
-    // ✅ 5. NETTOYAGE AU DÉMONTAGE
+    // ✅ NETTOYAGE AU DÉMONTAGE
     return () => {
       document.documentElement.classList.remove('cs-modal-open')
       document.body.classList.remove('cs-modal-open')
-      const mobileStyleEl = document.getElementById('chatseller-mobile-fullscreen-strict')
+      const mobileStyleEl = document.getElementById('chatseller-mobile-enhanced')
       if (mobileStyleEl) {
         mobileStyleEl.remove()
       }
