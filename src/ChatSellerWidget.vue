@@ -82,19 +82,10 @@
             </div>
           </div>
 
-          <!-- ✅ INDICATEUR DE FRAPPE CORRIGÉ UNE LIGNE HORIZONTALE -->
+          <!-- ✅ INDICATEUR DE FRAPPE  -->
           <div v-if="isTyping" class="cs-message-item cs-assistant-message" :style="messageItemStyle('assistant')">
-            <div class="cs-assistant-bubble" :style="assistantBubbleStyle">
-              <div class="cs-typing-content">
-                <div class="cs-typing-indicator" :style="typingIndicatorStyle">
-                  <span class="cs-typing-text" :style="typingTextStyle">{{ agentName }} est en train d'écrire...</span>
-                  <div class="cs-typing-dots" :style="typingDotsStyle">
-                    <div class="cs-typing-dot" :style="typingDotStyle"></div>
-                    <div class="cs-typing-dot" :style="typingDotStyle"></div>
-                    <div class="cs-typing-dot" :style="typingDotStyle"></div>
-                  </div>
-                </div>
-              </div>
+            <div class="cs-typing-simple" :style="typingSimpleStyle">
+              <span class="cs-typing-text" :style="typingTextStyle">{{ agentName }} est en train d'écrire...</span>
             </div>
           </div>
 
@@ -224,17 +215,8 @@
 
           <!-- ✅ Typing mobile CORRIGÉ UNE LIGNE HORIZONTALE -->
           <div v-if="isTyping" class="cs-mobile-message cs-mobile-assistant" :style="messageItemStyle('assistant')">
-            <div class="cs-mobile-assistant-bubble" :style="assistantBubbleStyle">
-              <div class="cs-mobile-typing">
-                <div class="cs-mobile-typing-indicator" :style="typingIndicatorStyle">
-                  <span class="cs-mobile-typing-text" :style="typingTextStyle">{{ agentName }} est en train d'écrire...</span>
-                  <div class="cs-mobile-typing-dots" :style="typingDotsStyle">
-                    <div class="cs-mobile-dot" :style="typingDotStyle"></div>
-                    <div class="cs-mobile-dot" :style="typingDotStyle"></div>
-                    <div class="cs-mobile-dot" :style="typingDotStyle"></div>
-                  </div>
-                </div>
-              </div>
+            <div class="cs-mobile-typing-simple" :style="typingSimpleStyle">
+              <span class="cs-mobile-typing-text" :style="typingTextStyle">{{ agentName }} est en train d'écrire...</span>
             </div>
           </div>
 
@@ -798,19 +780,32 @@ const messageTimeUserStyle = computed((): CSSProperties => ({
   fontFamily: 'inherit'
 }))
 
-// ✅ TYPING INDICATOR CORRIGÉ UNE LIGNE HORIZONTALE
+// ✅ TYPING INDICATOR 
+
+const typingSimpleStyle = computed((): CSSProperties => ({
+  padding: '12px 16px !important',
+  background: 'transparent !important',
+  borderRadius: '18px !important',
+  margin: '0 !important',
+  color: '#6b7280 !important',
+  fontSize: '12px !important',
+  fontStyle: 'italic !important',
+  fontFamily: 'inherit !important',
+  maxWidth: '75% !important'
+}))
+
 const typingTextStyle = computed((): CSSProperties => ({
   fontSize: '12px',
   color: '#6b7280',
   fontStyle: 'italic',
   marginRight: '8px',
   fontFamily: 'inherit',
-  whiteSpace: 'nowrap' // ✅ CORRECTION : Empêche retour à la ligne
+  whiteSpace: 'nowrap' 
 }))
 
 const typingIndicatorStyle = computed((): CSSProperties => ({
-  display: 'flex', // ✅ CORRECTION : Flexbox horizontal
-  alignItems: 'center', // ✅ CORRECTION : Centrage vertical
+  display: 'flex', 
+  alignItems: 'center', 
   gap: '8px',
   padding: '12px 16px',
   background: '#ffffff',
@@ -855,7 +850,7 @@ const mobileInputSectionStyle = computed((): CSSProperties => ({
   background: '#ffffff',
   flexShrink: '0',
   paddingTop: '16px',
-  paddingBottom: keyboardVisible.value ? '16px' : 'calc(16px + env(safe-area-inset-bottom))', // ✅ Gestion clavier
+  paddingBottom: keyboardVisible.value ? '16px' : 'calc(16px + env(safe-area-inset-bottom))', 
   paddingLeft: '0',
   paddingRight: '0',
   margin: '0',
@@ -1012,52 +1007,11 @@ Je vois que vous vous intéressez maintenant à "${productInfo.value?.name}". Co
       }
     }
 
-    console.log('🆕 [WELCOME] Première visite, création message standard')
-    
-    let welcomeMessage = ''
-    
-    if (configData.value.agentConfig?.welcomeMessage) {
-      welcomeMessage = configData.value.agentConfig.welcomeMessage
-    } else {
-      const localAgentName = agentName.value || 'Rose'
-      const localAgentTitle = agentTitle.value || 'Vendeuse'
-      const greeting = getTimeBasedGreeting()
-      const localAgentStore = 'VIENS ON S\'CONNAÎT' // ✅ CORRECTION : Nom boutique correct
-      
-      if (productInfo.value?.name) {
-        const productType = getProductType(productInfo.value.name)
-        welcomeMessage = `${greeting} 👋 Je suis ${localAgentName}, ${localAgentTitle} chez ${localAgentStore}.
-
-Je vois que vous vous intéressez à notre ${productType} **"${productInfo.value.name}"**. C'est un excellent choix ! 💫
-
-Comment puis-je vous aider ? 😊`
-      } else {
-        welcomeMessage = `${greeting} 👋 Je suis ${localAgentName}, ${localAgentTitle} chez ${localAgentStore}.
-
-En quoi puis-je vous aider ? 😊`
-      }
-    }
-
-    const aiMessage: Message = {
-      id: uuidv4(),
-      role: 'assistant',
-      content: welcomeMessage,
-      timestamp: new Date()
-    }
-    messages.value.push(aiMessage)
-    
-    console.log('✅ [WELCOME] Message d\'accueil créé pour première visite')
+    // L'API publique gère déjà le message d'accueil
+    console.log('📝 [WELCOME] Pas de message local - l\'API gère l\'accueil')
 
   } catch (error: unknown) {
     console.error('❌ [WELCOME] Erreur message d\'accueil:', error)
-    
-    const fallbackMessage: Message = {
-      id: uuidv4(),
-      role: 'assistant',
-      content: `Bonjour ! Je suis là pour vous aider. En quoi puis-je vous être utile ? 😊`,
-      timestamp: new Date()
-    }
-    messages.value.push(fallbackMessage)
   }
 }
 

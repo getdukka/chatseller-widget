@@ -1,4 +1,4 @@
-// src/embed.ts - VERSION COMPLÈTE RESTAURÉE + CORRECTIONS ICÔNE ✅
+// src/embed.ts 
 
 // ✅ POLYFILLS CRITIQUES POUR LE NAVIGATEUR
 if (typeof global === 'undefined') {
@@ -49,7 +49,7 @@ class ChatSeller {
       shopId: '',
       apiUrl: 'https://chatseller-api-production.up.railway.app',
       theme: 'modern',
-      primaryColor: '#8B5CF6', // ✅ CORRECTION : Violet par défaut
+      primaryColor: '#8B5CF6', 
       position: 'above-cta',
       buttonText: 'Parler au vendeur',
       borderRadius: 'full',
@@ -63,6 +63,19 @@ class ChatSeller {
   async init(config: ChatSellerConfig) {
     if (this.isInitialized) {
       console.warn('🟡 ChatSeller déjà initialisé')
+      return
+    }
+
+    if (!this.isProductPage()) {
+      console.log('🚫 [INIT] Page non-produit, initialisation annulée')
+      return
+    }
+
+    console.log('🚀 Initialisation ChatSeller widget...', config.shopId)
+    this.config = { ...this.config, ...config }
+
+    if (!this.config.shopId) {
+      console.error('❌ ChatSeller: shopId requis')
       return
     }
 
@@ -1355,106 +1368,192 @@ class ChatSeller {
   }
 
   private insertWidgetAtPosition(container: HTMLElement): void {
-    const position = this.config.position || 'above-cta'
+  // ✅ VÉRIFICATION STRICTE : SEULEMENT PAGES PRODUITS
+  if (!this.isProductPage()) {
+    console.log('🚫 [WIDGET] Page non-produit détectée, widget non inséré')
+    return
+  }
+
+  const position = this.config.position || 'above-cta'
+  
+  // ✅ SÉLECTEURS CTA ÉTENDUS POUR SHOPIFY + WOOCOMMERCE + AUTRES
+  const ctaSelectors = [
+    // Shopify - ORDRE PRIORITÉ
+    'form[action*="/cart/add"] button[type="submit"]',
+    '.product-form__buttons button[name="add"]',
+    '.product-form__cart-submit',
+    '.product-single__add-to-cart',
+    'button[name="add"]:not([name="add-to-cart"])',
+    '.add-to-cart',
+    '.shopify-payment-button__button',
     
-    // ✅ RESTAURÉ : SÉLECTEURS CTA ÉTENDUS POUR SHOPIFY + WOOCOMMERCE + AUTRES
-    const ctaSelectors = [
-      // Shopify
-      '.product-form__buttons',
-      'form[action*="/cart/add"] button[type="submit"]',
-      '.product-form button[name="add"]',
-      '.add-to-cart',
-      'button[name="add"]',
-      '.product-form__cart-submit',
-      '.btn.product-form__cart-submit',
-      '.shopify-payment-button',
-      '.product-single__add-to-cart',
-      
-      // WooCommerce
-      '.single_add_to_cart_button',
-      'button[name="add-to-cart"]',
-      '.woocommerce-cart .cart',
-      '.wc-add-to-cart',
-      '.add_to_cart_button',
-      
-      // Générique
-      'button[class*="add-to-cart"]',
-      'button[class*="buy"]',
-      'button[class*="purchase"]',
-      '.buy-button',
-      '.purchase-button'
-    ]
+    // WooCommerce
+    '.single_add_to_cart_button',
+    'button[name="add-to-cart"]',
+    '.wc-add-to-cart',
+    '.add_to_cart_button',
     
-    let targetElement = null
-    
-    for (const selector of ctaSelectors) {
-      targetElement = document.querySelector(selector)
-      if (targetElement) {
-        console.log(`✅ Élément CTA trouvé: ${selector}`)
-        break
-      }
-    }
-    
+    // Générique
+    'button[class*="add-to-cart"]',
+    'button[class*="add-cart"]',
+    'button[class*="buy"]',
+    'button[class*="purchase"]',
+    '.buy-button',
+    '.purchase-button'
+  ]
+  
+  let targetElement = null
+  
+  for (const selector of ctaSelectors) {
+    targetElement = document.querySelector(selector)
     if (targetElement) {
-      try {
-        const targetParent = targetElement.parentNode
-        if (targetParent) {
-          if (position === 'above-cta') {
-            targetParent.insertBefore(container, targetElement)
-          } else if (position === 'below-cta') {
-            targetParent.insertBefore(container, targetElement.nextSibling)
-          } else if (position === 'beside-cta') {
-            if (targetElement instanceof HTMLElement) {
-              targetElement.style.display = 'flex'
-              targetElement.style.gap = '10px'
-              targetElement.appendChild(container)
-            } else {
-              targetParent.insertBefore(container, targetElement.nextSibling)
-            }
+      console.log(`✅ Élément CTA trouvé: ${selector}`)
+      break
+    }
+  }
+  
+  if (targetElement) {
+    try {
+      const targetParent = targetElement.parentNode
+      if (targetParent) {
+        if (position === 'above-cta') {
+          targetParent.insertBefore(container, targetElement)
+        } else if (position === 'below-cta') {
+          targetParent.insertBefore(container, targetElement.nextSibling)
+        } else if (position === 'beside-cta') {
+          if (targetElement instanceof HTMLElement) {
+            targetElement.style.display = 'flex'
+            targetElement.style.gap = '10px'
+            targetElement.appendChild(container)
           } else {
             targetParent.insertBefore(container, targetElement.nextSibling)
           }
-          
-          console.log('✅ Widget inséré avec succès')
-          return
+        } else {
+          targetParent.insertBefore(container, targetElement.nextSibling)
         }
-      } catch (error) {
-        console.warn('⚠️ Erreur insertion:', error)
+        
+        console.log('✅ Widget inséré avec succès')
+        return
       }
-    }
-    
-    // ✅ RESTAURÉ : FALLBACKS ÉTENDUS
-    const fallbackSelectors = [
-      'form[action*="/cart/add"]',
-      '.product-form',
-      '.product-single',
-      '.product-details',
-      '.woocommerce-product',
-      '.product-info',
-      '.main-content',
-      'main',
-      '.container'
-    ]
-    
-    for (const selector of fallbackSelectors) {
-      const fallbackElement = document.querySelector(selector)
-      if (fallbackElement) {
-        try {
-          fallbackElement.appendChild(container)
-          console.log(`✅ Widget inséré via fallback: ${selector}`)
-          return
-        } catch (error) {
-          console.warn('⚠️ Erreur insertion fallback:', error)
-        }
-      }
-    }
-    
-    // ✅ RESTAURÉ : FALLBACK FINAL
-    if (!this.config.disableFallback) {
-      console.log('⚠️ Fallback final: insertion body')
-      document.body.appendChild(container)
+    } catch (error) {
+      console.warn('⚠️ Erreur insertion:', error)
     }
   }
+  
+  console.warn('⚠️ Aucun bouton CTA trouvé sur cette page produit')
+}
+
+// ✅ NOUVELLE FONCTION : Détection stricte des pages produits
+private isProductPage(): boolean {
+  try {
+    console.log('🔍 [PRODUCT PAGE] Vérification type de page...')
+    
+    // ✅ SHOPIFY - Vérifications multiples
+    if (this.isShopify()) {
+      // Vérifier template Shopify
+      const shopifyTemplateMeta = document.querySelector('meta[name="shopify-template"]')
+      if (shopifyTemplateMeta) {
+        const template = shopifyTemplateMeta.getAttribute('content')
+        console.log('🛍️ [SHOPIFY] Template détecté:', template)
+        return template === 'product' || (template?.startsWith('product.') ?? false)
+      }
+      
+      // Vérifier URL Shopify
+      const isShopifyProductUrl = /\/products\/[^\/]+\/?(?:\?|$)/.test(window.location.pathname)
+      if (isShopifyProductUrl) {
+        console.log('✅ [SHOPIFY] URL produit confirmée:', window.location.pathname)
+        return true
+      }
+      
+      // Vérifier sélecteurs produit Shopify
+      const shopifyProductSelectors = [
+        'form[action*="/cart/add"]',
+        '.product-form',
+        '.product-single',
+        '[data-product-handle]',
+        '.product'
+      ]
+      
+      for (const selector of shopifyProductSelectors) {
+        if (document.querySelector(selector)) {
+          console.log('✅ [SHOPIFY] Sélecteur produit trouvé:', selector)
+          return true
+        }
+      }
+    }
+    
+    // ✅ WOOCOMMERCE
+    if (this.isWooCommerce()) {
+      // Vérifier classe body WooCommerce
+      if (document.body.classList.contains('single-product')) {
+        console.log('✅ [WOOCOMMERCE] Page single-product confirmée')
+        return true
+      }
+      
+      // Vérifier sélecteurs WooCommerce
+      const wooSelectors = [
+        '.woocommerce-product',
+        '.single-product',
+        'form.cart',
+        '.single_add_to_cart_button'
+      ]
+      
+      for (const selector of wooSelectors) {
+        if (document.querySelector(selector)) {
+          console.log('✅ [WOOCOMMERCE] Sélecteur produit trouvé:', selector)
+          return true
+        }
+      }
+    }
+    
+    // ✅ DÉTECTION GÉNÉRIQUE
+    const genericProductIndicators = [
+      // URLs typiques
+      () => /\/(product|item|p)\//.test(window.location.pathname),
+      () => /\/products\/[^\/]+/.test(window.location.pathname),
+      
+      // Sélecteurs génériques
+      () => !!document.querySelector('button[class*="add-to-cart"], button[class*="buy"], .product-price, [data-product-id]'),
+      
+      // Métadonnées
+      () => !!document.querySelector('meta[property="product:price"], script[type="application/ld+json"]')?.textContent?.includes('"@type": "Product"')
+    ]
+    
+    for (const indicator of genericProductIndicators) {
+      if (indicator()) {
+        console.log('✅ [GENERIC] Indicateur produit générique confirmé')
+        return true
+      }
+    }
+    
+    console.log('🚫 [PRODUCT PAGE] Pas une page produit détectée')
+    return false
+    
+  } catch (error) {
+    console.warn('⚠️ Erreur détection page produit:', error)
+    return false // En cas d'erreur, on ne montre pas le widget
+  }
+}
+
+// ✅ HELPERS pour détection plateformes
+private isShopify(): boolean {
+  return !!(
+    (window as any).Shopify ||
+    document.querySelector('[data-shopify]') ||
+    window.location.hostname.includes('myshopify.com') ||
+    document.querySelector('script[src*="shopify"]') ||
+    document.querySelector('meta[name="shopify-template"]')
+  )
+}
+
+private isWooCommerce(): boolean {
+  return !!(
+    document.querySelector('.woocommerce') ||
+    document.querySelector('[class*="woo"]') ||
+    (window as any).wc_add_to_cart_params ||
+    document.body.classList.contains('woocommerce')
+  )
+}
 
   private renderWidget() {
     if (!this.widgetElement) return
