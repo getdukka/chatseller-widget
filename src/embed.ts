@@ -28,7 +28,17 @@ export interface ChatSellerConfig {
   borderRadius?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full'
   language?: 'fr' | 'en' | 'wo'
   autoDetectProduct?: boolean
-  agentConfig?: any
+  agentConfig?: {
+    id?: string
+    name?: string
+    title?: string
+    avatar?: string
+    welcomeMessage?: string  
+    fallbackMessage?: string
+    personality?: string
+    customProductType?: string  
+    shopName?: string  
+  }
   forceContainer?: string
   debug?: boolean
   disableFallback?: boolean
@@ -1801,16 +1811,15 @@ private isWooCommerce(): boolean {
 
   private initVueWidget(): void {
     try {
-      console.log('🎨 [INIT VUE] Initialisation composant Vue avec persistance...')
+      console.log('🎨 [INIT VUE] Initialisation composant Vue avec configuration complète...')
       
       if (!this.modalElement) {
         throw new Error('Modal element non trouvé pour Vue')
       }
       
-      // ✅ RESTAURÉ : DÉTECTION AUTOMATIQUE PRODUIT AMÉLIORÉE  
+      // ✅ CORRECTION MAJEURE : Récupération produit avec type personnalisé
       const currentProduct = this.detectCurrentProduct()
       if (currentProduct) {
-        // Vérifier si le produit a changé
         const hasProductChanged = this.config.productName !== currentProduct.name ||
                                  this.config.productId !== currentProduct.id
         
@@ -1818,20 +1827,26 @@ private isWooCommerce(): boolean {
           console.log('🔄 [PRODUCT CHANGE] Produit changé détecté')
           this.handleProductChange(currentProduct)
         } else {
-          // Mettre à jour la config avec les infos actuelles
           this.config.productName = currentProduct.name
           this.config.productPrice = currentProduct.price
           this.config.productUrl = currentProduct.url || window.location.href
         }
       }
       
-      // ✅ RESTAURÉ : CONFIGURATION COMPLÈTE AVEC PERSISTANCE
+      // ✅ CORRECTION CRITIQUE : Configuration complète avec welcomeMessage
       const widgetConfig = {
         shopId: this.config.shopId,
         apiUrl: this.config.apiUrl,
-        agentConfig: this.config.agentConfig || {
-          name: 'Rose',
-          title: 'Vendeuse'
+        agentConfig: {
+          id: this.config.agentConfig?.id || this.config.agentId,
+          name: this.config.agentConfig?.name || 'Rose',
+          title: this.config.agentConfig?.title || 'Vendeuse',
+          avatar: this.config.agentConfig?.avatar, // ✅ AVATAR SYNC
+          welcomeMessage: this.config.agentConfig?.welcomeMessage, // ✅ CORRECTION MAJEURE
+          fallbackMessage: this.config.agentConfig?.fallbackMessage,
+          personality: this.config.agentConfig?.personality || 'friendly',
+          customProductType: this.config.agentConfig?.customProductType, // ✅ NOUVEAU CHAMP
+          shopName: this.config.agentConfig?.shopName || 'notre boutique' // ✅ NOUVEAU CHAMP
         },
         primaryColor: this.config.primaryColor,
         buttonText: this.config.buttonText,
@@ -1843,9 +1858,15 @@ private isWooCommerce(): boolean {
         productUrl: this.config.productUrl || window.location.href
       }
 
-      console.log('⚙️ [INIT VUE] Configuration widget avec persistance:', {
+      console.log('⚙️ [INIT VUE] Configuration widget avec welcomeMessage:', {
         shopId: widgetConfig.shopId,
         agent: widgetConfig.agentConfig.name,
+        title: widgetConfig.agentConfig.title,
+        hasWelcomeMessage: !!widgetConfig.agentConfig.welcomeMessage,
+        welcomePreview: widgetConfig.agentConfig.welcomeMessage?.substring(0, 50),
+        hasAvatar: !!widgetConfig.agentConfig.avatar,
+        customProductType: widgetConfig.agentConfig.customProductType,
+        shopName: widgetConfig.agentConfig.shopName,
         product: widgetConfig.productName,
         hasPersistence: true
       })
@@ -1854,7 +1875,7 @@ private isWooCommerce(): boolean {
         config: widgetConfig
       })
 
-      // ✅ RESTAURÉ : EXPOSER MÉTHODES GLOBALES AVEC PERSISTANCE
+      // ✅ MÉTHODES GLOBALES ÉTENDUES
       if (typeof window !== 'undefined') {
         (window as any).ChatSeller = {
           ...((window as any).ChatSeller || {}),
@@ -1862,7 +1883,7 @@ private isWooCommerce(): boolean {
           // Méthodes de base
           closeChat: () => this.closeChat(),
           
-          // ✅ RESTAURÉ : NOUVEAU : Méthodes de persistance
+          // ✅ NOUVELLES MÉTHODES DE PERSISTANCE
           saveConversation: (messages: any[], conversationId: string) => {
             this.saveConversation(messages, conversationId)
           },
@@ -1875,9 +1896,19 @@ private isWooCommerce(): boolean {
             this.resetConversation()
           },
           
-          // ✅ RESTAURÉ : NOUVEAU : Gestion changement produit
+          // ✅ GESTION CHANGEMENT PRODUIT
           updateProduct: (productInfo: any) => {
             this.handleProductChange(productInfo)
+          },
+          
+          // ✅ NOUVEAU : Méthodes configuration agent
+          getAgentConfig: () => {
+            return this.config.agentConfig
+          },
+          
+          updateAgentConfig: (newConfig: any) => {
+            this.config.agentConfig = { ...this.config.agentConfig, ...newConfig }
+            console.log('🔄 [CONFIG UPDATE] Configuration agent mise à jour:', this.config.agentConfig)
           },
           
           // Debug et status
@@ -1888,13 +1919,14 @@ private isWooCommerce(): boolean {
               id: this.config.productId,
               name: this.config.productName,
               url: this.config.productUrl
-            }
+            },
+            agentConfig: this.config.agentConfig
           })
         }
       }
 
       this.vueApp.mount(this.modalElement)
-      console.log('✅ [INIT VUE] Composant Vue monté avec système de persistance')
+      console.log('✅ [INIT VUE] Composant Vue monté avec welcomeMessage et configuration complète')
 
     } catch (error) {
       console.error('❌ [INIT VUE] Erreur initialisation Vue:', error)
@@ -1905,13 +1937,14 @@ private isWooCommerce(): boolean {
   // ✅ RESTAURÉ : NOUVELLE FONCTION : Détection produit améliorée
   private detectCurrentProduct(): any {
     try {
-      console.log('🔍 [PRODUCT DETECT] Détection produit en cours...')
+      console.log('🔍 [PRODUCT DETECT] Détection produit avec type personnalisé...')
       
       let detectedProduct: any = {
         id: this.config.productId,
         name: this.config.productName,
         price: this.config.productPrice,
-        url: this.config.productUrl || window.location.href
+        url: this.config.productUrl || window.location.href,
+        customType: this.config.agentConfig?.customProductType // ✅ NOUVEAU
       }
 
       // ✅ DÉTECTION SHOPIFY AVANCÉE
@@ -1921,32 +1954,51 @@ private isWooCommerce(): boolean {
           id: shopifyProduct.id?.toString() || detectedProduct.id,
           name: shopifyProduct.title || detectedProduct.name,
           price: shopifyProduct.price ? shopifyProduct.price / 100 : detectedProduct.price,
-          url: window.location.href
+          url: window.location.href,
+          customType: this.config.agentConfig?.customProductType
         }
         console.log('✅ [PRODUCT DETECT] Shopify détecté:', detectedProduct.name)
         return detectedProduct
       }
       
-      // ✅ DÉTECTION WOOCOMMERCE
-      const wooProduct = document.querySelector('.woocommerce-product')
+      // ✅ DÉTECTION WOOCOMMERCE AMÉLIORÉE
+      const wooProduct = document.querySelector('.woocommerce-product, .single-product')
       if (wooProduct) {
-        const wooTitle = wooProduct.querySelector('.product_title, .entry-title')
+        const wooTitle = wooProduct.querySelector('.product_title, .entry-title, h1.product-title')
         if (wooTitle?.textContent?.trim()) {
           detectedProduct.name = wooTitle.textContent.trim()
           console.log('✅ [PRODUCT DETECT] WooCommerce détecté:', detectedProduct.name)
         }
+        
+        // ✅ DÉTECTION PRIX WOOCOMMERCE
+        const wooPrice = wooProduct.querySelector('.price .woocommerce-Price-amount, .price ins .amount, .price .amount')
+        if (wooPrice?.textContent) {
+          const priceMatch = wooPrice.textContent.match(/[\d,]+(?:[.,]\d{2})?/)
+          if (priceMatch) {
+            detectedProduct.price = parseFloat(priceMatch[0].replace(',', '.'))
+          }
+        }
       }
 
-      // ✅ DÉTECTION GÉNÉRIQUE PAR SÉLECTEURS
+      // ✅ DÉTECTION GÉNÉRIQUE ÉTENDUE
       if (!detectedProduct.name || detectedProduct.name === 'undefined') {
         const titleSelectors = [
+          // Shopify
           '.product__title',
           '.product-form__title', 
           'h1.product-title',
           '.product-single__title',
+          '.product-info__title',
+          // WooCommerce
+          '.product_title',
+          '.entry-title',
+          // Générique
           'h1[class*="product"]',
           '.product-title h1',
-          '.product-info__title'
+          '.product-detail-title',
+          '[data-product-title]',
+          '.item-title',
+          '.product-name'
         ]
         
         for (const selector of titleSelectors) {
@@ -1959,14 +2011,26 @@ private isWooCommerce(): boolean {
         }
       }
 
-      // ✅ DÉTECTION PRIX
+      // ✅ DÉTECTION PRIX AMÉLIORÉE
       if (!detectedProduct.price) {
         const priceSelectors = [
+          // Shopify
           '.price__current',
           '.product-form__price .price',
           '.money',
           '.price-current',
-          '.product-price'
+          '.product-single__price .money',
+          '.product__price .money',
+          // WooCommerce
+          '.price .woocommerce-Price-amount',
+          '.price ins .amount',
+          // Générique
+          '.product-price',
+          '.price .money',
+          '[data-product-price]',
+          '.price-sale .money',
+          '.current-price',
+          '.sale-price'
         ]
         
         for (const selector of priceSelectors) {
@@ -1983,13 +2047,43 @@ private isWooCommerce(): boolean {
         }
       }
 
-      console.log('🔍 [PRODUCT DETECT] Résultat final:', detectedProduct)
+      // ✅ NOUVEAU : Détection automatique du type si customType pas défini
+      if (!detectedProduct.customType && detectedProduct.name) {
+        detectedProduct.customType = this.getProductTypeFromName(detectedProduct.name)
+      }
+
+      console.log('🔍 [PRODUCT DETECT] Résultat final avec type personnalisé:', {
+        name: detectedProduct.name,
+        price: detectedProduct.price,
+        customType: detectedProduct.customType,
+        id: detectedProduct.id
+      })
+      
       return detectedProduct.name ? detectedProduct : null
 
     } catch (error) {
       console.warn('⚠️ [PRODUCT DETECT] Erreur détection produit:', error)
       return null
     }
+  }
+
+  // ✅ NOUVELLE HELPER : Détecter type de produit depuis le nom
+  private getProductTypeFromName(productName: string): string {
+    if (!productName) return 'produit'
+    
+    const name = productName.toLowerCase()
+    
+    // Détection intelligente du type
+    if (name.includes('jeu') || name.includes('game') || name.includes('cartes') || name.includes('poker')) return 'jeu'
+    if (name.includes('livre') || name.includes('book') || name.includes('roman') || name.includes('guide')) return 'livre'  
+    if (name.includes('cours') || name.includes('formation') || name.includes('training') || name.includes('apprentissage')) return 'formation'
+    if (name.includes('smartphone') || name.includes('téléphone') || name.includes('phone') || name.includes('mobile')) return 'smartphone'
+    if (name.includes('ordinateur') || name.includes('laptop') || name.includes('computer') || name.includes('pc')) return 'ordinateur'
+    if (name.includes('vêtement') || name.includes('tshirt') || name.includes('robe') || name.includes('pantalon')) return 'vêtement'
+    if (name.includes('service') || name.includes('consultation') || name.includes('accompagnement')) return 'service'
+    if (name.includes('bijou') || name.includes('collier') || name.includes('bracelet') || name.includes('bague')) return 'bijou'
+    
+    return 'produit'
   }
 
   private createFallbackModal() {
@@ -2463,25 +2557,154 @@ private isWooCommerce(): boolean {
   handleProductChange(newProductInfo: any) {
     console.log('🔄 [PRODUCT CHANGE] Changement de produit détecté:', {
       from: this.config.productName,
-      to: newProductInfo.name
+      to: newProductInfo.name,
+      customType: newProductInfo.customType
     })
     
     // Sauvegarder conversation actuelle si elle existe
     if (this.currentConversationKey && this.conversationHistory.has(this.currentConversationKey)) {
       console.log('💾 [PRODUCT CHANGE] Sauvegarde de la conversation précédente')
-      // La conversation reste accessible, mais on va créer une nouvelle clé
     }
     
-    // Mettre à jour config produit
+    // Mettre à jour config produit avec type personnalisé
     this.config.productId = newProductInfo.id
     this.config.productName = newProductInfo.name
     this.config.productPrice = newProductInfo.price
     this.config.productUrl = newProductInfo.url
     
+    // ✅ NOUVEAU : Mise à jour customProductType dans agentConfig
+    if (this.config.agentConfig && newProductInfo.customType) {
+      this.config.agentConfig.customProductType = newProductInfo.customType
+    }
+    
     // Générer nouvelle clé de conversation
     this.currentConversationKey = null
     
-    console.log('✅ [PRODUCT CHANGE] Nouveau contexte produit configuré')
+    console.log('✅ [PRODUCT CHANGE] Nouveau contexte produit configuré avec type:', newProductInfo.customType)
+  }
+
+  // ✅ NOUVELLE MÉTHODE : Mise à jour configuration agent depuis Dashboard
+  updateAgentConfiguration(newAgentConfig: any) {
+    console.log('🔄 [AGENT CONFIG UPDATE] Mise à jour configuration agent depuis Dashboard:', newAgentConfig)
+    
+    if (!this.config.agentConfig) {
+      this.config.agentConfig = {}
+    }
+    
+    // Mise à jour complète avec nouveaux champs
+    this.config.agentConfig = {
+      ...this.config.agentConfig,
+      name: newAgentConfig.name || this.config.agentConfig.name,
+      title: newAgentConfig.title || this.config.agentConfig.title,
+      avatar: newAgentConfig.avatar || this.config.agentConfig.avatar,
+      welcomeMessage: newAgentConfig.welcomeMessage || this.config.agentConfig.welcomeMessage,
+      fallbackMessage: newAgentConfig.fallbackMessage || this.config.agentConfig.fallbackMessage,
+      personality: newAgentConfig.personality || this.config.agentConfig.personality,
+      customProductType: newAgentConfig.customProductType || this.config.agentConfig.customProductType,
+      shopName: newAgentConfig.shopName || this.config.agentConfig.shopName
+    }
+    
+    console.log('✅ [AGENT CONFIG UPDATE] Configuration agent mise à jour:', {
+      name: this.config.agentConfig.name,
+      title: this.config.agentConfig.title,
+      hasWelcomeMessage: !!this.config.agentConfig.welcomeMessage,
+      hasAvatar: !!this.config.agentConfig.avatar,
+      customProductType: this.config.agentConfig.customProductType,
+      shopName: this.config.agentConfig.shopName
+    })
+    
+    // Si le chat est ouvert, informer le composant Vue de la mise à jour
+    if (this.isOpen && this.vueApp && typeof window !== 'undefined') {
+      console.log('🔄 [LIVE UPDATE] Notification du composant Vue pour mise à jour en temps réel')
+      // Le composant Vue écoutera les changements via les méthodes globales
+    }
+  }
+
+  // ✅ NOUVELLE MÉTHODE : Forcer rechargement configuration depuis API
+  async refreshConfigFromDashboard(agentId?: string): Promise<boolean> {
+    try {
+      console.log('🔄 [REFRESH CONFIG] Rechargement configuration depuis Dashboard...')
+      
+      if (!agentId && !this.config.agentId) {
+        console.warn('⚠️ [REFRESH CONFIG] Aucun agentId disponible pour le rechargement')
+        return false
+      }
+      
+      const targetAgentId = agentId || this.config.agentId
+      const apiUrl = this.config.apiUrl || 'https://chatseller-api-production.up.railway.app'
+      
+      // Appeler l'API publique pour récupérer la config
+      const response = await fetch(`${apiUrl}/api/v1/public/shops/${this.config.shopId}/config`)
+      
+      if (!response.ok) {
+        console.error('❌ [REFRESH CONFIG] Erreur API:', response.status)
+        return false
+      }
+      
+      const configData = await response.json()
+      
+      if (configData.success && configData.data.agent) {
+        console.log('✅ [REFRESH CONFIG] Nouvelle configuration reçue:', configData.data.agent.name)
+        
+        // Mettre à jour la configuration agent
+        this.updateAgentConfiguration({
+          id: configData.data.agent.id,
+          name: configData.data.agent.name,
+          title: configData.data.agent.title,
+          avatar: configData.data.agent.avatar,
+          welcomeMessage: configData.data.agent.welcomeMessage,
+          fallbackMessage: configData.data.agent.fallbackMessage,
+          personality: configData.data.agent.personality,
+          customProductType: configData.data.agent.customProductType,
+          shopName: configData.data.shop.name
+        })
+        
+        console.log('✅ [REFRESH CONFIG] Configuration mise à jour avec succès')
+        return true
+      }
+      
+      return false
+      
+    } catch (error) {
+      console.error('❌ [REFRESH CONFIG] Erreur:', error)
+      return false
+    }
+  }
+
+  // API publique étendue avec nouvelles fonctionnalités
+  getPublicAPI() {
+    return {
+      // Méthodes de base existantes
+      show: () => this.show(),
+      hide: () => this.hide(),
+      destroy: () => this.destroy(),
+      refresh: () => this.refresh(),
+      updateConfig: (newConfig: Partial<ChatSellerConfig>) => this.updateConfig(newConfig),
+      
+      // ✅ NOUVELLES MÉTHODES PUBLIQUES
+      updateAgentConfig: (newAgentConfig: any) => this.updateAgentConfiguration(newAgentConfig),
+      refreshFromDashboard: (agentId?: string) => this.refreshConfigFromDashboard(agentId),
+      getCurrentConfig: () => this.currentConfig,
+      getCurrentProduct: () => ({
+        id: this.config.productId,
+        name: this.config.productName,
+        price: this.config.productPrice,
+        customType: this.config.agentConfig?.customProductType
+      }),
+      
+      // Getters améliorés
+      get isReady(): boolean { return this.isReady },
+      get version(): string { return this.version },
+      get isModalOpen(): boolean { return this.isModalOpen },
+      get hasDetectedProduct(): boolean { return this.hasDetectedProduct },
+      
+      // Debug amélioré
+      debug: () => ({
+        ...this.debug(),
+        agentConfig: this.config.agentConfig,
+        productCustomType: this.config.agentConfig?.customProductType
+      })
+    }
   }
 
   // ✅ GETTERS PUBLICS
@@ -2525,13 +2748,85 @@ private isWooCommerce(): boolean {
   const chatSeller = new ChatSeller()
   
   if (typeof window !== 'undefined') {
-    (window as any).ChatSeller = chatSeller
+    // ✅ EXPOSITION API PUBLIQUE COMPLÈTE
+    (window as any).ChatSeller = {
+      // API de base
+      ...chatSeller.getPublicAPI(),
+      
+      // ✅ NOUVELLES MÉTHODES GLOBALES POUR SYNCHRONISATION DASHBOARD
+      syncFromDashboard: async (agentId?: string) => {
+        console.log('🔄 [SYNC DASHBOARD] Synchronisation depuis Dashboard...')
+        const success = await chatSeller.refreshConfigFromDashboard(agentId)
+        if (success) {
+          console.log('✅ [SYNC DASHBOARD] Configuration synchronisée avec succès')
+          // Rafraîchir le widget pour appliquer les changements
+          chatSeller.refresh()
+        }
+        return success
+      },
+      
+      // ✅ MÉTHODE POUR MISE À JOUR EN TEMPS RÉEL DEPUIS DASHBOARD
+      updateFromDashboard: (updates: any) => {
+        console.log('🔄 [LIVE UPDATE] Mise à jour en temps réel depuis Dashboard:', updates)
+        
+        if (updates.agent) {
+          chatSeller.updateAgentConfiguration(updates.agent)
+        }
+        
+        if (updates.widget) {
+          const newConfig = { ...chatSeller.currentConfig }
+          Object.assign(newConfig, updates.widget)
+          chatSeller.updateConfig(newConfig)
+        }
+        
+        // Actualiser le widget pour refléter les changements
+        if (chatSeller.isReady) {
+          chatSeller.refresh()
+        }
+      },
+      
+      // ✅ MÉTHODE POUR DÉCLENCHER MESSAGE D'ACCUEIL MANUELLEMENT
+      triggerWelcomeMessage: () => {
+        console.log('👋 [MANUAL WELCOME] Déclenchement manuel message d\'accueil')
+        if (chatSeller.isModalOpen && typeof window !== 'undefined') {
+          // Informer le composant Vue de déclencher le message d'accueil
+          const event = new CustomEvent('chatseller-trigger-welcome', {
+            detail: { 
+              agentConfig: chatSeller.currentConfig.agentConfig,
+              forceWelcome: true
+            }
+          })
+          window.dispatchEvent(event)
+        }
+      }
+    }
     
-    // ✅ AUTO-INIT INTELLIGENT
+    // ✅ AUTO-INIT INTELLIGENT AMÉLIORÉ
     const autoInit = () => {
       if ((window as any).ChatSellerConfig && !chatSeller.isReady) {
-        console.log('🚀 [AUTO-INIT] Initialisation automatique...')
-        chatSeller.init((window as any).ChatSellerConfig)
+        console.log('🚀 [AUTO-INIT] Initialisation automatique avec configuration enrichie...')
+        
+        // ✅ ENRICHIR CONFIG AVEC DONNÉES MANQUANTES
+        const enrichedConfig = {
+          ...(window as any).ChatSellerConfig,
+          agentConfig: {
+            ...((window as any).ChatSellerConfig.agentConfig || {}),
+            // S'assurer que les champs critiques sont présents
+            welcomeMessage: (window as any).ChatSellerConfig.agentConfig?.welcomeMessage || null,
+            customProductType: (window as any).ChatSellerConfig.agentConfig?.customProductType || null,
+            shopName: (window as any).ChatSellerConfig.agentConfig?.shopName || 'notre boutique'
+          }
+        }
+        
+        console.log('🔧 [AUTO-INIT] Configuration enrichie:', {
+          shopId: enrichedConfig.shopId,
+          agentName: enrichedConfig.agentConfig?.name,
+          hasWelcomeMessage: !!enrichedConfig.agentConfig?.welcomeMessage,
+          hasCustomProductType: !!enrichedConfig.agentConfig?.customProductType,
+          shopName: enrichedConfig.agentConfig?.shopName
+        })
+        
+        chatSeller.init(enrichedConfig)
       }
     }
     
@@ -2539,19 +2834,18 @@ private isWooCommerce(): boolean {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', autoInit)
     } else if (document.readyState === 'interactive' || document.readyState === 'complete') {
-      setTimeout(autoInit, 100)
+      setTimeout(autoInit, 200)
     }
     
     // ✅ SUPPORT SHOPIFY SECTIONS DYNAMIQUES AVANCÉ
     if (typeof window !== 'undefined') {
-      // Détecter si on est sur Shopify
       const isShopify = (window as any).Shopify || 
                        document.querySelector('[data-shopify]') || 
                        window.location.hostname.includes('myshopify.com') ||
                        document.querySelector('script[src*="shopify"]')
                        
       if (isShopify) {
-        console.log('🛍️ [SHOPIFY] Mode Shopify activé')
+        console.log('🛍️ [SHOPIFY] Mode Shopify activé avec synchronisation avancée')
         
         // Écouter les changements de section Shopify
         document.addEventListener('shopify:section:load', function(event) {
@@ -2560,7 +2854,12 @@ private isWooCommerce(): boolean {
             if (!chatSeller.isReady) {
               autoInit()
             } else {
-              chatSeller.refresh()
+              // Détecter nouveau produit et mettre à jour
+              const newProduct = chatSeller['detectCurrentProduct']?.()
+              if (newProduct) {
+                chatSeller.handleProductChange(newProduct)
+                chatSeller.refresh()
+              }
             }
           }, 1000)
         })
@@ -2570,105 +2869,93 @@ private isWooCommerce(): boolean {
           chatSeller.cleanupExistingWidgets()
         })
         
-        // Écouter les changements de variantes
-        document.addEventListener('variant:change', function(event) {
-          console.log('🔄 [SHOPIFY] Variante changée:', event)
-          if (chatSeller.config?.autoDetectProduct) {
-            chatSeller.detectProductInfo()
-          }
-        })
-        
-        // ✅ GESTION SPA SHOPIFY (AJAX Navigation)
+        // ✅ GESTION SPA SHOPIFY AMÉLIORÉE
         let currentUrl = window.location.href
         const checkUrlChange = () => {
           if (window.location.href !== currentUrl) {
             currentUrl = window.location.href
             console.log('🔄 [SPA] URL changée, rechargement widget:', currentUrl)
-            chatSeller.cleanupExistingWidgets()
+            
+            // Détecter nouveau produit
             setTimeout(() => {
-              autoInit()
+              const newProduct = chatSeller['detectCurrentProduct']?.()
+              if (newProduct) {
+                chatSeller.handleProductChange(newProduct)
+              }
+              
+              if (!chatSeller.isReady) {
+                autoInit()
+              } else {
+                chatSeller.refresh()
+              }
             }, 700)
           }
         }
         
         setInterval(checkUrlChange, 2000)
-        
-        // Écouter les événements de navigation
         window.addEventListener('popstate', checkUrlChange)
-        
-        // Observer les changements dans le DOM pour SPA
-        if ('MutationObserver' in window) {
-          const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-              if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-                // Vérifier si du nouveau contuit produit a été ajouté
-                const hasProductContent = Array.from(mutation.addedNodes).some(node => {
-                  if (node.nodeType === Node.ELEMENT_NODE) {
-                    const element = node as Element
-                    return element.querySelector('.product-form, .product-single, [data-product]')
-                  }
-                  return false
-                })
-                
-                if (hasProductContent) {
-                  console.log('🔄 [DOM] Nouveau contenu produit détecté')
-                  setTimeout(() => {
-                    if (!document.getElementById('chatseller-widget')) {
-                      autoInit()
-                    }
-                  }, 500)
-                }
-              }
-            })
-          })
-          
-          observer.observe(document.body, {
-            childList: true,
-            subtree: true
-          })
-        }
       }
       
-      // ✅ SUPPORT WOOCOMMERCE
+      // ✅ SUPPORT WOOCOMMERCE AMÉLIORÉ
       const isWooCommerce = document.querySelector('.woocommerce') || 
                            document.querySelector('[class*="woo"]') ||
                            (window as any).wc_add_to_cart_params
                            
       if (isWooCommerce) {
-        console.log('🛒 [WOOCOMMERCE] Mode WooCommerce activé')
+        console.log('🛒 [WOOCOMMERCE] Mode WooCommerce activé avec détection produit')
         
-        // Écouter les événements WooCommerce
         document.addEventListener('updated_cart_totals', () => {
           console.log('🔄 [WOOCOMMERCE] Panier mis à jour')
-          if (chatSeller.config?.autoDetectProduct) {
-            chatSeller.detectProductInfo()
+          if (chatSeller.currentConfig?.autoDetectProduct) {
+            const newProduct = chatSeller['detectCurrentProduct']?.()
+            if (newProduct) {
+              chatSeller.handleProductChange(newProduct)
+            }
           }
         })
       }
     }
     
-    // ✅ GESTION ERREURS GLOBALES
-    window.addEventListener('error', (event) => {
-      if (event.error && event.error.message && event.error.message.includes('ChatSeller')) {
-        console.error('❌ [GLOBAL ERROR] Erreur ChatSeller:', event.error)
-      }
-    })
+    // ✅ ÉCOUTER ÉVÉNEMENTS DASHBOARD POUR SYNCHRONISATION TEMPS RÉEL
+    if (typeof window !== 'undefined') {
+      window.addEventListener('chatseller-config-updated', (event: any) => {
+        console.log('📡 [DASHBOARD SYNC] Configuration mise à jour depuis Dashboard:', event.detail)
+        
+        if (event.detail) {
+          (window as any).ChatSeller.updateFromDashboard(event.detail)
+        }
+      })
+      
+      // ✅ ÉCOUTER DÉCLENCHEMENT MANUEL MESSAGE D'ACCUEIL
+      window.addEventListener('chatseller-trigger-welcome', (event: any) => {
+        console.log('👋 [WELCOME EVENT] Déclenchement message d\'accueil:', event.detail)
+        // L'événement sera géré par le composant Vue
+      })
+    }
     
-    console.log('✅ [CHATSELLER] Widget chargé - version 1.5.3')
+    console.log('✅ [CHATSELLER] Widget chargé avec nouvelles fonctionnalités - version 1.5.4')
     
-    // ✅ EXPOSER FONCTIONS DE DEBUG EN DÉVELOPPEMENT
+    // ✅ EXPOSER FONCTIONS DE DEBUG ÉTENDUES
     if (process.env.NODE_ENV === 'development' || (window as any).ChatSellerConfig?.debug) {
       (window as any).ChatSellerDebug = {
         instance: chatSeller,
-        version: chatSeller.version,
+        version: '1.5.4',
         debug: () => chatSeller.debug(),
         cleanup: () => chatSeller.cleanupExistingWidgets(),
         refresh: () => chatSeller.refresh(),
-        destroy: () => chatSeller.destroy()
+        destroy: () => chatSeller.destroy(),
+        // ✅ NOUVEAUX OUTILS DEBUG
+        testWelcomeMessage: () => (window as any).ChatSeller.triggerWelcomeMessage(),
+        getCurrentConfig: () => chatSeller.currentConfig,
+        syncFromDashboard: () => (window as any).ChatSeller.syncFromDashboard(),
+        detectProduct: () => chatSeller['detectCurrentProduct']?.()
       }
     }
   }
 })()
+
+// ✅ VERSION MISE À JOUR
+const CHATSELLER_VERSION = '1.5.4'
 
 // ✅ DÉCLARATIONS TYPESCRIPT COMPLÈTES
 declare global {
