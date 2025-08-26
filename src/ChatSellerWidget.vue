@@ -968,50 +968,128 @@ const securityStyle = computed((): CSSProperties => ({
 
 const sendWelcomeMessage = async () => {
   try {
-    console.log('👋 [WELCOME] Début initialisation message d\'accueil...')
+    console.log('👋 [WELCOME] Début envoi message d\'accueil...')
     
+    // ✅ PRIORITÉ 1 : Vérifier conversation sauvegardée
     if (typeof window !== 'undefined' && (window as any).ChatSeller) {
       const savedConversation = (window as any).ChatSeller.loadConversation()
       
-      if (savedConversation) {
-        if (savedConversation.messages && savedConversation.messages.length > 0) {
-          messages.value = savedConversation.messages.map((msg: any) => ({
-            ...msg,
-            timestamp: new Date(msg.timestamp)
-          }))
-          conversationId.value = savedConversation.conversationId
-          console.log('📂 [WELCOME] Conversation restaurée:', {
-            messages: messages.value.length,
-            product: savedConversation.productInfo?.name,
-            conversationId: conversationId.value
-          })
-          return
-        }
-        else if (savedConversation.isNewProductConversation) {
-          console.log('🔄 [WELCOME] Nouveau produit détecté, message de transition')
-          
-          const transitionMessage = `Re-${getTimeBasedGreeting().toLowerCase()} 👋 Nous avons déjà échangé au sujet de "${savedConversation.previousProduct}". 
+      if (savedConversation && savedConversation.messages && savedConversation.messages.length > 0) {
+        messages.value = savedConversation.messages.map((msg: any) => ({
+          ...msg,
+          timestamp: new Date(msg.timestamp)
+        }))
+        conversationId.value = savedConversation.conversationId
+        console.log('📂 [WELCOME] Conversation restaurée:', {
+          messages: messages.value.length,
+          product: savedConversation.productInfo?.name
+        })
+        return
+      }
+      
+      if (savedConversation?.isNewProductConversation) {
+        console.log('🔄 [WELCOME] Nouveau produit détecté')
+        const transitionMessage = `Re-${getTimeBasedGreeting().toLowerCase()} 👋 
 
 Je vois que vous vous intéressez maintenant à "${productInfo.value?.name}". Comment puis-je vous aider ? 😊`
-          
-          const aiMessage: Message = {
-            id: uuidv4(),
-            role: 'assistant',
-            content: transitionMessage,
-            timestamp: new Date()
-          }
-          messages.value.push(aiMessage)
-          console.log('✅ [WELCOME] Message de transition pour nouveau produit')
-          return
+        
+        const welcomeMsg: Message = {
+          id: uuidv4(),
+          role: 'assistant',
+          content: transitionMessage,
+          timestamp: new Date()
         }
+        messages.value.push(welcomeMsg)
+        return
       }
     }
 
-    // L'API publique gère déjà le message d'accueil
-    console.log('📝 [WELCOME] Pas de message local - l\'API gère l\'accueil')
+    // ✅ PRIORITÉ 2 : Message d'accueil depuis configuration
+    console.log('📝 [WELCOME] Génération message d\'accueil depuis config...')
+    
+    let welcomeMessage = ''
+    
+    // ✅ CORRECTION MAJEURE : Utiliser welcomeMessage personnalisé de l'agent
+    if (configData.value.agentConfig?.welcomeMessage) {
+      console.log('✅ [WELCOME] Message personnalisé trouvé')
+      welcomeMessage = replaceWelcomeVariables(configData.value.agentConfig.welcomeMessage)
+    } else {
+      // ✅ Fallback : Message par défaut intelligent
+      const greeting = getTimeBasedGreeting()
+      const agentName = configData.value.agentConfig?.name || 'Assistant'
+      const agentTitle = configData.value.agentConfig?.title || 'Conseiller'
+      
+      if (productInfo.value?.name) {
+        const productType = getProductType(productInfo.value.name)
+        welcomeMessage = `${greeting} 👋 Je suis ${agentName}, ${agentTitle}.
 
-  } catch (error: unknown) {
+Je vois que vous vous intéressez à notre ${productType} **"${productInfo.value.name}"**. Excellent choix ! ✨
+
+Comment puis-je vous aider avec ce ${productType} ? 😊`
+      } else {
+        welcomeMessage = `${greeting} 👋 Je suis ${agentName}, ${agentTitle}.
+
+Comment puis-je vous aider aujourd'hui ? 😊`
+      }
+    }
+
+    // ✅ Ajouter le message d'accueil
+    const welcomeMsg: Message = {
+      id: uuidv4(),
+      role: 'assistant',
+      content: welcomeMessage,
+      timestamp: new Date()
+    }
+    
+    messages.value.push(welcomeMsg)
+    console.log('✅ [WELCOME] Message d\'accueil ajouté:', welcomeMessage.substring(0, 50) + '...')
+    
+    // Scroll vers le bas
+    await nextTick()
+    scrollToBottom()
+
+  } catch (error) {
     console.error('❌ [WELCOME] Erreur message d\'accueil:', error)
+    
+    // ✅ Fallback minimal en cas d'erreur
+    const fallbackMessage: Message = {
+      id: uuidv4(),
+      role: 'assistant',
+      content: `Bonjour ! Je suis ${configData.value.agentConfig?.name || 'votre conseiller'}. Comment puis-je vous aider ? 😊`,
+      timestamp: new Date()
+    }
+    messages.value.push(fallbackMessage)
+  }
+}
+
+// ✅ NOUVELLE FONCTION : Remplacement variables dynamiques
+const replaceWelcomeVariables = (message: string): string => {
+  try {
+    const agentName = configData.value.agentConfig?.name || 'Assistant'
+    const agentTitle = configData.value.agentConfig?.title || 'Conseiller'
+    const shopName = 'cette boutique' // Peut être étendu plus tard
+    const currentTime = new Date().getHours()
+    const greeting = currentTime < 12 ? 'Bonjour' : currentTime < 18 ? 'Bonsoir' : 'Bonsoir'
+    
+    let productType = 'produit'
+    let productName = 'ce produit'
+    
+    if (productInfo.value?.name) {
+      productName = productInfo.value.name
+      productType = getProductType(productInfo.value.name)
+    }
+    
+    return message
+      .replace(/\$\{agentName\}/g, agentName)
+      .replace(/\$\{agentTitle\}/g, agentTitle)
+      .replace(/\$\{shopName\}/g, shopName)
+      .replace(/\$\{productName\}/g, productName)
+      .replace(/\$\{productType\}/g, productType)
+      .replace(/\$\{greeting\}/g, greeting)
+      
+  } catch (error) {
+    console.error('❌ [VARIABLES] Erreur remplacement variables:', error)
+    return message // Retourner message original en cas d'erreur
   }
 }
 
@@ -1084,7 +1162,14 @@ const sendMessage = async () => {
 
   try {
     console.log('📤 [WIDGET] Envoi message à l\'API...')
-    const response = await sendApiMessage(messageContent)
+    
+    // ✅ CORRECTION : Déterminer si c'est le premier message utilisateur
+    const userMessageCount = messages.value.filter(m => m.role === 'user').length
+    const isFirstUserMessage = userMessageCount === 1
+    
+    console.log('📤 [WIDGET] Premier message utilisateur:', isFirstUserMessage)
+    
+    const response = await sendApiMessage(messageContent, isFirstUserMessage)
     
     if (response.success) {
       conversationId.value = response.data.conversationId
@@ -1096,6 +1181,8 @@ const sendMessage = async () => {
         timestamp: new Date()
       }
       messages.value.push(aiMessage)
+      
+      console.log('✅ [WIDGET] Réponse IA reçue et affichée')
     } else {
       throw new Error(response.error || 'Erreur API inconnue')
     }
@@ -1116,6 +1203,7 @@ const sendMessage = async () => {
     await nextTick()
     scrollToBottom()
     
+    // ✅ Sauvegarder conversation
     if (typeof window !== 'undefined' && (window as any).ChatSeller) {
       (window as any).ChatSeller.saveConversation(messages.value, conversationId.value)
     }
@@ -1145,12 +1233,13 @@ const closeChat = () => {
 }
 
 // ✅ API CALL CORRIGÉE AVEC GESTION CORS
-const sendApiMessage = async (message: string) => {
+const sendApiMessage = async (message: string, isFirstUserMessage: boolean = false) => {
   const apiUrl = configData.value.apiUrl || 'https://chatseller-api-production.up.railway.app'
   const endpoint = `${apiUrl}/api/v1/public/chat`
   
   console.log('📤 [API CALL] Endpoint:', endpoint)
   console.log('📤 [API CALL] ShopId:', configData.value.shopId)
+  console.log('📤 [API CALL] Premier message utilisateur:', isFirstUserMessage)
   
   const payload = {
     shopId: configData.value.shopId || 'demo',
@@ -1163,7 +1252,7 @@ const sendApiMessage = async (message: string) => {
       url: productInfo.value.url
     } : null,
     visitorId: `visitor_${Date.now()}`,
-    isFirstMessage: messages.value.length <= 2
+    isFirstMessage: false // ✅ CORRECTION : Toujours false car on gère l'accueil côté Widget
   }
 
   console.log('📤 [API CALL] Payload complet:', payload)
@@ -1177,11 +1266,12 @@ const sendApiMessage = async (message: string) => {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Origin': window.location.origin,
-        'X-Message-Count': messages.value.filter(m => m.role === 'assistant').length.toString()
+        'X-Message-Count': messages.value.filter(m => m.role === 'assistant').length.toString(),
+        'X-Is-First-User-Message': isFirstUserMessage.toString() // ✅ NOUVEAU : Header pour indiquer le contexte
       },
       body: JSON.stringify(payload),
-      mode: 'cors', // ✅ AJOUT : Mode CORS explicite
-      credentials: 'omit' // ✅ AJOUT : Pas de credentials nécessaires
+      mode: 'cors',
+      credentials: 'omit'
     })
 
     console.log('📥 [API CALL] Statut réponse:', response.status)
@@ -1544,9 +1634,21 @@ watch(messages, () => {
   }
 }, { deep: true })
 
+
 onMounted(() => {
   console.log('🎨 [WIDGET VUE] Composant monté avec couleur:', primaryColor.value)
-  sendWelcomeMessage() // ✅ CORRECTION : Message d'accueil unique au montage
+  console.log('🎨 [WIDGET VUE] Configuration agent:', {
+    name: configData.value.agentConfig?.name,
+    title: configData.value.agentConfig?.title,
+    welcomeMessage: configData.value.agentConfig?.welcomeMessage ? 'OUI' : 'NON',
+    productInfo: productInfo.value?.name || 'AUCUN'
+  })
+  
+  // ✅ CORRECTION MAJEURE : Déclencher message d'accueil IMMÉDIATEMENT
+  nextTick(() => {
+    sendWelcomeMessage()
+    console.log('✅ [WIDGET VUE] Message d\'accueil déclenché')
+  })
   
   // ✅ GESTION MOBILE VIEWPORT AMÉLIORÉE
   if (isMobile.value && typeof window !== 'undefined') {
