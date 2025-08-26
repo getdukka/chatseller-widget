@@ -42,6 +42,7 @@ export interface ChatSellerConfig {
   forceContainer?: string
   debug?: boolean
   disableFallback?: boolean
+  forceDisplay?: boolean
 }
 
 class ChatSeller {
@@ -1458,30 +1459,48 @@ private isProductPage(): boolean {
   try {
     console.log('🔍 [PRODUCT PAGE] Vérification type de page...')
     
-    // ✅ SHOPIFY - Vérifications multiples
+    // ✅ NOUVEAU : Mode de test/développement - toujours autoriser
+    if (this.config.debug || this.config.forceDisplay) {
+      console.log('🚧 [DEBUG MODE] Affichage forcé activé')
+      return true
+    }
+    
+    // ✅ NOUVEAU : Si l'utilisateur a configuré forceContainer, on fait confiance
+    if (this.config.forceContainer) {
+      console.log('🎯 [FORCE CONTAINER] Container spécifique configuré')
+      return true
+    }
+    
+    // ✅ SHOPIFY - Vérifications assouplies
     if (this.isShopify()) {
-      // Vérifier template Shopify
+      console.log('🛍️ [SHOPIFY] Mode Shopify détecté')
+      
+      // Vérifier template Shopify (critère principal)
       const shopifyTemplateMeta = document.querySelector('meta[name="shopify-template"]')
       if (shopifyTemplateMeta) {
         const template = shopifyTemplateMeta.getAttribute('content')
         console.log('🛍️ [SHOPIFY] Template détecté:', template)
-        return template === 'product' || (template?.startsWith('product.') ?? false)
+        if (template === 'product' || (template?.startsWith('product.') ?? false)) {
+          return true
+        }
       }
       
-      // Vérifier URL Shopify
-      const isShopifyProductUrl = /\/products\/[^\/]+\/?(?:\?|$)/.test(window.location.pathname)
-      if (isShopifyProductUrl) {
-        console.log('✅ [SHOPIFY] URL produit confirmée:', window.location.pathname)
+      // Vérifier URL Shopify (plus permissif)
+      const hasProductInUrl = window.location.pathname.includes('/products/') || 
+                             window.location.pathname.includes('/product/')
+      if (hasProductInUrl) {
+        console.log('✅ [SHOPIFY] URL contient /products/')
         return true
       }
       
-      // Vérifier sélecteurs produit Shopify
+      // Vérifier sélecteurs produit Shopify (au moins un suffit)
       const shopifyProductSelectors = [
         'form[action*="/cart/add"]',
         '.product-form',
         '.product-single',
         '[data-product-handle]',
-        '.product'
+        '.product',
+        '.shopify-product-form'
       ]
       
       for (const selector of shopifyProductSelectors) {
@@ -1492,20 +1511,25 @@ private isProductPage(): boolean {
       }
     }
     
-    // ✅ WOOCOMMERCE
+    // ✅ WOOCOMMERCE - Vérifications assouplies
     if (this.isWooCommerce()) {
+      console.log('🛒 [WOOCOMMERCE] Mode WooCommerce détecté')
+      
       // Vérifier classe body WooCommerce
-      if (document.body.classList.contains('single-product')) {
-        console.log('✅ [WOOCOMMERCE] Page single-product confirmée')
+      if (document.body.classList.contains('single-product') || 
+          document.body.classList.contains('woocommerce-page')) {
+        console.log('✅ [WOOCOMMERCE] Page produit confirmée via classe body')
         return true
       }
       
-      // Vérifier sélecteurs WooCommerce
+      // Vérifier sélecteurs WooCommerce (plus permissif)
       const wooSelectors = [
         '.woocommerce-product',
         '.single-product',
         'form.cart',
-        '.single_add_to_cart_button'
+        '.single_add_to_cart_button',
+        '.product_title',
+        '.woocommerce'
       ]
       
       for (const selector of wooSelectors) {
@@ -1516,32 +1540,38 @@ private isProductPage(): boolean {
       }
     }
     
-    // ✅ DÉTECTION GÉNÉRIQUE
+    // ✅ DÉTECTION GÉNÉRIQUE - Plus permissive
     const genericProductIndicators = [
-      // URLs typiques
-      () => /\/(product|item|p)\//.test(window.location.pathname),
-      () => /\/products\/[^\/]+/.test(window.location.pathname),
+      // URLs typiques (plus flexibles)
+      () => /\/(product|item|p|produit)[\/-]/i.test(window.location.pathname),
+      () => window.location.pathname.includes('product'),
+      () => window.location.search.includes('product'),
       
-      // Sélecteurs génériques
-      () => !!document.querySelector('button[class*="add-to-cart"], button[class*="buy"], .product-price, [data-product-id]'),
+      // Sélecteurs génériques (au moins un bouton d'achat)
+      () => !!document.querySelector('button[class*="add"], button[class*="cart"], button[class*="buy"], .product-price, [data-product]'),
       
-      // Métadonnées
-      () => !!document.querySelector('meta[property="product:price"], script[type="application/ld+json"]')?.textContent?.includes('"@type": "Product"')
+      // Métadonnées produit
+      () => !!document.querySelector('meta[property*="product"], script[type="application/ld+json"]')?.textContent?.includes('"Product"')
     ]
     
     for (const indicator of genericProductIndicators) {
-      if (indicator()) {
-        console.log('✅ [GENERIC] Indicateur produit générique confirmé')
-        return true
+      try {
+        if (indicator()) {
+          console.log('✅ [GENERIC] Indicateur produit générique confirmé')
+          return true
+        }
+      } catch (e) {
+        // Ignore les erreurs sur les indicateurs individuels
       }
     }
     
-    console.log('🚫 [PRODUCT PAGE] Pas une page produit détectée')
-    return false
+    // ✅ NOUVEAU : Mode permissif - autoriser sur toutes les pages si aucune restriction
+    console.log('⚠️ [PERMISSIVE] Page non identifiée comme produit, mais autorisation par défaut')
+    return true // Changement majeur : on autorise par défaut
     
   } catch (error) {
     console.warn('⚠️ Erreur détection page produit:', error)
-    return false // En cas d'erreur, on ne montre pas le widget
+    return true // En cas d'erreur, on autorise l'affichage
   }
 }
 
