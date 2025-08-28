@@ -1280,19 +1280,22 @@ class ChatSeller {
       // ✅ RESTAURÉ : SÉLECTEURS DE TITRE ÉTENDUS
       if (!detectedName) {
         const titleSelectors = [
-          '.product__title',
-          '.product-form__title', 
-          'h1.product-title',
-          '.product-single__title',
-          'h1[class*="product"]',
-          '.product-title h1',
-          '.product-info__title',
-          '.product-detail-title',
-          '.product-single__title h1',
-          '.product__info .product__title',
-          '.product-meta__title',
-          '.product-single-title'
-        ]
+          // Shopify modernes (par priorité)
+          '.product__title', '.product-title', 'h1.product-title',
+          '.product-form__title', '.product-single__title',
+          '.product__info h1', '.product-meta__title',
+          '.product-single-title',
+          
+          // WooCommerce
+          '.product_title', '.entry-title', 'h1.entry-title',
+          
+          // Thèmes Shopify populaires
+          '.product-detail-title', '.item-title', '.product-name',
+          
+          // Génériques étendus
+          'h1[class*="product"]', '[data-product-title]',
+          '.product-info__title'
+        ];
         
         for (const selector of titleSelectors) {
           const element = document.querySelector(selector)
@@ -1307,18 +1310,20 @@ class ChatSeller {
       // ✅ RESTAURÉ : SÉLECTEURS DE PRIX ÉTENDUS
       if (!detectedPrice) {
         const priceSelectors = [
-          '.price__current',
-          '.product-form__price .price',
-          '.money',
-          '.price-current',
-          '.product-price',
-          '.price .money',
-          '[data-product-price]',
-          '.product-single__price .money',
-          '.product__price .money',
-          '.price-sale .money',
+          // Shopify (ordre de priorité)
+          '.price__current .money', '.price .money', '.money',
+          '.price-current', '.product-price', '.price__sale .money',
+          '.product-form__price .money', '.product-single__price .money',
+          '.product__price .money', '.price-sale .money',
+          
+          // WooCommerce  
+          '.price .woocommerce-Price-amount', '.price .amount',
+          '.price ins .amount', '.woocommerce-Price-amount',
+          
+          // Génériques
+          '[data-product-price]', '.current-price', '.sale-price',
           '.product-form__price'
-        ]
+        ];
         
         for (const selector of priceSelectors) {
           const element = document.querySelector(selector)
@@ -1389,67 +1394,112 @@ class ChatSeller {
   
   // ✅ SÉLECTEURS CTA ÉTENDUS POUR SHOPIFY + WOOCOMMERCE + AUTRES
   const ctaSelectors = [
-    // Shopify - ORDRE PRIORITÉ
-    'form[action*="/cart/add"] button[type="submit"]',
-    '.product-form__buttons button[name="add"]',
-    '.product-form__cart-submit',
-    '.product-single__add-to-cart',
-    'button[name="add"]:not([name="add-to-cart"])',
-    '.add-to-cart',
-    '.shopify-payment-button__button',
-    
-    // WooCommerce
-    '.single_add_to_cart_button',
-    'button[name="add-to-cart"]',
-    '.wc-add-to-cart',
-    '.add_to_cart_button',
-    
-    // Générique
-    'button[class*="add-to-cart"]',
-    'button[class*="add-cart"]',
-    'button[class*="buy"]',
-    'button[class*="purchase"]',
-    '.buy-button',
-    '.purchase-button'
-  ]
+  // ✅ Shopify - Sélecteurs les plus récents d'abord (ordre prioritaire)
+  'form[action*="/cart/add"] button[type="submit"]',
+  'form[action*="/cart/add"] [name="add"]', // Nouveau : sans restriction sur button
+  '.product-form__cart button',
+  '.product-form__buttons button[name="add"]',
+  '.product-form__buttons .btn--add-to-cart',
+  '.product-single__add-to-cart',
+  '.shopify-payment-button__button',
+  'button[name="add"]:not([name="add-to-cart"])', // Évite conflit WooCommerce
+  '[data-shopify-add-to-cart]',
+  '.product-form button[type="submit"]',
   
-  let targetElement = null
+  // ✅ Thèmes Shopify populaires spécifiques
+  '.btn--add-to-cart', // Dawn, Impulse
+  '.product__add-to-cart', // Debut
+  '.product-single__cart-submit', // Brooklyn
+  '.product-form-cart__submit', // Narrative
+  '.cart-submit', // Supply
   
-  for (const selector of ctaSelectors) {
-    targetElement = document.querySelector(selector)
-    if (targetElement) {
-      console.log(`✅ Élément CTA trouvé: ${selector}`)
-      break
-    }
+  // ✅ WooCommerce
+  '.single_add_to_cart_button',
+  'button[name="add-to-cart"]',
+  '.wc-add-to-cart',
+  '.add_to_cart_button',
+  
+  // ✅ Générique - plus large
+  'button[class*="add-to-cart"]',
+  'button[class*="add-cart"]',
+  'button[class*="buy"]',
+  'button[class*="purchase"]',
+  '.buy-button',
+  '.purchase-button',
+  '.add-to-basket',
+  '[data-add-to-cart]'
+];
+
+// ✅ AJOUTEZ aussi cette fonction helper juste après les ctaSelectors :
+const isElementVisible = (element: Element): boolean => {
+  const style = window.getComputedStyle(element)
+  const htmlElement = element as HTMLElement // ✅ Cast vers HTMLElement
+  return style.display !== 'none' && 
+         style.visibility !== 'hidden' && 
+         style.opacity !== '0' &&
+         htmlElement.offsetWidth > 0 && 
+         htmlElement.offsetHeight > 0
+}
+  
+  let targetElement: HTMLElement | null = null
+let selectorUsed = ''
+
+// Chercher le premier élément CTA disponible
+for (const selector of ctaSelectors) {
+  const element = document.querySelector(selector)
+  if (element && isElementVisible(element)) {
+    targetElement = element as HTMLElement
+    selectorUsed = selector
+    console.log(`✅ Élément CTA trouvé: ${selector}`)
+    break
   }
-  
-  if (targetElement) {
-    try {
-      const targetParent = targetElement.parentNode
-      if (targetParent) {
-        if (position === 'above-cta') {
+}
+
+// Si CTA trouvé, insérer selon la position
+if (targetElement && targetElement.parentNode) {
+  try {
+    const targetParent = targetElement.parentNode as HTMLElement
+    if (targetParent) {
+      const position = this.config.position || 'above-cta'
+      
+      switch (position) {
+        case 'above-cta':
           targetParent.insertBefore(container, targetElement)
-        } else if (position === 'below-cta') {
-          targetParent.insertBefore(container, targetElement.nextSibling)
-        } else if (position === 'beside-cta') {
-          if (targetElement instanceof HTMLElement) {
-            targetElement.style.display = 'flex'
-            targetElement.style.gap = '10px'
-            targetElement.appendChild(container)
+          console.log('✅ Widget inséré AVANT le CTA')
+          break
+          
+        case 'below-cta':
+          const nextSiblingBelow = targetElement.nextSibling
+          if (nextSiblingBelow) {
+            targetParent.insertBefore(container, nextSiblingBelow)
           } else {
-            targetParent.insertBefore(container, targetElement.nextSibling)
+            targetParent.appendChild(container)
           }
-        } else {
-          targetParent.insertBefore(container, targetElement.nextSibling)
-        }
-        
-        console.log('✅ Widget inséré avec succès')
-        return
+          console.log('✅ Widget inséré APRÈS le CTA')
+          break
+          
+        case 'beside-cta':
+          // Créer un container flex
+          const flexContainer = document.createElement('div')
+          flexContainer.style.cssText = 'display: flex; gap: 12px; align-items: stretch; flex-wrap: wrap;'
+          targetParent.insertBefore(flexContainer, targetElement)
+          flexContainer.appendChild(targetElement)
+          flexContainer.appendChild(container)
+          console.log('✅ Widget inséré À CÔTÉ du CTA')
+          break
+          
+        default:
+          targetParent.insertBefore(container, targetElement)
+          console.log('✅ Widget inséré par défaut AVANT le CTA')
       }
-    } catch (error) {
-      console.warn('⚠️ Erreur insertion:', error)
+      
+      console.log('✅ Widget inséré avec succès')
+      return // Succès !
     }
+  } catch (insertError) {
+    console.warn('⚠️ Erreur insertion près du CTA:', insertError)
   }
+}
   
   console.warn('⚠️ Aucun bouton CTA trouvé sur cette page produit')
 }
@@ -1457,121 +1507,115 @@ class ChatSeller {
 // ✅ NOUVELLE FONCTION : Détection stricte des pages produits
 private isProductPage(): boolean {
   try {
-    console.log('🔍 [PRODUCT PAGE] Vérification type de page...')
+    console.log('🔍 [PRODUCT PAGE] Vérification améliorée du type de page...')
     
-    // ✅ NOUVEAU : Mode de test/développement - toujours autoriser
+    // ✅ Mode debug/force - toujours autoriser
     if (this.config.debug || this.config.forceDisplay) {
-      console.log('🚧 [DEBUG MODE] Affichage forcé activé')
+      console.log('🚧 [DEBUG] Mode debug/force activé - autorisation forcée')
       return true
     }
     
-    // ✅ NOUVEAU : Si l'utilisateur a configuré forceContainer, on fait confiance
+    // ✅ Container personnalisé configuré
     if (this.config.forceContainer) {
       console.log('🎯 [FORCE CONTAINER] Container spécifique configuré')
       return true
     }
     
-    // ✅ SHOPIFY - Vérifications assouplies
+    // ✅ SHOPIFY - Détection très permissive
     if (this.isShopify()) {
-      console.log('🛍️ [SHOPIFY] Mode Shopify détecté')
+      console.log('🛍️ [SHOPIFY] Environnement Shopify détecté')
       
-      // Vérifier template Shopify (critère principal)
-      const shopifyTemplateMeta = document.querySelector('meta[name="shopify-template"]')
-      if (shopifyTemplateMeta) {
-        const template = shopifyTemplateMeta.getAttribute('content')
-        console.log('🛍️ [SHOPIFY] Template détecté:', template)
-        if (template === 'product' || (template?.startsWith('product.') ?? false)) {
-          return true
-        }
-      }
-      
-      // Vérifier URL Shopify (plus permissif)
-      const hasProductInUrl = window.location.pathname.includes('/products/') || 
-                             window.location.pathname.includes('/product/')
-      if (hasProductInUrl) {
-        console.log('✅ [SHOPIFY] URL contient /products/')
+      // Critère 1 : Template produit dans meta
+      const shopifyTemplate = document.querySelector('meta[name="shopify-template"]')?.getAttribute('content')
+      if (shopifyTemplate?.includes('product')) {
+        console.log('✅ [SHOPIFY] Template produit confirmé:', shopifyTemplate)
         return true
       }
       
-      // Vérifier sélecteurs produit Shopify (au moins un suffit)
-      const shopifyProductSelectors = [
+      // Critère 2 : URL contient "products"
+      if (window.location.pathname.includes('/products/')) {
+        console.log('✅ [SHOPIFY] URL produit détectée')
+        return true
+      }
+      
+      // Critère 3 : Analyse Shopify présente
+      if ((window as any).ShopifyAnalytics?.meta?.product) {
+        console.log('✅ [SHOPIFY] Analytics produit trouvées')
+        return true
+      }
+      
+      // Critère 4 : Au moins un sélecteur produit Shopify présent
+      const shopifySelectors = [
         'form[action*="/cart/add"]',
         '.product-form',
         '.product-single',
         '[data-product-handle]',
-        '.product',
-        '.shopify-product-form'
+        '.shopify-product-form',
+        '.product__info'
       ]
       
-      for (const selector of shopifyProductSelectors) {
+      for (const selector of shopifySelectors) {
         if (document.querySelector(selector)) {
           console.log('✅ [SHOPIFY] Sélecteur produit trouvé:', selector)
           return true
         }
       }
+      
+      console.log('⚠️ [SHOPIFY] Aucun critère produit strict trouvé, mais autorisation sur Shopify')
+      return true // ✅ CORRECTION MAJEURE : Sur Shopify, autoriser par défaut
     }
     
-    // ✅ WOOCOMMERCE - Vérifications assouplies
+    // ✅ WOOCOMMERCE - Détection permissive
     if (this.isWooCommerce()) {
-      console.log('🛒 [WOOCOMMERCE] Mode WooCommerce détecté')
+      console.log('🛒 [WOOCOMMERCE] Environnement WooCommerce détecté')
       
-      // Vérifier classe body WooCommerce
-      if (document.body.classList.contains('single-product') || 
-          document.body.classList.contains('woocommerce-page')) {
-        console.log('✅ [WOOCOMMERCE] Page produit confirmée via classe body')
+      if (document.body.classList.contains('single-product')) {
+        console.log('✅ [WOOCOMMERCE] Page produit confirmée')
         return true
       }
       
-      // Vérifier sélecteurs WooCommerce (plus permissif)
-      const wooSelectors = [
-        '.woocommerce-product',
-        '.single-product',
-        'form.cart',
-        '.single_add_to_cart_button',
-        '.product_title',
-        '.woocommerce'
-      ]
-      
+      const wooSelectors = ['.woocommerce-product', '.single-product', 'form.cart']
       for (const selector of wooSelectors) {
         if (document.querySelector(selector)) {
           console.log('✅ [WOOCOMMERCE] Sélecteur produit trouvé:', selector)
           return true
         }
       }
+      
+      return true // ✅ Sur WooCommerce, autoriser par défaut
     }
     
-    // ✅ DÉTECTION GÉNÉRIQUE - Plus permissive
-    const genericProductIndicators = [
-      // URLs typiques (plus flexibles)
-      () => /\/(product|item|p|produit)[\/-]/i.test(window.location.pathname),
-      () => window.location.pathname.includes('product'),
+    // ✅ DÉTECTION GÉNÉRIQUE très permissive
+    const genericIndicators = [
+      // URLs
+      () => /\/(product|item|p)[\/-]/i.test(window.location.pathname),
       () => window.location.search.includes('product'),
       
-      // Sélecteurs génériques (au moins un bouton d'achat)
+      // Sélecteurs génériques
       () => !!document.querySelector('button[class*="add"], button[class*="cart"], button[class*="buy"], .product-price, [data-product]'),
+      () => !!document.querySelector('.product, .item, [class*="product-"]'),
       
-      // Métadonnées produit
+      // Métadonnées
       () => !!document.querySelector('meta[property*="product"], script[type="application/ld+json"]')?.textContent?.includes('"Product"')
     ]
     
-    for (const indicator of genericProductIndicators) {
+    for (const indicator of genericIndicators) {
       try {
         if (indicator()) {
-          console.log('✅ [GENERIC] Indicateur produit générique confirmé')
+          console.log('✅ [GENERIC] Indicateur produit générique trouvé')
           return true
         }
       } catch (e) {
-        // Ignore les erreurs sur les indicateurs individuels
+        // Ignore errors on individual indicators
       }
     }
     
-    // ✅ NOUVEAU : Mode permissif - autoriser sur toutes les pages si aucune restriction
-    console.log('⚠️ [PERMISSIVE] Page non identifiée comme produit, mais autorisation par défaut')
-    return true // Changement majeur : on autorise par défaut
+    console.log('✅ [PERMISSIVE] Aucun critère strict trouvé, mais autorisation par défaut')
+    return true // ✅ CORRECTION MAJEURE : Autoriser par défaut au lieu de rejeter
     
   } catch (error) {
     console.warn('⚠️ Erreur détection page produit:', error)
-    return true // En cas d'erreur, on autorise l'affichage
+    return true // ✅ En cas d'erreur, autoriser par défaut
   }
 }
 
