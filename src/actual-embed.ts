@@ -1,4 +1,4 @@
-// src/embed.ts - VERSION COMPLÈTE RESTAURÉE ✅
+// src/embed.ts 
 
 // ✅ POLYFILLS CRITIQUES POUR LE NAVIGATEUR
 if (typeof global === 'undefined') {
@@ -28,10 +28,21 @@ export interface ChatSellerConfig {
   borderRadius?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full'
   language?: 'fr' | 'en' | 'wo'
   autoDetectProduct?: boolean
-  agentConfig?: any
+  agentConfig?: {
+    id?: string
+    name?: string
+    title?: string
+    avatar?: string
+    welcomeMessage?: string  
+    fallbackMessage?: string
+    personality?: string
+    customProductType?: string  
+    shopName?: string  
+  }
   forceContainer?: string
   debug?: boolean
   disableFallback?: boolean
+  forceDisplay?: boolean
 }
 
 class ChatSeller {
@@ -42,14 +53,14 @@ class ChatSeller {
   private modalElement: HTMLElement | null = null
   private vueApp: any = null
   private cssInjected = false
-  private conversationData: any = null // ✅ AJOUT : Persistance conversation
+  private conversationData: any = null // ✅ RESTAURÉ : Persistance conversation
 
   constructor() {
     this.config = {
       shopId: '',
       apiUrl: 'https://chatseller-api-production.up.railway.app',
       theme: 'modern',
-      primaryColor: '#8B5CF6', // ✅ CORRECTION : Violet par défaut
+      primaryColor: '#8B5CF6', 
       position: 'above-cta',
       buttonText: 'Parler au vendeur',
       borderRadius: 'full',
@@ -63,6 +74,19 @@ class ChatSeller {
   async init(config: ChatSellerConfig) {
     if (this.isInitialized) {
       console.warn('🟡 ChatSeller déjà initialisé')
+      return
+    }
+
+    if (!this.isProductPage()) {
+      console.log('🚫 [INIT] Page non-produit, initialisation annulée')
+      return
+    }
+
+    console.log('🚀 Initialisation ChatSeller widget...', config.shopId)
+    this.config = { ...this.config, ...config }
+
+    if (!this.config.shopId) {
+      console.error('❌ ChatSeller: shopId requis')
       return
     }
 
@@ -109,13 +133,13 @@ class ChatSeller {
   }
 
   private getCompleteCSS(): string {
-    // ✅ UTILISER LA COULEUR CONFIGURÉE DYNAMIQUEMENT
+    // ✅ RESTAURÉ : UTILISER LA COULEUR CONFIGURÉE DYNAMIQUEMENT
     const primaryColor = this.config.primaryColor || '#8B5CF6'
     const darkerColor = this.adjustColor(primaryColor, -15)
     const rgbColor = this.hexToRgb(primaryColor)
     
     return `
-/* ✅ CHATSELLER WIDGET - CSS COMPLET CORRIGÉ AVEC COULEURS DYNAMIQUES */
+/* ✅ CHATSELLER WIDGET - CSS COMPLET RESTAURÉ AVEC CORRECTIONS ICÔNE */
 .cs-chatseller-widget,
 .cs-chatseller-widget *,
 .cs-chatseller-widget *::before,
@@ -150,7 +174,7 @@ class ChatSeller {
   isolation: isolate !important;
 }
 
-/* ✅ BOUTON TRIGGER AVEC ICÔNE CORRIGÉE ET COULEUR DYNAMIQUE */
+/* ✅ CORRECTION MAJEURE : BOUTON TRIGGER AVEC ICÔNE FORCÉE ET COULEUR DYNAMIQUE */
 .cs-chat-trigger-button {
   width: 100% !important;
   padding: 16px 24px !important;
@@ -184,7 +208,7 @@ class ChatSeller {
   box-shadow: 0 12px 35px rgba(${rgbColor}, 0.4) !important;
 }
 
-/* ✅ CORRECTION : Styles SVG forcés avec couleur dynamique */
+/* ✅ CORRECTION MAJEURE : Styles SVG forcés avec !important maximal pour corriger icône manquante */
 .cs-chat-trigger-button svg {
   width: 20px !important;
   height: 20px !important;
@@ -195,6 +219,16 @@ class ChatSeller {
   display: block !important;
   opacity: 1 !important;
   visibility: visible !important;
+  position: relative !important;
+  z-index: 999999 !important;
+  pointer-events: none !important;
+  /* ✅ AJOUT : Forces supplémentaires pour Shopify */
+  min-width: 20px !important;
+  max-width: 20px !important;
+  min-height: 20px !important;
+  max-height: 20px !important;
+  color: white !important;
+  stroke: white !important;
 }
 
 .cs-chat-trigger-button svg path {
@@ -203,6 +237,37 @@ class ChatSeller {
   stroke-width: 2 !important;
   stroke-linecap: round !important;
   stroke-linejoin: round !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  pointer-events: none !important;
+  color: white !important;
+  stroke: white !important;
+}
+
+/* ✅ PROTECTION ANTI-OVERRIDE SHOPIFY/AUTRES THEMES */
+.cs-chat-trigger-button svg,
+.cs-chat-trigger-button svg * {
+  transition: none !important;
+  transform: none !important;
+  animation: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+.cs-chat-trigger-button:hover svg {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* ✅ SPECIFIQUE SHOPIFY - NEUTRALISER LEURS OVERRIDES */
+.shopify-section .cs-chat-trigger-button svg,
+.product-form .cs-chat-trigger-button svg,
+[class*="product"] .cs-chat-trigger-button svg {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 /* ✅ MODAL OVERLAY - PROTECTION MAXIMALE */
@@ -1203,7 +1268,7 @@ class ChatSeller {
       let detectedPrice = this.config.productPrice
       let detectedId = this.config.productId
 
-      // ✅ DÉTECTION SHOPIFY AVANCÉE
+      // ✅ RESTAURÉ : DÉTECTION SHOPIFY AVANCÉE
       const shopifyProduct = (window as any).ShopifyAnalytics?.meta?.product
       if (shopifyProduct && shopifyProduct.title) {
         detectedName = shopifyProduct.title
@@ -1212,22 +1277,25 @@ class ChatSeller {
         console.log('✅ Produit Shopify détecté:', detectedName)
       }
       
-      // ✅ SÉLECTEURS DE TITRE ÉTENDUS
+      // ✅ RESTAURÉ : SÉLECTEURS DE TITRE ÉTENDUS
       if (!detectedName) {
         const titleSelectors = [
-          '.product__title',
-          '.product-form__title', 
-          'h1.product-title',
-          '.product-single__title',
-          'h1[class*="product"]',
-          '.product-title h1',
-          '.product-info__title',
-          '.product-detail-title',
-          '.product-single__title h1',
-          '.product__info .product__title',
-          '.product-meta__title',
-          '.product-single-title'
-        ]
+          // Shopify modernes (par priorité)
+          '.product__title', '.product-title', 'h1.product-title',
+          '.product-form__title', '.product-single__title',
+          '.product__info h1', '.product-meta__title',
+          '.product-single-title',
+          
+          // WooCommerce
+          '.product_title', '.entry-title', 'h1.entry-title',
+          
+          // Thèmes Shopify populaires
+          '.product-detail-title', '.item-title', '.product-name',
+          
+          // Génériques étendus
+          'h1[class*="product"]', '[data-product-title]',
+          '.product-info__title'
+        ];
         
         for (const selector of titleSelectors) {
           const element = document.querySelector(selector)
@@ -1239,21 +1307,23 @@ class ChatSeller {
         }
       }
 
-      // ✅ SÉLECTEURS DE PRIX ÉTENDUS
+      // ✅ RESTAURÉ : SÉLECTEURS DE PRIX ÉTENDUS
       if (!detectedPrice) {
         const priceSelectors = [
-          '.price__current',
-          '.product-form__price .price',
-          '.money',
-          '.price-current',
-          '.product-price',
-          '.price .money',
-          '[data-product-price]',
-          '.product-single__price .money',
-          '.product__price .money',
-          '.price-sale .money',
+          // Shopify (ordre de priorité)
+          '.price__current .money', '.price .money', '.money',
+          '.price-current', '.product-price', '.price__sale .money',
+          '.product-form__price .money', '.product-single__price .money',
+          '.product__price .money', '.price-sale .money',
+          
+          // WooCommerce  
+          '.price .woocommerce-Price-amount', '.price .amount',
+          '.price ins .amount', '.woocommerce-Price-amount',
+          
+          // Génériques
+          '[data-product-price]', '.current-price', '.sale-price',
           '.product-form__price'
-        ]
+        ];
         
         for (const selector of priceSelectors) {
           const element = document.querySelector(selector)
@@ -1269,7 +1339,7 @@ class ChatSeller {
         }
       }
 
-      // ✅ DÉTECTION WOOCOMMERCE
+      // ✅ RESTAURÉ : DÉTECTION WOOCOMMERCE
       const wooProduct = document.querySelector('.woocommerce-product')
       if (wooProduct && !detectedName) {
         const wooTitle = wooProduct.querySelector('.product_title, .entry-title')
@@ -1314,106 +1384,260 @@ class ChatSeller {
   }
 
   private insertWidgetAtPosition(container: HTMLElement): void {
-    const position = this.config.position || 'above-cta'
-    
-    // ✅ SÉLECTEURS CTA ÉTENDUS POUR SHOPIFY + WOOCOMMERCE + AUTRES
-    const ctaSelectors = [
-      // Shopify
-      '.product-form__buttons',
-      'form[action*="/cart/add"] button[type="submit"]',
-      '.product-form button[name="add"]',
-      '.add-to-cart',
-      'button[name="add"]',
-      '.product-form__cart-submit',
-      '.btn.product-form__cart-submit',
-      '.shopify-payment-button',
-      '.product-single__add-to-cart',
-      
-      // WooCommerce
-      '.single_add_to_cart_button',
-      'button[name="add-to-cart"]',
-      '.woocommerce-cart .cart',
-      '.wc-add-to-cart',
-      '.add_to_cart_button',
-      
-      // Générique
-      'button[class*="add-to-cart"]',
-      'button[class*="buy"]',
-      'button[class*="purchase"]',
-      '.buy-button',
-      '.purchase-button'
-    ]
-    
-    let targetElement = null
-    
-    for (const selector of ctaSelectors) {
-      targetElement = document.querySelector(selector)
-      if (targetElement) {
-        console.log(`✅ Élément CTA trouvé: ${selector}`)
-        break
-      }
-    }
-    
-    if (targetElement) {
-      try {
-        const targetParent = targetElement.parentNode
-        if (targetParent) {
-          if (position === 'above-cta') {
-            targetParent.insertBefore(container, targetElement)
-          } else if (position === 'below-cta') {
-            targetParent.insertBefore(container, targetElement.nextSibling)
-          } else if (position === 'beside-cta') {
-            if (targetElement instanceof HTMLElement) {
-              targetElement.style.display = 'flex'
-              targetElement.style.gap = '10px'
-              targetElement.appendChild(container)
-            } else {
-              targetParent.insertBefore(container, targetElement.nextSibling)
-            }
-          } else {
-            targetParent.insertBefore(container, targetElement.nextSibling)
-          }
-          
-          console.log('✅ Widget inséré avec succès')
-          return
-        }
-      } catch (error) {
-        console.warn('⚠️ Erreur insertion:', error)
-      }
-    }
-    
-    // ✅ FALLBACKS ÉTENDUS
-    const fallbackSelectors = [
-      'form[action*="/cart/add"]',
-      '.product-form',
-      '.product-single',
-      '.product-details',
-      '.woocommerce-product',
-      '.product-info',
-      '.main-content',
-      'main',
-      '.container'
-    ]
-    
-    for (const selector of fallbackSelectors) {
-      const fallbackElement = document.querySelector(selector)
-      if (fallbackElement) {
-        try {
-          fallbackElement.appendChild(container)
-          console.log(`✅ Widget inséré via fallback: ${selector}`)
-          return
-        } catch (error) {
-          console.warn('⚠️ Erreur insertion fallback:', error)
-        }
-      }
-    }
-    
-    // ✅ FALLBACK FINAL
-    if (!this.config.disableFallback) {
-      console.log('⚠️ Fallback final: insertion body')
-      document.body.appendChild(container)
-    }
+  // ✅ VÉRIFICATION STRICTE : SEULEMENT PAGES PRODUITS
+  if (!this.isProductPage()) {
+    console.log('🚫 [WIDGET] Page non-produit détectée, widget non inséré')
+    return
   }
+
+  const position = this.config.position || 'above-cta'
+  
+  // ✅ SÉLECTEURS CTA ÉTENDUS POUR SHOPIFY + WOOCOMMERCE + AUTRES
+  const ctaSelectors = [
+  // ✅ Shopify - Sélecteurs les plus récents d'abord (ordre prioritaire)
+  'form[action*="/cart/add"] button[type="submit"]',
+  'form[action*="/cart/add"] [name="add"]', // Nouveau : sans restriction sur button
+  '.product-form__cart button',
+  '.product-form__buttons button[name="add"]',
+  '.product-form__buttons .btn--add-to-cart',
+  '.product-single__add-to-cart',
+  '.shopify-payment-button__button',
+  'button[name="add"]:not([name="add-to-cart"])', // Évite conflit WooCommerce
+  '[data-shopify-add-to-cart]',
+  '.product-form button[type="submit"]',
+  
+  // ✅ Thèmes Shopify populaires spécifiques
+  '.btn--add-to-cart', // Dawn, Impulse
+  '.product__add-to-cart', // Debut
+  '.product-single__cart-submit', // Brooklyn
+  '.product-form-cart__submit', // Narrative
+  '.cart-submit', // Supply
+  
+  // ✅ WooCommerce
+  '.single_add_to_cart_button',
+  'button[name="add-to-cart"]',
+  '.wc-add-to-cart',
+  '.add_to_cart_button',
+  
+  // ✅ Générique - plus large
+  'button[class*="add-to-cart"]',
+  'button[class*="add-cart"]',
+  'button[class*="buy"]',
+  'button[class*="purchase"]',
+  '.buy-button',
+  '.purchase-button',
+  '.add-to-basket',
+  '[data-add-to-cart]'
+];
+
+// ✅ AJOUTEZ aussi cette fonction helper juste après les ctaSelectors :
+const isElementVisible = (element: Element): boolean => {
+  const style = window.getComputedStyle(element)
+  const htmlElement = element as HTMLElement // ✅ Cast vers HTMLElement
+  return style.display !== 'none' && 
+         style.visibility !== 'hidden' && 
+         style.opacity !== '0' &&
+         htmlElement.offsetWidth > 0 && 
+         htmlElement.offsetHeight > 0
+}
+  
+  let targetElement: HTMLElement | null = null
+let selectorUsed = ''
+
+// Chercher le premier élément CTA disponible
+for (const selector of ctaSelectors) {
+  const element = document.querySelector(selector)
+  if (element && isElementVisible(element)) {
+    targetElement = element as HTMLElement
+    selectorUsed = selector
+    console.log(`✅ Élément CTA trouvé: ${selector}`)
+    break
+  }
+}
+
+// Si CTA trouvé, insérer selon la position
+if (targetElement && targetElement.parentNode) {
+  try {
+    const targetParent = targetElement.parentNode as HTMLElement
+    if (targetParent) {
+      const position = this.config.position || 'above-cta'
+      
+      switch (position) {
+        case 'above-cta':
+          targetParent.insertBefore(container, targetElement)
+          console.log('✅ Widget inséré AVANT le CTA')
+          break
+          
+        case 'below-cta':
+          const nextSiblingBelow = targetElement.nextSibling
+          if (nextSiblingBelow) {
+            targetParent.insertBefore(container, nextSiblingBelow)
+          } else {
+            targetParent.appendChild(container)
+          }
+          console.log('✅ Widget inséré APRÈS le CTA')
+          break
+          
+        case 'beside-cta':
+          // Créer un container flex
+          const flexContainer = document.createElement('div')
+          flexContainer.style.cssText = 'display: flex; gap: 12px; align-items: stretch; flex-wrap: wrap;'
+          targetParent.insertBefore(flexContainer, targetElement)
+          flexContainer.appendChild(targetElement)
+          flexContainer.appendChild(container)
+          console.log('✅ Widget inséré À CÔTÉ du CTA')
+          break
+          
+        default:
+          targetParent.insertBefore(container, targetElement)
+          console.log('✅ Widget inséré par défaut AVANT le CTA')
+      }
+      
+      console.log('✅ Widget inséré avec succès')
+      return // Succès !
+    }
+  } catch (insertError) {
+    console.warn('⚠️ Erreur insertion près du CTA:', insertError)
+  }
+}
+  
+  console.warn('⚠️ Aucun bouton CTA trouvé sur cette page produit')
+}
+
+// ✅ NOUVELLE FONCTION : Détection stricte des pages produits
+private isProductPage(): boolean {
+  try {
+    console.log('🔍 [PRODUCT PAGE] Vérification améliorée du type de page...')
+    
+    // ✅ Mode debug/force - toujours autoriser
+    if (this.config.debug || this.config.forceDisplay) {
+      console.log('🚧 [DEBUG] Mode debug/force activé - autorisation forcée')
+      return true
+    }
+    
+    // ✅ Container personnalisé configuré
+    if (this.config.forceContainer) {
+      console.log('🎯 [FORCE CONTAINER] Container spécifique configuré')
+      return true
+    }
+    
+    // ✅ SHOPIFY - Détection très permissive
+    if (this.isShopify()) {
+      console.log('🛍️ [SHOPIFY] Environnement Shopify détecté')
+      
+      // Critère 1 : Template produit dans meta
+      const shopifyTemplate = document.querySelector('meta[name="shopify-template"]')?.getAttribute('content')
+      if (shopifyTemplate?.includes('product')) {
+        console.log('✅ [SHOPIFY] Template produit confirmé:', shopifyTemplate)
+        return true
+      }
+      
+      // Critère 2 : URL contient "products"
+      if (window.location.pathname.includes('/products/')) {
+        console.log('✅ [SHOPIFY] URL produit détectée')
+        return true
+      }
+      
+      // Critère 3 : Analyse Shopify présente
+      if ((window as any).ShopifyAnalytics?.meta?.product) {
+        console.log('✅ [SHOPIFY] Analytics produit trouvées')
+        return true
+      }
+      
+      // Critère 4 : Au moins un sélecteur produit Shopify présent
+      const shopifySelectors = [
+        'form[action*="/cart/add"]',
+        '.product-form',
+        '.product-single',
+        '[data-product-handle]',
+        '.shopify-product-form',
+        '.product__info'
+      ]
+      
+      for (const selector of shopifySelectors) {
+        if (document.querySelector(selector)) {
+          console.log('✅ [SHOPIFY] Sélecteur produit trouvé:', selector)
+          return true
+        }
+      }
+      
+      console.log('⚠️ [SHOPIFY] Aucun critère produit strict trouvé, mais autorisation sur Shopify')
+      return true // ✅ CORRECTION MAJEURE : Sur Shopify, autoriser par défaut
+    }
+    
+    // ✅ WOOCOMMERCE - Détection permissive
+    if (this.isWooCommerce()) {
+      console.log('🛒 [WOOCOMMERCE] Environnement WooCommerce détecté')
+      
+      if (document.body.classList.contains('single-product')) {
+        console.log('✅ [WOOCOMMERCE] Page produit confirmée')
+        return true
+      }
+      
+      const wooSelectors = ['.woocommerce-product', '.single-product', 'form.cart']
+      for (const selector of wooSelectors) {
+        if (document.querySelector(selector)) {
+          console.log('✅ [WOOCOMMERCE] Sélecteur produit trouvé:', selector)
+          return true
+        }
+      }
+      
+      return true // ✅ Sur WooCommerce, autoriser par défaut
+    }
+    
+    // ✅ DÉTECTION GÉNÉRIQUE très permissive
+    const genericIndicators = [
+      // URLs
+      () => /\/(product|item|p)[\/-]/i.test(window.location.pathname),
+      () => window.location.search.includes('product'),
+      
+      // Sélecteurs génériques
+      () => !!document.querySelector('button[class*="add"], button[class*="cart"], button[class*="buy"], .product-price, [data-product]'),
+      () => !!document.querySelector('.product, .item, [class*="product-"]'),
+      
+      // Métadonnées
+      () => !!document.querySelector('meta[property*="product"], script[type="application/ld+json"]')?.textContent?.includes('"Product"')
+    ]
+    
+    for (const indicator of genericIndicators) {
+      try {
+        if (indicator()) {
+          console.log('✅ [GENERIC] Indicateur produit générique trouvé')
+          return true
+        }
+      } catch (e) {
+        // Ignore errors on individual indicators
+      }
+    }
+    
+    console.log('✅ [PERMISSIVE] Aucun critère strict trouvé, mais autorisation par défaut')
+    return true // ✅ CORRECTION MAJEURE : Autoriser par défaut au lieu de rejeter
+    
+  } catch (error) {
+    console.warn('⚠️ Erreur détection page produit:', error)
+    return true // ✅ En cas d'erreur, autoriser par défaut
+  }
+}
+
+// ✅ HELPERS pour détection plateformes
+private isShopify(): boolean {
+  return !!(
+    (window as any).Shopify ||
+    document.querySelector('[data-shopify]') ||
+    window.location.hostname.includes('myshopify.com') ||
+    document.querySelector('script[src*="shopify"]') ||
+    document.querySelector('meta[name="shopify-template"]')
+  )
+}
+
+private isWooCommerce(): boolean {
+  return !!(
+    document.querySelector('.woocommerce') ||
+    document.querySelector('[class*="woo"]') ||
+    (window as any).wc_add_to_cart_params ||
+    document.body.classList.contains('woocommerce')
+  )
+}
 
   private renderWidget() {
     if (!this.widgetElement) return
@@ -1423,7 +1647,7 @@ class ChatSeller {
     const darkerColor = this.adjustColor(primaryColor, -15)
     const borderRadius = this.getBorderRadiusValue(this.config.borderRadius || 'full')
 
-    // ✅ BOUTON AVEC ICÔNE CORRIGÉE - SVG INLINE FORCÉ
+    // ✅ CORRECTION MAJEURE : BOUTON AVEC ICÔNE FORCÉE - SVG INLINE STRICT
     this.widgetElement.innerHTML = `
       <button 
         id="chatseller-trigger-btn"
@@ -1458,42 +1682,65 @@ class ChatSeller {
           user-select: none !important;
         "
       >
+        <!-- ✅ CORRECTION ICÔNE : SVG INLINE FORCÉ AVEC PROTECTION MAXIMALE -->
         <svg 
           width="20" 
           height="20" 
-          fill="none" 
-          stroke="currentColor" 
           viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="white" 
+          stroke-width="2" 
+          stroke-linecap="round" 
+          stroke-linejoin="round"
           style="
             flex-shrink: 0 !important; 
             display: block !important; 
             opacity: 1 !important; 
             visibility: visible !important;
-            stroke-width: 2 !important;
-            stroke-linecap: round !important;
-            stroke-linejoin: round !important;
+            position: relative !important;
+            z-index: 999999 !important;
+            pointer-events: none !important;
+            min-width: 20px !important;
+            max-width: 20px !important;
+            min-height: 20px !important;
+            max-height: 20px !important;
+            color: white !important;
+            stroke: white !important;
           "
           xmlns="http://www.w3.org/2000/svg"
         >
           <path 
-            stroke-linecap="round" 
-            stroke-linejoin="round" 
-            stroke-width="2" 
             d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.906-1.479L3 21l2.521-5.094A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"
+            fill="none"
+            stroke="white"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
             style="
-              fill: none !important;
-              stroke: currentColor !important;
-              stroke-width: 2 !important;
-              stroke-linecap: round !important;
-              stroke-linejoin: round !important;
+              opacity: 1 !important;
+              visibility: visible !important;
+              display: block !important;
+              pointer-events: none !important;
+              color: white !important;
+              stroke: white !important;
             "
-          ></path>
+          />
         </svg>
-        <span style="flex: 1; display: block;">${buttonText}</span>
+        <!-- ✅ TEXTE DU BOUTON -->
+        <span style="
+          flex: 1; 
+          display: block !important; 
+          text-align: center !important;
+          opacity: 1 !important;
+          visibility: visible !important;
+          font-size: inherit !important;
+          font-weight: inherit !important;
+          color: white !important;
+        ">${buttonText}</span>
       </button>
     `
 
-    // ✅ EVENT LISTENER ROBUSTE
+    // ✅ RESTAURÉ : EVENT LISTENER ROBUSTE
     const triggerBtn = this.widgetElement.querySelector('#chatseller-trigger-btn') as HTMLElement
     if (triggerBtn) {
       // Supprimer les anciens listeners
@@ -1522,55 +1769,55 @@ class ChatSeller {
     }
   }
 
-  // ✅ CORRECTION MAJEURE : Méthode openChat qui gère la réouverture
+  // ✅ RESTAURÉ : CORRECTION MAJEURE : Méthode openChat qui gère la réouverture
   private openChat() {
-    console.log('💬 [OPEN CHAT] Tentative ouverture, état actuel:', { 
-      isOpen: this.isOpen, 
-      modalExists: !!this.modalElement,
-      vueAppExists: !!this.vueApp 
-    })
-    
-    // ✅ SI DÉJÀ OUVERT, NE RIEN FAIRE
-    if (this.isOpen && this.modalElement && this.vueApp) {
-      console.log('ℹ️ [OPEN CHAT] Chat déjà ouvert, ignore')
-      return
-    }
-    
-    // ✅ FERMER LE MODAL EXISTANT S'IL Y EN A UN PROPREMENT
-    if (this.modalElement || this.isOpen) {
-      console.log('🔄 [OPEN CHAT] Fermeture propre du chat existant...')
-      this.closeChat()
-      
-      // Attendre un petit délai pour s'assurer que le nettoyage est terminé
-      setTimeout(() => {
-        this.proceedWithChatOpening()
-      }, 100)
-    } else {
-      this.proceedWithChatOpening()
-    }
+  console.log('💬 [OPEN CHAT] Tentative ouverture, état actuel:', { 
+    isOpen: this.isOpen, 
+    modalExists: !!this.modalElement,
+    vueAppExists: !!this.vueApp 
+  })
+  
+  // SI DÉJÀ OUVERT, NE RIEN FAIRE
+  if (this.isOpen && this.modalElement && this.vueApp) {
+    console.log('ℹ️ [OPEN CHAT] Chat déjà ouvert, ignore')
+    return
   }
+  
+  // FERMER LE MODAL EXISTANT S'IL Y EN A UN
+  if (this.modalElement || this.isOpen) {
+    console.log('🔄 [OPEN CHAT] Fermeture propre du chat existant...')
+    this.closeChat()
+    
+    // Attendre un délai pour s'assurer que le nettoyage est terminé
+    setTimeout(() => {
+      this.proceedWithChatOpening()
+    }, 100)
+  } else {
+    this.proceedWithChatOpening()
+  }
+}
 
   private proceedWithChatOpening() {
-    console.log('🚀 [OPEN CHAT] Procédure d\'ouverture...')
-    this.isOpen = true
-    
-    // ✅ AJOUT : Protection mobile viewport
-    if (typeof window !== 'undefined' && window.innerWidth < 768) {
-      document.documentElement.classList.add('cs-modal-open')
-      document.body.classList.add('cs-modal-open')
-    }
-    
-    try {
-      this.createVueChatModal()
-      console.log('✅ [OPEN CHAT] Modal Vue créé avec succès')
-    } catch (error) {
-      console.error('❌ [OPEN CHAT] Erreur création Vue:', error)
-      this.createFallbackModal()
-    }
+  console.log('🚀 [OPEN CHAT] Procédure d\'ouverture...')
+  this.isOpen = true
+  
+  // Protection mobile viewport
+  if (typeof window !== 'undefined' && window.innerWidth < 768) {
+    document.documentElement.classList.add('cs-modal-open')
+    document.body.classList.add('cs-modal-open')
   }
+  
+  try {
+    this.createVueChatModal()
+    console.log('✅ [OPEN CHAT] Modal Vue créé avec succès')
+  } catch (error) {
+    console.error('❌ [OPEN CHAT] Erreur création Vue:', error)
+    this.createFallbackModal()
+  }
+}
 
   private createVueChatModal() {
-    // ✅ NETTOYAGE PRÉVENTIF RENFORCÉ
+    // ✅ RESTAURÉ : NETTOYAGE PRÉVENTIF RENFORCÉ
     this.cleanupModalElements()
 
     console.log('🎨 [CREATE MODAL] Création du modal Vue...')
@@ -1580,7 +1827,7 @@ class ChatSeller {
     this.modalElement.className = 'cs-chat-modal-overlay'
     this.modalElement.setAttribute('data-chatseller', 'vue-modal')
 
-    // ✅ STYLES INLINE POUR FORCER L'AFFICHAGE
+    // ✅ RESTAURÉ : STYLES INLINE POUR FORCER L'AFFICHAGE
     this.modalElement.style.cssText = `
       position: fixed !important;
       top: 0 !important;
@@ -1602,7 +1849,7 @@ class ChatSeller {
       pointer-events: auto !important;
     `
 
-    // ✅ GESTION MOBILE
+    // ✅ RESTAURÉ : GESTION MOBILE
     if (typeof window !== 'undefined' && window.innerWidth < 768) {
       this.modalElement.style.padding = '0px !important'
       this.modalElement.style.alignItems = 'stretch !important'
@@ -1638,61 +1885,252 @@ class ChatSeller {
 
   private initVueWidget(): void {
     try {
-      console.log('🎨 [INIT VUE] Initialisation composant Vue...')
+      console.log('🎨 [INIT VUE] Initialisation Vue avec configuration complète...')
       
       if (!this.modalElement) {
-        throw new Error('Modal element non trouvé pour Vue')
+        throw new Error('Modal element manquant')
       }
       
-      // ✅ CORRECTION : Configuration avec couleur appropriée
+      // Détecter produit courant
+      const currentProduct = this.detectCurrentProduct()
+      if (currentProduct) {
+        this.config.productName = currentProduct.name
+        this.config.productPrice = currentProduct.price
+        this.config.productUrl = currentProduct.url || window.location.href
+      }
+      
+      // ✅ CORRECTION CRITIQUE : Configuration complète pour Vue
       const widgetConfig = {
         shopId: this.config.shopId,
         apiUrl: this.config.apiUrl,
-        agentConfig: this.config.agentConfig || {
-          name: 'Anna',
-          title: 'Vendeuse IA'
+        agentConfig: {
+          id: this.config.agentConfig?.id || this.config.agentId,
+          name: this.config.agentConfig?.name || 'Rose',
+          title: this.config.agentConfig?.title || 'Vendeuse', 
+          avatar: this.config.agentConfig?.avatar,
+          welcomeMessage: this.config.agentConfig?.welcomeMessage,
+          fallbackMessage: this.config.agentConfig?.fallbackMessage,
+          personality: this.config.agentConfig?.personality || 'friendly',
+          customProductType: this.config.agentConfig?.customProductType,
+          shopName: this.config.agentConfig?.shopName || 'notre boutique'
         },
-        primaryColor: this.config.primaryColor, // ✅ COULEUR DYNAMIQUE
+        primaryColor: this.config.primaryColor,
         buttonText: this.config.buttonText,
         borderRadius: this.config.borderRadius,
         language: this.config.language,
         productId: this.config.productId,
         productName: this.config.productName,
         productPrice: this.config.productPrice,
-        productUrl: this.config.productUrl
+        productUrl: this.config.productUrl || window.location.href
       }
 
-      console.log('⚙️ [INIT VUE] Configuration widget:', widgetConfig)
-
-      this.vueApp = createApp(ChatSellerWidget, {
-        config: widgetConfig
+      console.log('⚙️ [INIT VUE] Config widget:', {
+        shopId: widgetConfig.shopId,
+        agent: widgetConfig.agentConfig.name,
+        hasWelcomeMessage: !!widgetConfig.agentConfig.welcomeMessage,
+        product: widgetConfig.productName,
+        primaryColor: widgetConfig.primaryColor
       })
 
-      // ✅ AJOUT : Exposer méthodes de fermeture au global
-      if (typeof window !== 'undefined') {
-        (window as any).ChatSeller = {
-          ...((window as any).ChatSeller || {}),
-          closeChat: () => this.closeChat(),
-          saveConversation: (messages: any[], conversationId: string) => {
-            this.conversationData = { messages, conversationId, timestamp: Date.now() }
-          },
-          loadConversation: () => this.conversationData,
-          resetConversation: () => {
-            this.conversationData = null
+      // ✅ CORRECTION CRITIQUE : Création app Vue avec gestion d'erreur
+      try {
+        this.vueApp = createApp(ChatSellerWidget, {
+          config: widgetConfig
+        })
+
+        // ✅ Gestion d'erreur Vue
+        this.vueApp.config.errorHandler = (err: any, instance: any, info: string) => {
+          console.error('❌ [VUE ERROR]:', err, info)
+          console.log('🔄 Fallback vers modal HTML simple')
+          this.createFallbackModal()
+        }
+
+        // ✅ EXPOSITION MÉTHODES GLOBALES
+        if (typeof window !== 'undefined') {
+          (window as any).ChatSeller = {
+            closeChat: () => this.closeChat(),
+            saveConversation: (messages: any[], conversationId: string) => {
+              this.saveConversation(messages, conversationId)
+            },
+            loadConversation: () => {
+              return this.loadConversation()
+            },
+            resetConversation: () => {
+              this.resetConversation()
+            }
           }
         }
+
+        // ✅ MONTAGE VUE AVEC GESTION D'ERREUR
+        this.vueApp.mount(this.modalElement)
+        console.log('✅ [INIT VUE] Vue monté avec succès')
+
+      } catch (vueError) {
+        console.error('❌ [VUE MOUNT ERROR]:', vueError)
+        throw vueError
       }
 
-      this.vueApp.mount(this.modalElement)
-      console.log('✅ [INIT VUE] Composant Vue monté avec succès')
-
     } catch (error) {
-      console.error('❌ [INIT VUE] Erreur initialisation Vue:', error)
+      console.error('❌ [INIT VUE] Erreur:', error)
       throw error
     }
   }
 
+
+  // ✅ RESTAURÉ : NOUVELLE FONCTION : Détection produit améliorée
+  private detectCurrentProduct(): any {
+    try {
+      console.log('🔍 [PRODUCT DETECT] Détection produit avec type personnalisé...')
+      
+      let detectedProduct: any = {
+        id: this.config.productId,
+        name: this.config.productName,
+        price: this.config.productPrice,
+        url: this.config.productUrl || window.location.href,
+        customType: this.config.agentConfig?.customProductType // ✅ NOUVEAU
+      }
+
+      // ✅ DÉTECTION SHOPIFY AVANCÉE
+      if ((window as any).ShopifyAnalytics?.meta?.product) {
+        const shopifyProduct = (window as any).ShopifyAnalytics.meta.product
+        detectedProduct = {
+          id: shopifyProduct.id?.toString() || detectedProduct.id,
+          name: shopifyProduct.title || detectedProduct.name,
+          price: shopifyProduct.price ? shopifyProduct.price / 100 : detectedProduct.price,
+          url: window.location.href,
+          customType: this.config.agentConfig?.customProductType
+        }
+        console.log('✅ [PRODUCT DETECT] Shopify détecté:', detectedProduct.name)
+        return detectedProduct
+      }
+      
+      // ✅ DÉTECTION WOOCOMMERCE AMÉLIORÉE
+      const wooProduct = document.querySelector('.woocommerce-product, .single-product')
+      if (wooProduct) {
+        const wooTitle = wooProduct.querySelector('.product_title, .entry-title, h1.product-title')
+        if (wooTitle?.textContent?.trim()) {
+          detectedProduct.name = wooTitle.textContent.trim()
+          console.log('✅ [PRODUCT DETECT] WooCommerce détecté:', detectedProduct.name)
+        }
+        
+        // ✅ DÉTECTION PRIX WOOCOMMERCE
+        const wooPrice = wooProduct.querySelector('.price .woocommerce-Price-amount, .price ins .amount, .price .amount')
+        if (wooPrice?.textContent) {
+          const priceMatch = wooPrice.textContent.match(/[\d,]+(?:[.,]\d{2})?/)
+          if (priceMatch) {
+            detectedProduct.price = parseFloat(priceMatch[0].replace(',', '.'))
+          }
+        }
+      }
+
+      // ✅ DÉTECTION GÉNÉRIQUE ÉTENDUE
+      if (!detectedProduct.name || detectedProduct.name === 'undefined') {
+        const titleSelectors = [
+          // Shopify
+          '.product__title',
+          '.product-form__title', 
+          'h1.product-title',
+          '.product-single__title',
+          '.product-info__title',
+          // WooCommerce
+          '.product_title',
+          '.entry-title',
+          // Générique
+          'h1[class*="product"]',
+          '.product-title h1',
+          '.product-detail-title',
+          '[data-product-title]',
+          '.item-title',
+          '.product-name'
+        ]
+        
+        for (const selector of titleSelectors) {
+          const element = document.querySelector(selector)
+          if (element?.textContent?.trim()) {
+            detectedProduct.name = element.textContent.trim()
+            console.log(`✅ [PRODUCT DETECT] Générique détecté via ${selector}:`, detectedProduct.name)
+            break
+          }
+        }
+      }
+
+      // ✅ DÉTECTION PRIX AMÉLIORÉE
+      if (!detectedProduct.price) {
+        const priceSelectors = [
+          // Shopify
+          '.price__current',
+          '.product-form__price .price',
+          '.money',
+          '.price-current',
+          '.product-single__price .money',
+          '.product__price .money',
+          // WooCommerce
+          '.price .woocommerce-Price-amount',
+          '.price ins .amount',
+          // Générique
+          '.product-price',
+          '.price .money',
+          '[data-product-price]',
+          '.price-sale .money',
+          '.current-price',
+          '.sale-price'
+        ]
+        
+        for (const selector of priceSelectors) {
+          const element = document.querySelector(selector)
+          if (element?.textContent?.trim()) {
+            const priceText = element.textContent.trim()
+            const priceMatch = priceText.match(/[\d,]+(?:[.,]\d{2})?/)
+            if (priceMatch) {
+              detectedProduct.price = parseFloat(priceMatch[0].replace(',', '.'))
+              console.log(`✅ [PRODUCT DETECT] Prix détecté:`, detectedProduct.price)
+              break
+            }
+          }
+        }
+      }
+
+      // ✅ NOUVEAU : Détection automatique du type si customType pas défini
+      if (!detectedProduct.customType && detectedProduct.name) {
+        detectedProduct.customType = this.getProductTypeFromName(detectedProduct.name)
+      }
+
+      console.log('🔍 [PRODUCT DETECT] Résultat final avec type personnalisé:', {
+        name: detectedProduct.name,
+        price: detectedProduct.price,
+        customType: detectedProduct.customType,
+        id: detectedProduct.id
+      })
+      
+      return detectedProduct.name ? detectedProduct : null
+
+    } catch (error) {
+      console.warn('⚠️ [PRODUCT DETECT] Erreur détection produit:', error)
+      return null
+    }
+  }
+
+  // ✅ NOUVELLE HELPER : Détecter type de produit depuis le nom
+  private getProductTypeFromName(productName: string): string {
+    if (!productName) return 'produit'
+    
+    const name = productName.toLowerCase()
+    
+    // Détection intelligente du type
+    if (name.includes('jeu') || name.includes('game') || name.includes('cartes') || name.includes('poker')) return 'jeu'
+    if (name.includes('livre') || name.includes('book') || name.includes('roman') || name.includes('guide')) return 'livre'  
+    if (name.includes('cours') || name.includes('formation') || name.includes('training') || name.includes('apprentissage')) return 'formation'
+    if (name.includes('smartphone') || name.includes('téléphone') || name.includes('phone') || name.includes('mobile')) return 'smartphone'
+    if (name.includes('ordinateur') || name.includes('laptop') || name.includes('computer') || name.includes('pc')) return 'ordinateur'
+    if (name.includes('vêtement') || name.includes('tshirt') || name.includes('robe') || name.includes('pantalon')) return 'vêtement'
+    if (name.includes('service') || name.includes('consultation') || name.includes('accompagnement')) return 'service'
+    if (name.includes('bijou') || name.includes('collier') || name.includes('bracelet') || name.includes('bague')) return 'bijou'
+    
+    return 'produit'
+  }
+
   private createFallbackModal() {
+    this.cleanupModalElements()
     const agentName = this.config.agentConfig?.name || 'Anna'
     const primaryColor = this.config.primaryColor || '#8B5CF6'
 
@@ -1774,19 +2212,19 @@ class ChatSeller {
     console.log('✅ [FALLBACK WIDGET] Widget de fallback créé')
   }
 
-  // ✅ CORRECTION MAJEURE : Méthode closeChat qui permet la réouverture
+  // ✅ RESTAURÉ : CORRECTION MAJEURE : Méthode closeChat qui permet la réouverture
   closeChat() {
     console.log('❌ [CLOSE CHAT] Début fermeture chat...')
     
     this.isOpen = false
     
-    // ✅ SUPPRESSION MOBILE VIEWPORT CLASSES
+    // ✅ RESTAURÉ : SUPPRESSION MOBILE VIEWPORT CLASSES
     if (typeof window !== 'undefined') {
       document.documentElement.classList.remove('cs-modal-open')
       document.body.classList.remove('cs-modal-open')
     }
     
-    // ✅ DÉMONTAGE PROPRE DE VUE SANS DESTRUCTION
+    // ✅ RESTAURÉ : DÉMONTAGE PROPRE DE VUE SANS DESTRUCTION
     if (this.vueApp) {
       try {
         console.log('🎨 [CLOSE CHAT] Démontage application Vue...')
@@ -1798,7 +2236,7 @@ class ChatSeller {
       this.vueApp = null
     }
     
-    // ✅ SUPPRESSION COMPLÈTE DU MODAL
+    // ✅ RESTAURÉ : SUPPRESSION COMPLÈTE DU MODAL
     if (this.modalElement) {
       try {
         console.log('🗑️ [CLOSE CHAT] Suppression élément modal...')
@@ -1810,7 +2248,7 @@ class ChatSeller {
       this.modalElement = null
     }
     
-    // ✅ NETTOYAGE SÉCURISÉ DES MODALS ORPHELINS
+    // ✅ RESTAURÉ : NETTOYAGE SÉCURISÉ DES MODALS ORPHELINS
     this.cleanupModalElements()
     
     console.log('✅ [CLOSE CHAT] Chat fermé proprement - prêt pour réouverture')
@@ -1869,7 +2307,7 @@ class ChatSeller {
     })
   }
 
-  // ✅ API PUBLIQUE ÉTENDUE
+  // ✅ RESTAURÉ : API PUBLIQUE ÉTENDUE
   show() {
     if (this.widgetElement) {
       this.widgetElement.style.display = 'block'
@@ -1918,62 +2356,398 @@ class ChatSeller {
     this.refresh()
   }
 
-  // ✅ GESTION LOCALSTORAGE ROBUSTE AVEC PERSISTANCE AMÉLIORÉE
+  // ✅ RESTAURÉ : STRUCTURE CONVERSATION
+  private conversationHistory: Map<string, any> = new Map()
+  private currentConversationKey: string | null = null
+
+  // ✅ RESTAURÉ : GÉNÉRER CLÉ CONVERSATION INTELLIGENTE
+  private generateConversationKey(): string {
+    const shopId = this.config.shopId
+    const productId = this.config.productId || 'general'
+    const productName = this.config.productName || 'general'
+    
+    // Clé basée sur shopId + produit (ID ou nom normalisé)
+    const normalizedProduct = productId !== 'general' 
+      ? productId 
+      : productName.toLowerCase().replace(/[^a-z0-9]/g, '-').substring(0, 50)
+    
+    return `${shopId}-${normalizedProduct}`
+  }
+
+  // ✅ RESTAURÉ : GESTION LOCALSTORAGE ROBUSTE AVEC PERSISTANCE AMÉLIORÉE
   saveConversation(messages: any[], conversationId: string | null) {
     try {
+      if (!this.currentConversationKey) {
+        this.currentConversationKey = this.generateConversationKey()
+      }
+
       const conversationData = {
         messages,
         conversationId,
         timestamp: new Date().toISOString(),
         shopId: this.config.shopId,
         productInfo: {
+          id: this.config.productId,
           name: this.config.productName,
           price: this.config.productPrice,
-          url: this.config.productUrl
+          url: this.config.productUrl || window.location.href
+        },
+        userAgent: navigator.userAgent,
+        lastActivity: Date.now()
+      }
+      
+      // ✅ SAUVEGARDE LOCALE ET NAVIGATEUR
+      this.conversationHistory.set(this.currentConversationKey, conversationData)
+      
+      // ✅ SAUVEGARDE LOCALSTORAGE AVEC NETTOYAGE AUTO
+      try {
+        const storageKey = `chatseller-conv-${this.currentConversationKey}`
+        localStorage.setItem(storageKey, JSON.stringify(conversationData))
+        
+        // ✅ NETTOYAGE CONVERSATIONS ANCIENNES (>7 jours)
+        this.cleanupOldConversations()
+        
+        console.log('💾 [PERSISTENCE] Conversation sauvegardée:', {
+          key: this.currentConversationKey,
+          messages: messages.length,
+          product: conversationData.productInfo.name
+        })
+      } catch (storageError) {
+        console.warn('⚠️ [PERSISTENCE] LocalStorage failed, using memory only:', storageError)
+      }
+      
+    } catch (error) {
+      console.warn('⚠️ [PERSISTENCE] Erreur sauvegarde conversation:', error)
+    }
+  }
+
+  loadConversation(): any {
+    try {
+      const requestedKey = this.generateConversationKey()
+      console.log('📂 [PERSISTENCE] Recherche conversation:', requestedKey)
+
+      // ✅ PRIORITÉ 1 : Conversation en mémoire
+      if (this.conversationHistory.has(requestedKey)) {
+        const memoryConv = this.conversationHistory.get(requestedKey)
+        if (this.isConversationValid(memoryConv)) {
+          this.currentConversationKey = requestedKey
+          console.log('📂 [PERSISTENCE] Conversation trouvée en mémoire')
+          return memoryConv
+        }
+      }
+
+      // ✅ PRIORITÉ 2 : LocalStorage
+      try {
+        const storageKey = `chatseller-conv-${requestedKey}`
+        const stored = localStorage.getItem(storageKey)
+        if (stored) {
+          const data = JSON.parse(stored)
+          if (this.isConversationValid(data)) {
+            this.conversationHistory.set(requestedKey, data)
+            this.currentConversationKey = requestedKey
+            console.log('📂 [PERSISTENCE] Conversation restaurée depuis localStorage')
+            return data
+          }
+        }
+      } catch (storageError) {
+        console.warn('⚠️ [PERSISTENCE] Erreur lecture localStorage:', storageError)
+      }
+
+      // ✅ PRIORITÉ 3 : Recherche conversation similaire (même shop, produit différent)
+      const similarConv = this.findSimilarConversation()
+      if (similarConv) {
+        console.log('📂 [PERSISTENCE] Conversation similaire trouvée, création nouvelle session')
+        // Ne pas restaurer mais notifier qu'il y a un historique
+        return {
+          isNewProductConversation: true,
+          previousProduct: similarConv.productInfo?.name,
+          suggestedMessage: `Je vois que nous avons déjà échangé au sujet de "${similarConv.productInfo?.name}". Aujourd'hui vous regardez "${this.config.productName}". Comment puis-je vous aider ?`
+        }
+      }
+
+      console.log('📂 [PERSISTENCE] Aucune conversation trouvée, nouvelle session')
+      return null
+
+    } catch (error) {
+      console.warn('⚠️ [PERSISTENCE] Erreur chargement conversation:', error)
+      return null
+    }
+  }
+
+  // ✅ RESTAURÉ : VALIDATION CONVERSATION
+  private isConversationValid(conversation: any): boolean {
+    if (!conversation || !conversation.messages || !Array.isArray(conversation.messages)) {
+      return false
+    }
+
+    // ✅ Vérifier que la conversation n'est pas trop ancienne (7 jours)
+    const maxAge = 7 * 24 * 60 * 60 * 1000 // 7 jours
+    const age = Date.now() - (conversation.lastActivity || 0)
+    
+    if (age > maxAge) {
+      console.log('⏰ [PERSISTENCE] Conversation trop ancienne:', age / (24 * 60 * 60 * 1000), 'jours')
+      return false
+    }
+
+    return true // Conversation valide
+  }
+
+  // ✅ RESTAURÉ : RECHERCHE CONVERSATION SIMILAIRE
+  private findSimilarConversation(): any {
+    try {
+      const currentShop = this.config.shopId
+      
+      // Chercher dans localStorage toutes les conversations du même shop
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i)
+        if (key && key.startsWith(`chatseller-conv-${currentShop}-`)) {
+          try {
+            const stored = localStorage.getItem(key)
+            if (stored) {
+              const data = JSON.parse(stored)
+              if (data.shopId === currentShop && data.messages && data.messages.length > 0) {
+                return data
+              }
+            }
+          } catch (e) {
+            console.warn('⚠️ Erreur lecture conversation:', key, e)
+          }
         }
       }
       
-      // ✅ SAUVEGARDE LOCALE ET EN INSTANCE
-      this.conversationData = conversationData
-      
-      const key = `chatseller-conversation-${this.config.shopId}`
-      localStorage.setItem(key, JSON.stringify(conversationData))
-      console.log('💾 [STORAGE] Conversation sauvegardée:', key)
+      return null
     } catch (error) {
-      console.warn('⚠️ [STORAGE] Erreur sauvegarde conversation:', error)
+      console.warn('⚠️ [PERSISTENCE] Erreur recherche similaire:', error)
+      return null
     }
   }
 
-  loadConversation() {
+  // ✅ RESTAURÉ : NETTOYAGE CONVERSATIONS ANCIENNES
+  private cleanupOldConversations(): void {
     try {
-      // ✅ PRIORITÉ À LA CONVERSATION EN INSTANCE
-      if (this.conversationData) {
-        console.log('📂 [STORAGE] Conversation restaurée depuis instance')
-        return this.conversationData
+      const maxAge = 7 * 24 * 60 * 60 * 1000 // 7 jours
+      const currentTime = Date.now()
+      
+      // Nettoyer localStorage
+      const keysToRemove: string[] = []
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i)
+        if (key && key.startsWith('chatseller-conv-')) {
+          try {
+            const stored = localStorage.getItem(key)
+            if (stored) {
+              const data = JSON.parse(stored)
+              const age = currentTime - (data.lastActivity || 0)
+              if (age > maxAge) {
+                keysToRemove.push(key)
+              }
+            }
+          } catch (e) {
+            keysToRemove.push(key) // Supprimer les conversations corrompues
+          }
+        }
       }
       
-      const key = `chatseller-conversation-${this.config.shopId}`
-      const saved = localStorage.getItem(key)
-      if (saved) {
-        const data = JSON.parse(saved)
-        this.conversationData = data
-        console.log('📂 [STORAGE] Conversation restaurée depuis localStorage:', key)
-        return data
+      // Supprimer les conversations anciennes
+      keysToRemove.forEach(key => {
+        try {
+          localStorage.removeItem(key)
+          console.log('🧹 [CLEANUP] Conversation ancienne supprimée:', key)
+        } catch (e) {
+          console.warn('⚠️ [CLEANUP] Erreur suppression:', key, e)
+        }
+      })
+      
+      // Nettoyer mémoire
+      this.conversationHistory.forEach((value, key) => {
+        const age = currentTime - (value.lastActivity || 0)
+        if (age > maxAge) {
+          this.conversationHistory.delete(key)
+        }
+      })
+      
+      if (keysToRemove.length > 0) {
+        console.log(`🧹 [CLEANUP] ${keysToRemove.length} conversations anciennes nettoyées`)
       }
+      
     } catch (error) {
-      console.warn('⚠️ [STORAGE] Erreur chargement conversation:', error)
+      console.warn('⚠️ [CLEANUP] Erreur nettoyage:', error)
     }
-    return null
   }
 
+  // ✅ RESET CONVERSATION (BOUTON RESET)
   resetConversation() {
     try {
-      this.conversationData = null
-      const key = `chatseller-conversation-${this.config.shopId}`
-      localStorage.removeItem(key)
-      console.log('🔄 [STORAGE] Conversation réinitialisée:', key)
+      if (this.currentConversationKey) {
+        // Supprimer de localStorage
+        const storageKey = `chatseller-conv-${this.currentConversationKey}`
+        localStorage.removeItem(storageKey)
+        
+        // Supprimer de mémoire
+        this.conversationHistory.delete(this.currentConversationKey)
+        
+        console.log('🔄 [RESET] Conversation réinitialisée:', this.currentConversationKey)
+      }
+      
+      // Réinitialiser état
+      this.currentConversationKey = null
+      
     } catch (error) {
-      console.warn('⚠️ [STORAGE] Erreur reset conversation:', error)
+      console.warn('⚠️ [RESET] Erreur reset conversation:', error)
+    }
+  }
+
+  // ✅ CHANGER DE PRODUIT (LOGIQUE INTELLIGENTE)
+  handleProductChange(newProductInfo: any) {
+    console.log('🔄 [PRODUCT CHANGE] Changement de produit détecté:', {
+      from: this.config.productName,
+      to: newProductInfo.name,
+      customType: newProductInfo.customType
+    })
+    
+    // Sauvegarder conversation actuelle si elle existe
+    if (this.currentConversationKey && this.conversationHistory.has(this.currentConversationKey)) {
+      console.log('💾 [PRODUCT CHANGE] Sauvegarde de la conversation précédente')
+    }
+    
+    // Mettre à jour config produit avec type personnalisé
+    this.config.productId = newProductInfo.id
+    this.config.productName = newProductInfo.name
+    this.config.productPrice = newProductInfo.price
+    this.config.productUrl = newProductInfo.url
+    
+    // ✅ NOUVEAU : Mise à jour customProductType dans agentConfig
+    if (this.config.agentConfig && newProductInfo.customType) {
+      this.config.agentConfig.customProductType = newProductInfo.customType
+    }
+    
+    // Générer nouvelle clé de conversation
+    this.currentConversationKey = null
+    
+    console.log('✅ [PRODUCT CHANGE] Nouveau contexte produit configuré avec type:', newProductInfo.customType)
+  }
+
+  // ✅ NOUVELLE MÉTHODE : Mise à jour configuration agent depuis Dashboard
+  updateAgentConfiguration(newAgentConfig: any) {
+    console.log('🔄 [AGENT CONFIG UPDATE] Mise à jour configuration agent depuis Dashboard:', newAgentConfig)
+    
+    if (!this.config.agentConfig) {
+      this.config.agentConfig = {}
+    }
+    
+    // Mise à jour complète avec nouveaux champs
+    this.config.agentConfig = {
+      ...this.config.agentConfig,
+      name: newAgentConfig.name || this.config.agentConfig.name,
+      title: newAgentConfig.title || this.config.agentConfig.title,
+      avatar: newAgentConfig.avatar || this.config.agentConfig.avatar,
+      welcomeMessage: newAgentConfig.welcomeMessage || this.config.agentConfig.welcomeMessage,
+      fallbackMessage: newAgentConfig.fallbackMessage || this.config.agentConfig.fallbackMessage,
+      personality: newAgentConfig.personality || this.config.agentConfig.personality,
+      customProductType: newAgentConfig.customProductType || this.config.agentConfig.customProductType,
+      shopName: newAgentConfig.shopName || this.config.agentConfig.shopName
+    }
+    
+    console.log('✅ [AGENT CONFIG UPDATE] Configuration agent mise à jour:', {
+      name: this.config.agentConfig.name,
+      title: this.config.agentConfig.title,
+      hasWelcomeMessage: !!this.config.agentConfig.welcomeMessage,
+      hasAvatar: !!this.config.agentConfig.avatar,
+      customProductType: this.config.agentConfig.customProductType,
+      shopName: this.config.agentConfig.shopName
+    })
+    
+    // Si le chat est ouvert, informer le composant Vue de la mise à jour
+    if (this.isOpen && this.vueApp && typeof window !== 'undefined') {
+      console.log('🔄 [LIVE UPDATE] Notification du composant Vue pour mise à jour en temps réel')
+      // Le composant Vue écoutera les changements via les méthodes globales
+    }
+  }
+
+  // ✅ NOUVELLE MÉTHODE : Forcer rechargement configuration depuis API
+  async refreshConfigFromDashboard(agentId?: string): Promise<boolean> {
+    try {
+      console.log('🔄 [REFRESH CONFIG] Rechargement configuration depuis Dashboard...')
+      
+      if (!agentId && !this.config.agentId) {
+        console.warn('⚠️ [REFRESH CONFIG] Aucun agentId disponible pour le rechargement')
+        return false
+      }
+      
+      const targetAgentId = agentId || this.config.agentId
+      const apiUrl = this.config.apiUrl || 'https://chatseller-api-production.up.railway.app'
+      
+      // Appeler l'API publique pour récupérer la config
+      const response = await fetch(`${apiUrl}/api/v1/public/shops/${this.config.shopId}/config`)
+      
+      if (!response.ok) {
+        console.error('❌ [REFRESH CONFIG] Erreur API:', response.status)
+        return false
+      }
+      
+      const configData = await response.json()
+      
+      if (configData.success && configData.data.agent) {
+        console.log('✅ [REFRESH CONFIG] Nouvelle configuration reçue:', configData.data.agent.name)
+        
+        // Mettre à jour la configuration agent
+        this.updateAgentConfiguration({
+          id: configData.data.agent.id,
+          name: configData.data.agent.name,
+          title: configData.data.agent.title,
+          avatar: configData.data.agent.avatar,
+          welcomeMessage: configData.data.agent.welcomeMessage,
+          fallbackMessage: configData.data.agent.fallbackMessage,
+          personality: configData.data.agent.personality,
+          customProductType: configData.data.agent.customProductType,
+          shopName: configData.data.shop.name
+        })
+        
+        console.log('✅ [REFRESH CONFIG] Configuration mise à jour avec succès')
+        return true
+      }
+      
+      return false
+      
+    } catch (error) {
+      console.error('❌ [REFRESH CONFIG] Erreur:', error)
+      return false
+    }
+  }
+
+  // API publique étendue avec nouvelles fonctionnalités
+  getPublicAPI() {
+    return {
+      // Méthodes de base existantes
+      show: () => this.show(),
+      hide: () => this.hide(),
+      destroy: () => this.destroy(),
+      refresh: () => this.refresh(),
+      updateConfig: (newConfig: Partial<ChatSellerConfig>) => this.updateConfig(newConfig),
+      
+      // ✅ NOUVELLES MÉTHODES PUBLIQUES
+      updateAgentConfig: (newAgentConfig: any) => this.updateAgentConfiguration(newAgentConfig),
+      refreshFromDashboard: (agentId?: string) => this.refreshConfigFromDashboard(agentId),
+      getCurrentConfig: () => this.currentConfig,
+      getCurrentProduct: () => ({
+        id: this.config.productId,
+        name: this.config.productName,
+        price: this.config.productPrice,
+        customType: this.config.agentConfig?.customProductType
+      }),
+      
+      // Getters améliorés
+      get isReady(): boolean { return this.isReady },
+      get version(): string { return this.version },
+      get isModalOpen(): boolean { return this.isModalOpen },
+      get hasDetectedProduct(): boolean { return this.hasDetectedProduct },
+      
+      // Debug amélioré
+      debug: () => ({
+        ...this.debug(),
+        agentConfig: this.config.agentConfig,
+        productCustomType: this.config.agentConfig?.customProductType
+      })
     }
   }
 
@@ -2018,13 +2792,85 @@ class ChatSeller {
   const chatSeller = new ChatSeller()
   
   if (typeof window !== 'undefined') {
-    (window as any).ChatSeller = chatSeller
+    // ✅ EXPOSITION API PUBLIQUE COMPLÈTE
+    (window as any).ChatSeller = {
+      // API de base
+      ...chatSeller.getPublicAPI(),
+      
+      // ✅ NOUVELLES MÉTHODES GLOBALES POUR SYNCHRONISATION DASHBOARD
+      syncFromDashboard: async (agentId?: string) => {
+        console.log('🔄 [SYNC DASHBOARD] Synchronisation depuis Dashboard...')
+        const success = await chatSeller.refreshConfigFromDashboard(agentId)
+        if (success) {
+          console.log('✅ [SYNC DASHBOARD] Configuration synchronisée avec succès')
+          // Rafraîchir le widget pour appliquer les changements
+          chatSeller.refresh()
+        }
+        return success
+      },
+      
+      // ✅ MÉTHODE POUR MISE À JOUR EN TEMPS RÉEL DEPUIS DASHBOARD
+      updateFromDashboard: (updates: any) => {
+        console.log('🔄 [LIVE UPDATE] Mise à jour en temps réel depuis Dashboard:', updates)
+        
+        if (updates.agent) {
+          chatSeller.updateAgentConfiguration(updates.agent)
+        }
+        
+        if (updates.widget) {
+          const newConfig = { ...chatSeller.currentConfig }
+          Object.assign(newConfig, updates.widget)
+          chatSeller.updateConfig(newConfig)
+        }
+        
+        // Actualiser le widget pour refléter les changements
+        if (chatSeller.isReady) {
+          chatSeller.refresh()
+        }
+      },
+      
+      // ✅ MÉTHODE POUR DÉCLENCHER MESSAGE D'ACCUEIL MANUELLEMENT
+      triggerWelcomeMessage: () => {
+        console.log('👋 [MANUAL WELCOME] Déclenchement manuel message d\'accueil')
+        if (chatSeller.isModalOpen && typeof window !== 'undefined') {
+          // Informer le composant Vue de déclencher le message d'accueil
+          const event = new CustomEvent('chatseller-trigger-welcome', {
+            detail: { 
+              agentConfig: chatSeller.currentConfig.agentConfig,
+              forceWelcome: true
+            }
+          })
+          window.dispatchEvent(event)
+        }
+      }
+    }
     
-    // ✅ AUTO-INIT INTELLIGENT
+    // ✅ AUTO-INIT INTELLIGENT AMÉLIORÉ
     const autoInit = () => {
       if ((window as any).ChatSellerConfig && !chatSeller.isReady) {
-        console.log('🚀 [AUTO-INIT] Initialisation automatique...')
-        chatSeller.init((window as any).ChatSellerConfig)
+        console.log('🚀 [AUTO-INIT] Initialisation automatique avec configuration enrichie...')
+        
+        // ✅ ENRICHIR CONFIG AVEC DONNÉES MANQUANTES
+        const enrichedConfig = {
+          ...(window as any).ChatSellerConfig,
+          agentConfig: {
+            ...((window as any).ChatSellerConfig.agentConfig || {}),
+            // S'assurer que les champs critiques sont présents
+            welcomeMessage: (window as any).ChatSellerConfig.agentConfig?.welcomeMessage || null,
+            customProductType: (window as any).ChatSellerConfig.agentConfig?.customProductType || null,
+            shopName: (window as any).ChatSellerConfig.agentConfig?.shopName || 'notre boutique'
+          }
+        }
+        
+        console.log('🔧 [AUTO-INIT] Configuration enrichie:', {
+          shopId: enrichedConfig.shopId,
+          agentName: enrichedConfig.agentConfig?.name,
+          hasWelcomeMessage: !!enrichedConfig.agentConfig?.welcomeMessage,
+          hasCustomProductType: !!enrichedConfig.agentConfig?.customProductType,
+          shopName: enrichedConfig.agentConfig?.shopName
+        })
+        
+        chatSeller.init(enrichedConfig)
       }
     }
     
@@ -2032,19 +2878,18 @@ class ChatSeller {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', autoInit)
     } else if (document.readyState === 'interactive' || document.readyState === 'complete') {
-      setTimeout(autoInit, 100)
+      setTimeout(autoInit, 200)
     }
     
     // ✅ SUPPORT SHOPIFY SECTIONS DYNAMIQUES AVANCÉ
     if (typeof window !== 'undefined') {
-      // Détecter si on est sur Shopify
       const isShopify = (window as any).Shopify || 
                        document.querySelector('[data-shopify]') || 
                        window.location.hostname.includes('myshopify.com') ||
                        document.querySelector('script[src*="shopify"]')
                        
       if (isShopify) {
-        console.log('🛍️ [SHOPIFY] Mode Shopify activé')
+        console.log('🛍️ [SHOPIFY] Mode Shopify activé avec synchronisation avancée')
         
         // Écouter les changements de section Shopify
         document.addEventListener('shopify:section:load', function(event) {
@@ -2053,7 +2898,12 @@ class ChatSeller {
             if (!chatSeller.isReady) {
               autoInit()
             } else {
-              chatSeller.refresh()
+              // Détecter nouveau produit et mettre à jour
+              const newProduct = chatSeller['detectCurrentProduct']?.()
+              if (newProduct) {
+                chatSeller.handleProductChange(newProduct)
+                chatSeller.refresh()
+              }
             }
           }, 1000)
         })
@@ -2063,105 +2913,93 @@ class ChatSeller {
           chatSeller.cleanupExistingWidgets()
         })
         
-        // Écouter les changements de variantes
-        document.addEventListener('variant:change', function(event) {
-          console.log('🔄 [SHOPIFY] Variante changée:', event)
-          if (chatSeller.config?.autoDetectProduct) {
-            chatSeller.detectProductInfo()
-          }
-        })
-        
-        // ✅ GESTION SPA SHOPIFY (AJAX Navigation)
+        // ✅ GESTION SPA SHOPIFY AMÉLIORÉE
         let currentUrl = window.location.href
         const checkUrlChange = () => {
           if (window.location.href !== currentUrl) {
             currentUrl = window.location.href
             console.log('🔄 [SPA] URL changée, rechargement widget:', currentUrl)
-            chatSeller.cleanupExistingWidgets()
+            
+            // Détecter nouveau produit
             setTimeout(() => {
-              autoInit()
+              const newProduct = chatSeller['detectCurrentProduct']?.()
+              if (newProduct) {
+                chatSeller.handleProductChange(newProduct)
+              }
+              
+              if (!chatSeller.isReady) {
+                autoInit()
+              } else {
+                chatSeller.refresh()
+              }
             }, 700)
           }
         }
         
         setInterval(checkUrlChange, 2000)
-        
-        // Écouter les événements de navigation
         window.addEventListener('popstate', checkUrlChange)
-        
-        // Observer les changements dans le DOM pour SPA
-        if ('MutationObserver' in window) {
-          const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-              if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-                // Vérifier si du nouveau contuit produit a été ajouté
-                const hasProductContent = Array.from(mutation.addedNodes).some(node => {
-                  if (node.nodeType === Node.ELEMENT_NODE) {
-                    const element = node as Element
-                    return element.querySelector('.product-form, .product-single, [data-product]')
-                  }
-                  return false
-                })
-                
-                if (hasProductContent) {
-                  console.log('🔄 [DOM] Nouveau contenu produit détecté')
-                  setTimeout(() => {
-                    if (!document.getElementById('chatseller-widget')) {
-                      autoInit()
-                    }
-                  }, 500)
-                }
-              }
-            })
-          })
-          
-          observer.observe(document.body, {
-            childList: true,
-            subtree: true
-          })
-        }
       }
       
-      // ✅ SUPPORT WOOCOMMERCE
+      // ✅ SUPPORT WOOCOMMERCE AMÉLIORÉ
       const isWooCommerce = document.querySelector('.woocommerce') || 
                            document.querySelector('[class*="woo"]') ||
                            (window as any).wc_add_to_cart_params
                            
       if (isWooCommerce) {
-        console.log('🛒 [WOOCOMMERCE] Mode WooCommerce activé')
+        console.log('🛒 [WOOCOMMERCE] Mode WooCommerce activé avec détection produit')
         
-        // Écouter les événements WooCommerce
         document.addEventListener('updated_cart_totals', () => {
           console.log('🔄 [WOOCOMMERCE] Panier mis à jour')
-          if (chatSeller.config?.autoDetectProduct) {
-            chatSeller.detectProductInfo()
+          if (chatSeller.currentConfig?.autoDetectProduct) {
+            const newProduct = chatSeller['detectCurrentProduct']?.()
+            if (newProduct) {
+              chatSeller.handleProductChange(newProduct)
+            }
           }
         })
       }
     }
     
-    // ✅ GESTION ERREURS GLOBALES
-    window.addEventListener('error', (event) => {
-      if (event.error && event.error.message && event.error.message.includes('ChatSeller')) {
-        console.error('❌ [GLOBAL ERROR] Erreur ChatSeller:', event.error)
-      }
-    })
+    // ✅ ÉCOUTER ÉVÉNEMENTS DASHBOARD POUR SYNCHRONISATION TEMPS RÉEL
+    if (typeof window !== 'undefined') {
+      window.addEventListener('chatseller-config-updated', (event: any) => {
+        console.log('📡 [DASHBOARD SYNC] Configuration mise à jour depuis Dashboard:', event.detail)
+        
+        if (event.detail) {
+          (window as any).ChatSeller.updateFromDashboard(event.detail)
+        }
+      })
+      
+      // ✅ ÉCOUTER DÉCLENCHEMENT MANUEL MESSAGE D'ACCUEIL
+      window.addEventListener('chatseller-trigger-welcome', (event: any) => {
+        console.log('👋 [WELCOME EVENT] Déclenchement message d\'accueil:', event.detail)
+        // L'événement sera géré par le composant Vue
+      })
+    }
     
-    console.log('✅ [CHATSELLER] Widget chargé - version 1.5.3')
+    console.log('✅ [CHATSELLER] Widget chargé avec nouvelles fonctionnalités - version 1.5.4')
     
-    // ✅ EXPOSER FONCTIONS DE DEBUG EN DÉVELOPPEMENT
+    // ✅ EXPOSER FONCTIONS DE DEBUG ÉTENDUES
     if (process.env.NODE_ENV === 'development' || (window as any).ChatSellerConfig?.debug) {
       (window as any).ChatSellerDebug = {
         instance: chatSeller,
-        version: chatSeller.version,
+        version: '1.5.4',
         debug: () => chatSeller.debug(),
         cleanup: () => chatSeller.cleanupExistingWidgets(),
         refresh: () => chatSeller.refresh(),
-        destroy: () => chatSeller.destroy()
+        destroy: () => chatSeller.destroy(),
+        // ✅ NOUVEAUX OUTILS DEBUG
+        testWelcomeMessage: () => (window as any).ChatSeller.triggerWelcomeMessage(),
+        getCurrentConfig: () => chatSeller.currentConfig,
+        syncFromDashboard: () => (window as any).ChatSeller.syncFromDashboard(),
+        detectProduct: () => chatSeller['detectCurrentProduct']?.()
       }
     }
   }
 })()
+
+// ✅ VERSION MISE À JOUR
+const CHATSELLER_VERSION = '1.5.4'
 
 // ✅ DÉCLARATIONS TYPESCRIPT COMPLÈTES
 declare global {
