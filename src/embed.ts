@@ -1771,50 +1771,50 @@ private isWooCommerce(): boolean {
 
   // ✅ RESTAURÉ : CORRECTION MAJEURE : Méthode openChat qui gère la réouverture
   private openChat() {
-    console.log('💬 [OPEN CHAT] Tentative ouverture, état actuel:', { 
-      isOpen: this.isOpen, 
-      modalExists: !!this.modalElement,
-      vueAppExists: !!this.vueApp 
-    })
-    
-    // ✅ SI DÉJÀ OUVERT, NE RIEN FAIRE
-    if (this.isOpen && this.modalElement && this.vueApp) {
-      console.log('ℹ️ [OPEN CHAT] Chat déjà ouvert, ignore')
-      return
-    }
-    
-    // ✅ FERMER LE MODAL EXISTANT S'IL Y EN A UN PROPREMENT
-    if (this.modalElement || this.isOpen) {
-      console.log('🔄 [OPEN CHAT] Fermeture propre du chat existant...')
-      this.closeChat()
-      
-      // Attendre un petit délai pour s'assurer que le nettoyage est terminé
-      setTimeout(() => {
-        this.proceedWithChatOpening()
-      }, 100)
-    } else {
-      this.proceedWithChatOpening()
-    }
+  console.log('💬 [OPEN CHAT] Tentative ouverture, état actuel:', { 
+    isOpen: this.isOpen, 
+    modalExists: !!this.modalElement,
+    vueAppExists: !!this.vueApp 
+  })
+  
+  // SI DÉJÀ OUVERT, NE RIEN FAIRE
+  if (this.isOpen && this.modalElement && this.vueApp) {
+    console.log('ℹ️ [OPEN CHAT] Chat déjà ouvert, ignore')
+    return
   }
+  
+  // FERMER LE MODAL EXISTANT S'IL Y EN A UN
+  if (this.modalElement || this.isOpen) {
+    console.log('🔄 [OPEN CHAT] Fermeture propre du chat existant...')
+    this.closeChat()
+    
+    // Attendre un délai pour s'assurer que le nettoyage est terminé
+    setTimeout(() => {
+      this.proceedWithChatOpening()
+    }, 100)
+  } else {
+    this.proceedWithChatOpening()
+  }
+}
 
   private proceedWithChatOpening() {
-    console.log('🚀 [OPEN CHAT] Procédure d\'ouverture...')
-    this.isOpen = true
-    
-    // ✅ RESTAURÉ : AJOUT : Protection mobile viewport
-    if (typeof window !== 'undefined' && window.innerWidth < 768) {
-      document.documentElement.classList.add('cs-modal-open')
-      document.body.classList.add('cs-modal-open')
-    }
-    
-    try {
-      this.createVueChatModal()
-      console.log('✅ [OPEN CHAT] Modal Vue créé avec succès')
-    } catch (error) {
-      console.error('❌ [OPEN CHAT] Erreur création Vue:', error)
-      this.createFallbackModal()
-    }
+  console.log('🚀 [OPEN CHAT] Procédure d\'ouverture...')
+  this.isOpen = true
+  
+  // Protection mobile viewport
+  if (typeof window !== 'undefined' && window.innerWidth < 768) {
+    document.documentElement.classList.add('cs-modal-open')
+    document.body.classList.add('cs-modal-open')
   }
+  
+  try {
+    this.createVueChatModal()
+    console.log('✅ [OPEN CHAT] Modal Vue créé avec succès')
+  } catch (error) {
+    console.error('❌ [OPEN CHAT] Erreur création Vue:', error)
+    this.createFallbackModal()
+  }
+}
 
   private createVueChatModal() {
     // ✅ RESTAURÉ : NETTOYAGE PRÉVENTIF RENFORCÉ
@@ -1885,42 +1885,34 @@ private isWooCommerce(): boolean {
 
   private initVueWidget(): void {
     try {
-      console.log('🎨 [INIT VUE] Initialisation composant Vue avec configuration complète...')
+      console.log('🎨 [INIT VUE] Initialisation Vue avec configuration complète...')
       
       if (!this.modalElement) {
-        throw new Error('Modal element non trouvé pour Vue')
+        throw new Error('Modal element manquant')
       }
       
-      // ✅ CORRECTION MAJEURE : Récupération produit avec type personnalisé
+      // Détecter produit courant
       const currentProduct = this.detectCurrentProduct()
       if (currentProduct) {
-        const hasProductChanged = this.config.productName !== currentProduct.name ||
-                                 this.config.productId !== currentProduct.id
-        
-        if (hasProductChanged) {
-          console.log('🔄 [PRODUCT CHANGE] Produit changé détecté')
-          this.handleProductChange(currentProduct)
-        } else {
-          this.config.productName = currentProduct.name
-          this.config.productPrice = currentProduct.price
-          this.config.productUrl = currentProduct.url || window.location.href
-        }
+        this.config.productName = currentProduct.name
+        this.config.productPrice = currentProduct.price
+        this.config.productUrl = currentProduct.url || window.location.href
       }
       
-      // ✅ CORRECTION CRITIQUE : Configuration complète avec welcomeMessage
+      // ✅ CORRECTION CRITIQUE : Configuration complète pour Vue
       const widgetConfig = {
         shopId: this.config.shopId,
         apiUrl: this.config.apiUrl,
         agentConfig: {
           id: this.config.agentConfig?.id || this.config.agentId,
           name: this.config.agentConfig?.name || 'Rose',
-          title: this.config.agentConfig?.title || 'Vendeuse',
-          avatar: this.config.agentConfig?.avatar, // ✅ AVATAR SYNC
-          welcomeMessage: this.config.agentConfig?.welcomeMessage, // ✅ CORRECTION MAJEURE
+          title: this.config.agentConfig?.title || 'Vendeuse', 
+          avatar: this.config.agentConfig?.avatar,
+          welcomeMessage: this.config.agentConfig?.welcomeMessage,
           fallbackMessage: this.config.agentConfig?.fallbackMessage,
           personality: this.config.agentConfig?.personality || 'friendly',
-          customProductType: this.config.agentConfig?.customProductType, // ✅ NOUVEAU CHAMP
-          shopName: this.config.agentConfig?.shopName || 'notre boutique' // ✅ NOUVEAU CHAMP
+          customProductType: this.config.agentConfig?.customProductType,
+          shopName: this.config.agentConfig?.shopName || 'notre boutique'
         },
         primaryColor: this.config.primaryColor,
         buttonText: this.config.buttonText,
@@ -1932,81 +1924,58 @@ private isWooCommerce(): boolean {
         productUrl: this.config.productUrl || window.location.href
       }
 
-      console.log('⚙️ [INIT VUE] Configuration widget avec welcomeMessage:', {
+      console.log('⚙️ [INIT VUE] Config widget:', {
         shopId: widgetConfig.shopId,
         agent: widgetConfig.agentConfig.name,
-        title: widgetConfig.agentConfig.title,
         hasWelcomeMessage: !!widgetConfig.agentConfig.welcomeMessage,
-        welcomePreview: widgetConfig.agentConfig.welcomeMessage?.substring(0, 50),
-        hasAvatar: !!widgetConfig.agentConfig.avatar,
-        customProductType: widgetConfig.agentConfig.customProductType,
-        shopName: widgetConfig.agentConfig.shopName,
         product: widgetConfig.productName,
-        hasPersistence: true
+        primaryColor: widgetConfig.primaryColor
       })
 
-      this.vueApp = createApp(ChatSellerWidget, {
-        config: widgetConfig
-      })
+      // ✅ CORRECTION CRITIQUE : Création app Vue avec gestion d'erreur
+      try {
+        this.vueApp = createApp(ChatSellerWidget, {
+          config: widgetConfig
+        })
 
-      // ✅ MÉTHODES GLOBALES ÉTENDUES
-      if (typeof window !== 'undefined') {
-        (window as any).ChatSeller = {
-          ...((window as any).ChatSeller || {}),
-          
-          // Méthodes de base
-          closeChat: () => this.closeChat(),
-          
-          // ✅ NOUVELLES MÉTHODES DE PERSISTANCE
-          saveConversation: (messages: any[], conversationId: string) => {
-            this.saveConversation(messages, conversationId)
-          },
-          
-          loadConversation: () => {
-            return this.loadConversation()
-          },
-          
-          resetConversation: () => {
-            this.resetConversation()
-          },
-          
-          // ✅ GESTION CHANGEMENT PRODUIT
-          updateProduct: (productInfo: any) => {
-            this.handleProductChange(productInfo)
-          },
-          
-          // ✅ NOUVEAU : Méthodes configuration agent
-          getAgentConfig: () => {
-            return this.config.agentConfig
-          },
-          
-          updateAgentConfig: (newConfig: any) => {
-            this.config.agentConfig = { ...this.config.agentConfig, ...newConfig }
-            console.log('🔄 [CONFIG UPDATE] Configuration agent mise à jour:', this.config.agentConfig)
-          },
-          
-          // Debug et status
-          getConversationStatus: () => ({
-            currentKey: this.currentConversationKey,
-            hasHistory: this.conversationHistory.size > 0,
-            currentProduct: {
-              id: this.config.productId,
-              name: this.config.productName,
-              url: this.config.productUrl
-            },
-            agentConfig: this.config.agentConfig
-          })
+        // ✅ Gestion d'erreur Vue
+        this.vueApp.config.errorHandler = (err: any, instance: any, info: string) => {
+          console.error('❌ [VUE ERROR]:', err, info)
+          console.log('🔄 Fallback vers modal HTML simple')
+          this.createFallbackModal()
         }
+
+        // ✅ EXPOSITION MÉTHODES GLOBALES
+        if (typeof window !== 'undefined') {
+          (window as any).ChatSeller = {
+            closeChat: () => this.closeChat(),
+            saveConversation: (messages: any[], conversationId: string) => {
+              this.saveConversation(messages, conversationId)
+            },
+            loadConversation: () => {
+              return this.loadConversation()
+            },
+            resetConversation: () => {
+              this.resetConversation()
+            }
+          }
+        }
+
+        // ✅ MONTAGE VUE AVEC GESTION D'ERREUR
+        this.vueApp.mount(this.modalElement)
+        console.log('✅ [INIT VUE] Vue monté avec succès')
+
+      } catch (vueError) {
+        console.error('❌ [VUE MOUNT ERROR]:', vueError)
+        throw vueError
       }
 
-      this.vueApp.mount(this.modalElement)
-      console.log('✅ [INIT VUE] Composant Vue monté avec welcomeMessage et configuration complète')
-
     } catch (error) {
-      console.error('❌ [INIT VUE] Erreur initialisation Vue:', error)
+      console.error('❌ [INIT VUE] Erreur:', error)
       throw error
     }
   }
+
 
   // ✅ RESTAURÉ : NOUVELLE FONCTION : Détection produit améliorée
   private detectCurrentProduct(): any {
@@ -2161,6 +2130,7 @@ private isWooCommerce(): boolean {
   }
 
   private createFallbackModal() {
+    this.cleanupModalElements()
     const agentName = this.config.agentConfig?.name || 'Anna'
     const primaryColor = this.config.primaryColor || '#8B5CF6'
 
