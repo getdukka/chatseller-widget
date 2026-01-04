@@ -21,17 +21,16 @@ export default defineConfig(({ command }) => {
       target: ['es2020', 'chrome60', 'firefox60', 'safari11'],
       lib: {
         entry: resolve(__dirname, 'src/embed.ts'),
+        formats: ['iife'],
         name: 'ChatSellerWidget',
-        fileName: 'embed',
-        formats: ['iife']
+        fileName: 'embed'
       },
       rollupOptions: {
         output: {
           format: 'iife',
-          name: 'ChatSellerWidget',
           entryFileNames: 'embed.js',
           inlineDynamicImports: true,
-          exports: 'named' // ✅ CORRECTION POUR LE WARNING
+          extend: true,
         },
         external: []
       },

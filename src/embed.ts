@@ -78,8 +78,9 @@ class ChatSeller {
       return
     }
 
-    if (!this.isProductPage()) {
-      console.log('🚫 [INIT] Page non-produit, initialisation annulée')
+    // ✅ Autoriser l'initialisation sur toutes les pages (mode flottant sur pages non-produit)
+    if (!this.isProductPage() && !this.config.forceDisplay) {
+      console.log('🚫 [INIT] Page non-produit sans forceDisplay, initialisation annulée')
       return
     }
 
@@ -1392,8 +1393,31 @@ class ChatSeller {
   // ✅ NOUVELLE MÉTHODE : Détection type de page améliorée
   private detectPageType(): 'product' | 'category' | 'home' | 'other' {
     try {
-      // ✅ DÉTECTION PAGE PRODUIT
+      // ✅ PRIORITÉ 1 : Si floatingPosition est configuré ET pas de CTA produit réel, mode flottant
+      if (this.config.floatingPosition) {
+        // Vérifie s'il y a un VRAI CTA de produit (pas juste un bouton quelconque)
+        const realProductCTA = document.querySelector(
+          'form[action*="/cart/add"] button, ' +
+          '.product-form button[type="submit"], ' +
+          'button[name="add"], ' +
+          '.add-to-cart, ' +
+          '.shopify-payment-button'
+        )
+        if (!realProductCTA) {
+          console.log('💬 [DETECT] floatingPosition configuré + pas de CTA produit = mode flottant')
+          return 'other'
+        }
+      }
+
+      // ✅ PRIORITÉ 2 : DÉTECTION PAGE PRODUIT
       if (this.isProductPage()) {
+        console.log('🛍️ [DETECT] Page produit détectée')
+        return 'product'
+      }
+
+      // ✅ MODE FORCE : Traiter comme page produit si forceDisplay activé ET CTA présent
+      if (this.config.forceDisplay && document.querySelector('.cta-button, button[class*="add"], button[class*="buy"]')) {
+        console.log('🚧 [FORCE] Mode forceDisplay: traitement comme page produit')
         return 'product'
       }
       
@@ -1470,16 +1494,17 @@ class ChatSeller {
       '.product-form__buttons button[name="add"]',
       '.btn--add-to-cart',
       '.product-form button[type="submit"]',
-      
+
       // WooCommerce beauté
       '.single_add_to_cart_button',
       'button[name="add-to-cart"]',
-      
+
       // Génériques beauté
       'button[class*="add-to-cart"]',
       'button[class*="buy"]',
       '.buy-button',
-      '.add-to-basket'
+      '.add-to-basket',
+      '.cta-button'  // Pour pages de test
     ]
 
     const isElementVisible = (element: Element): boolean => {
@@ -1548,32 +1573,40 @@ class ChatSeller {
       }
     }
     
-    // ✅ FALLBACK : Container spécialisé beauté
-    this.insertInBeautyContainer(container)
+    // ✅ FALLBACK : Mode flottant si pas de CTA trouvé
+    console.log('⚠️ Pas de CTA trouvé, basculement en mode flottant')
+    this.insertFloatingWidget(container)
   }
 
   // ✅ NOUVELLE MÉTHODE : Insertion sur page catégorie
   private insertOnCategoryPage(container: HTMLElement): void {
     console.log('📂 [CATEGORY PAGE] Insertion widget flottant sur page catégorie')
-    
+
     // Sur les pages catégories, toujours affichage flottant
-    this.insertFloatingWidget(container, true)
+    this.insertFloatingWidget(container)
   }
 
   // ✅ NOUVELLE MÉTHODE : Insertion sur page d'accueil
   private insertOnHomePage(container: HTMLElement): void {
     console.log('🏠 [HOME PAGE] Insertion widget sur page d\'accueil')
-    
+
+    // ✅ SI floatingPosition est configuré, TOUJOURS mode flottant
+    if (this.config.floatingPosition) {
+      console.log('💬 [HOME] floatingPosition configuré, mode flottant forcé')
+      this.insertFloatingWidget(container)
+      return
+    }
+
     // Chercher un endroit approprié sur la homepage
     const homeSelectors = [
       '.hero-section',
-      '.home-banner', 
+      '.home-banner',
       '.homepage-content',
       '.main-content',
       'main',
       '.content'
     ]
-    
+
     let targetElement: HTMLElement | null = null
     for (const selector of homeSelectors) {
       const element = document.querySelector(selector)
@@ -1582,7 +1615,7 @@ class ChatSeller {
         break
       }
     }
-    
+
     if (targetElement) {
       // ✅ WIDGET INTÉGRÉ EN HAUT DU CONTENU PRINCIPAL
       container.style.cssText = `
@@ -1595,34 +1628,39 @@ class ChatSeller {
       console.log('✅ Widget beauté intégré en haut de la homepage')
     } else {
       // ✅ FALLBACK : Flottant
-      this.insertFloatingWidget(container, true)
+      this.insertFloatingWidget(container)
     }
   }
 
   // ✅ MÉTHODE AMÉLIORÉE : Widget flottant
   private insertFloatingWidget(container: HTMLElement, isVisible: boolean = false): void {
     console.log('💬 [FLOATING] Insertion widget flottant')
-    
-    // ✅ STYLES FLOTTANT BEAUTÉ ADAPTATIFS
+
+    // ✅ STYLES FLOTTANT - FORCER VISIBILITÉ MAXIMALE
     const position = this.config.floatingPosition || 'bottom-right'
-    const primaryColor = this.config.primaryColor || '#8B5CF6'
-    
+
     container.className = 'cs-chatseller-widget cs-floating-widget'
     container.style.cssText = `
       position: fixed !important;
-      ${position.includes('right') ? 'right: 20px;' : 'left: 20px;'}
-      bottom: 20px;
-      z-index: 999999 !important;
-      max-width: ${isVisible ? '280px' : '60px'} !important;
-      transition: all 0.3s ease !important;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
-      border-radius: ${isVisible ? '16px' : '50%'} !important;
-      backdrop-filter: blur(10px) !important;
+      ${position.includes('right') ? 'right: 20px !important;' : 'left: 20px !important;'}
+      bottom: 20px !important;
+      z-index: 2147483647 !important;
+      width: 60px !important;
+      height: 60px !important;
+      min-width: 60px !important;
+      min-height: 60px !important;
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      overflow: visible !important;
+      transform: none !important;
+      border-radius: 50% !important;
     `
-    
+
     // ✅ INSÉRER À LA FIN DU BODY
     document.body.appendChild(container)
-    console.log('✅ Widget flottant beauté inséré')
+    console.log('✅ Widget flottant beauté inséré avec styles forcés')
   }
 
   // ✅ NOUVELLE MÉTHODE : Container beauté spécialisé
@@ -1694,96 +1732,37 @@ class ChatSeller {
 
   // ✅ NOUVELLE MÉTHODE : Rendu widget flottant
   private renderFloatingWidget(buttonText: string, primaryColor: string, pageType: string) {
-    const isCompact = pageType !== 'home'
-    
-    if (isCompact) {
-      // ✅ VERSION COMPACTE (icône + tooltip)
-      this.widgetElement!.innerHTML = `
-        <div class="cs-floating-compact" style="
-          width: 60px;
-          height: 60px;
-          background: linear-gradient(135deg, ${primaryColor} 0%, ${this.adjustColor(primaryColor, -15)} 100%);
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          box-shadow: 0 8px 25px rgba(${this.hexToRgb(primaryColor)}, 0.4);
-          transition: all 0.3s ease;
-          position: relative;
-        " 
-        onmouseover="this.style.transform='scale(1.1)'"
-        onmouseout="this.style.transform='scale(1)'"
-        onclick="this.parentElement.querySelector('.cs-floating-expanded').style.display='block'; this.style.display='none';"
-        >
-          <svg width="24" height="24" fill="white" viewBox="0 0 24 24">
-            <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.906-1.479L3 21l2.521-5.094A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"/>
-          </svg>
-          
-          <!-- Tooltip -->
-          <div style="
-            position: absolute;
-            ${this.config.floatingPosition?.includes('right') ? 'right: 70px;' : 'left: 70px;'}
-            top: 50%;
-            transform: translateY(-50%);
-            background: #333;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            white-space: nowrap;
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-            z-index: 1000000;
-          " class="cs-tooltip">
-            ${buttonText}
-          </div>
-        </div>
-        
-        <div class="cs-floating-expanded" style="
-          display: none;
-          width: 240px;
-          background: white;
-          border-radius: 16px;
-          padding: 16px;
-          box-shadow: 0 12px 35px rgba(0,0,0,0.15);
-        ">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-            <span style="font-weight: 600; color: #333;">${buttonText}</span>
-            <button onclick="this.parentElement.parentElement.style.display='none'; this.parentElement.parentElement.previousElementSibling.style.display='flex';" style="background: none; border: none; font-size: 18px; cursor: pointer;">×</button>
-          </div>
-          <button onclick="window.ChatSeller.open && window.ChatSeller.open()" style="
-            width: 100%;
-            background: ${primaryColor};
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-          ">
-            💬 Ouvrir le chat
-          </button>
-        </div>
+    const darkerColor = this.adjustColor(primaryColor, -15)
+    const rgbColor = this.hexToRgb(primaryColor)
+    const tooltipPosition = this.config.floatingPosition?.includes('right') ? 'right: 70px;' : 'left: 70px;'
+
+    // ✅ INJECTER LE CSS DANS LE HEAD (une seule fois)
+    if (!document.getElementById('cs-floating-styles')) {
+      const styleEl = document.createElement('style')
+      styleEl.id = 'cs-floating-styles'
+      styleEl.textContent = `
+        .cs-floating-btn:hover { transform: scale(1.1) !important; }
+        .cs-floating-btn:hover .cs-tip { opacity: 1 !important; }
       `
-    } else {
-      // ✅ VERSION ÉTENDUE (sur homepage)
-      this.renderIntegratedWidget(buttonText, primaryColor, pageType)
+      document.head.appendChild(styleEl)
     }
 
-    // ✅ ÉVÉNEMENTS HOVER TOOLTIP
-    const compact = this.widgetElement!.querySelector('.cs-floating-compact')
-    const tooltip = this.widgetElement!.querySelector('.cs-tooltip') as HTMLElement
-    
-    if (compact && tooltip) {
-      compact.addEventListener('mouseenter', () => {
-        tooltip.style.opacity = '1'
-      })
-      compact.addEventListener('mouseleave', () => {
-        tooltip.style.opacity = '0'
-      })
+    // ✅ CRÉER LE BOUTON DIRECTEMENT VIA DOM (pas innerHTML)
+    const btn = document.createElement('div')
+    btn.className = 'cs-floating-btn'
+    btn.style.cssText = `width:60px;height:60px;background:linear-gradient(135deg,${primaryColor} 0%,${darkerColor} 100%);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 25px rgba(${rgbColor},0.4);transition:all 0.3s ease;position:relative;`
+    btn.onclick = () => {
+      if ((window as any).ChatSeller?.show) (window as any).ChatSeller.show()
+      else if ((window as any).ChatSeller?.open) (window as any).ChatSeller.open()
     }
+
+    // SVG icône (sans tooltip pour éviter texte orphelin)
+    btn.innerHTML = `<svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>`
+
+    // ✅ VIDER ET AJOUTER
+    this.widgetElement!.innerHTML = ''
+    this.widgetElement!.appendChild(btn)
+    console.log('✅ [FLOATING] Bouton flottant créé via DOM')
   }
 
   // ✅ MÉTHODE EXISTANTE AMÉLIORÉE : Rendu widget intégré
@@ -3098,15 +3077,18 @@ private isWooCommerce(): boolean {
         customType: this.config.agentConfig?.customProductType
       }),
 
-      // Getters améliorés
-      get isReady(): boolean { return this.isReady },
-      get version(): string { return this.version },
-      get isModalOpen(): boolean { return this.isModalOpen },
-      get hasDetectedProduct(): boolean { return this.hasDetectedProduct },
+      // Getters (convertis en propriétés pour éviter la récursion)
+      getIsReady: () => this.isReady,
+      getVersion: () => this.version,
+      getIsModalOpen: () => this.isModalOpen,
+      getHasDetectedProduct: () => this.hasDetectedProduct,
 
       // Debug amélioré
       debug: () => ({
-        ...this.debug(),
+        isReady: this.isReady,
+        version: this.version,
+        isModalOpen: this.isModalOpen,
+        hasDetectedProduct: this.hasDetectedProduct,
         agentConfig: this.config.agentConfig,
         productCustomType: this.config.agentConfig?.customProductType
       })
@@ -3359,9 +3341,6 @@ private isWooCommerce(): boolean {
     }
   }
 })()
-
-// ✅ VERSION MISE À JOUR
-const CHATSELLER_VERSION = '1.5.4'
 
 // ✅ DÉCLARATIONS TYPESCRIPT COMPLÈTES
 declare global {
