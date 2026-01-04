@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Simple Flottant</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #f0f0f0;
+      min-height: 100vh;
+    }
+    h1 {
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <h1>Test Simple - Widget Flottant</h1>
+  <p>Regardez en bas à droite de l'écran!</p>
+
+  <script>
+    // Configuration minimale
+    window.ChatSellerConfig = {
+      shopId: 'b4b2639b-687b-4263-a4ce-f0e8ace1ab63',
+      agentId: 'dfa9c078-829e-497a-8d66-4c7210279709',
+      apiUrl: 'https://chatseller-api-production.up.railway.app',
+      buttonText: 'Parler à une conseillère beauté',
+      primaryColor: '#E91E63',
+      floatingPosition: 'bottom-right',
+      debug: true,
+      forceDisplay: true,
+      agentConfig: {
+        id: 'dfa9c078-829e-497a-8d66-4c7210279709',
+        name: 'Katia',
+        title: 'Conseillère beauté',
+        welcomeMessage: 'Bonjour !',
+        fallbackMessage: 'Question transmise',
+        personality: 'friendly'
+      }
+    };
+
+    // Chargement du widget
+    const script = document.createElement('script');
+    script.src = 'http://localhost:8080/dist/embed.js?v=' + Date.now();
+    script.async = true;
+
+    script.onload = function() {
+      console.log('✅ Script chargé');
+
+      setTimeout(() => {
+        if (window.ChatSeller && window.ChatSeller.init) {
+          window.ChatSeller.init(window.ChatSellerConfig);
+
+          // DEBUG: Forcer la visibilité après 2 secondes
+          setTimeout(() => {
+            const widget = document.getElementById('chatseller-widget');
+            if (widget) {
+              console.log('Widget trouvé:', widget);
+              console.log('Style:', widget.style.cssText);
+              console.log('Classes:', widget.className);
+
+              // Forcer le style pour être SÛR qu'il est visible
+              widget.style.cssText = `
+                position: fixed !important;
+                bottom: 20px !important;
+                right: 20px !important;
+                width: 60px !important;
+                height: 60px !important;
+                z-index: 999999 !important;
+                background: red !important;
+                border: 5px solid yellow !important;
+                border-radius: 50% !important;
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+              `;
+
+              console.log('✅ Style forcé appliqué');
+            } else {
+              console.error('❌ Widget non trouvé dans le DOM');
+            }
+          }, 2000);
+        }
+      }, 300);
+    };
+
+    document.head.appendChild(script);
+  </script>
+</body>
+</html>

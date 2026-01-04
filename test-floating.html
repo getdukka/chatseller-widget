@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Widget Flottant - ChatSeller</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      padding: 2rem;
+      background: linear-gradient(135deg, #E91E63, #9C27B0);
+      color: white;
+      border-radius: 12px;
+    }
+
+    .content {
+      margin: 2rem 0;
+      padding: 2rem;
+      border: 2px dashed #dee2e6;
+      border-radius: 12px;
+    }
+
+    .info-box {
+      background: #e3f2fd;
+      border-left: 4px solid #2196F3;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      border-radius: 4px;
+    }
+
+    .info-box h3 {
+      margin-top: 0;
+      color: #1976D2;
+    }
+
+    .position-selector {
+      background: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+    }
+
+    .position-selector label {
+      display: block;
+      margin: 0.5rem 0;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    .position-selector label:hover {
+      background: #e9ecef;
+    }
+
+    .position-selector input[type="radio"] {
+      margin-right: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎈 Test Widget Flottant</h1>
+      <p><strong>Mode flottant</strong> - Pages catégorie, accueil, autres</p>
+    </div>
+
+    <div class="content">
+      <h2>📄 Page de catégorie (exemple)</h2>
+      <p>Cette page simule une page de catégorie ou une page d'accueil.</p>
+      <p>Le widget s'affichera en <strong>mode flottant</strong> en bas de l'écran.</p>
+    </div>
+
+    <div class="info-box">
+      <h3>ℹ️ À propos du mode flottant</h3>
+      <ul>
+        <li><strong>Version compacte:</strong> Icône circulaire avec tooltip au survol</li>
+        <li><strong>Version étendue:</strong> Bouton avec texte complet (s'affiche au clic sur l'icône)</li>
+        <li><strong>Position:</strong> Configurable (bottom-right ou bottom-left)</li>
+        <li><strong>Responsive:</strong> S'adapte automatiquement aux mobiles et tablettes</li>
+      </ul>
+    </div>
+
+    <div class="position-selector">
+      <h3>🎯 Tester les positions</h3>
+      <p>Changez la position du widget flottant:</p>
+      <label>
+        <input type="radio" name="position" value="bottom-right" checked onchange="updatePosition(this.value)">
+        Bas droite (défaut)
+      </label>
+      <label>
+        <input type="radio" name="position" value="bottom-left" onchange="updatePosition(this.value)">
+        Bas gauche
+      </label>
+    </div>
+
+    <div style="margin-top: 3rem; padding: 2rem; background: #fff3cd; border-radius: 8px; border: 2px solid #ffc107;">
+      <h3 style="margin-top: 0; color: #856404;">👀 Regardez en bas à droite de l'écran!</h3>
+      <p>Le widget flottant devrait apparaître sous forme d'icône circulaire.</p>
+      <p><strong>Survolez l'icône</strong> pour voir un tooltip.</p>
+      <p><strong>Cliquez sur l'icône</strong> pour voir le bouton étendu avec le texte complet.</p>
+    </div>
+  </div>
+
+  <!-- ========== WIDGET CHATSELLER - VERSION FLOTTANTE ========== -->
+  <script>
+  (function() {
+    'use strict';
+
+    console.log('🎈 [FLOATING TEST] Test mode flottant');
+
+    // Configuration du widget
+    window.ChatSellerConfig = {
+      shopId: 'b4b2639b-687b-4263-a4ce-f0e8ace1ab63',
+      agentId: 'dfa9c078-829e-497a-8d66-4c7210279709',
+      apiUrl: 'https://chatseller-api-production.up.railway.app',
+      buttonText: 'Parler à une conseillère beauté',
+      primaryColor: '#E91E63',
+      floatingPosition: 'bottom-right',  // Mode flottant
+      theme: 'modern',
+      language: 'fr',
+      borderRadius: 'full',
+      debug: true,
+      forceDisplay: true,
+      agentConfig: {
+        id: 'dfa9c078-829e-497a-8d66-4c7210279709',
+        name: 'Katia',
+        title: 'Conseillère beauté',
+        welcomeMessage: 'Bonjour ! Je suis Katia, votre conseillère beauté. Comment puis-je vous aider ?',
+        fallbackMessage: 'Je transmets votre question à notre équipe beauté.',
+        personality: 'friendly'
+      }
+    };
+
+    // Fonction pour changer la position
+    window.updatePosition = function(position) {
+      console.log('🔄 Changement position:', position);
+      window.ChatSellerConfig.floatingPosition = position;
+
+      // Détruire et réinitialiser le widget
+      if (window.ChatSeller && window.ChatSeller.destroy) {
+        window.ChatSeller.destroy();
+        setTimeout(() => {
+          window.ChatSeller.init(window.ChatSellerConfig);
+        }, 100);
+      }
+    };
+
+    // Chargement du widget
+    function loadWidget() {
+      const script = document.createElement('script');
+      script.src = 'http://localhost:8080/dist/embed.js?v=' + Date.now();
+      script.async = true;
+
+      script.onload = function() {
+        console.log('✅ embed.js chargé');
+
+        // Attendre que window.ChatSeller soit disponible
+        let attempts = 0;
+        function tryInit() {
+          attempts++;
+          if (window.ChatSeller && typeof window.ChatSeller.init === 'function') {
+            console.log('✅ Initialisation du widget en mode flottant');
+            window.ChatSeller.init(window.ChatSellerConfig);
+          } else if (attempts < 20) {
+            setTimeout(tryInit, 300);
+          }
+        }
+        tryInit();
+      };
+
+      script.onerror = function(e) {
+        console.error('❌ Erreur chargement embed.js');
+      };
+
+      document.head.appendChild(script);
+    }
+
+    // Attendre le DOM
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadWidget);
+    } else {
+      setTimeout(loadWidget, 100);
+    }
+
+  })();
+  </script>
+  <!-- ========== FIN WIDGET ========== -->
+
+</body>
+</html>

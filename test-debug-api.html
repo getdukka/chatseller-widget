@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Debug API ChatSeller</title>
+  <style>
+    body {
+      font-family: monospace;
+      padding: 2rem;
+      background: #1e1e1e;
+      color: #d4d4d4;
+    }
+    .section {
+      background: #252526;
+      padding: 1.5rem;
+      margin: 1rem 0;
+      border-radius: 8px;
+      border-left: 4px solid #007acc;
+    }
+    h2 {
+      color: #4ec9b0;
+      margin-top: 0;
+    }
+    pre {
+      background: #1e1e1e;
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    .success { color: #4ec9b0; }
+    .error { color: #f48771; }
+    .warning { color: #ce9178; }
+  </style>
+</head>
+<body>
+  <h1>🔍 Debug API ChatSeller</h1>
+
+  <div class="section">
+    <h2>1. Chargement du script</h2>
+    <pre id="loading-status">⏳ Chargement en cours...</pre>
+  </div>
+
+  <div class="section">
+    <h2>2. window.ChatSeller disponible ?</h2>
+    <pre id="chatseller-status">⏳ Vérification...</pre>
+  </div>
+
+  <div class="section">
+    <h2>3. Propriétés de window.ChatSeller</h2>
+    <pre id="chatseller-props">⏳ Analyse...</pre>
+  </div>
+
+  <div class="section">
+    <h2>4. window.ChatSeller.init disponible ?</h2>
+    <pre id="init-status">⏳ Vérification...</pre>
+  </div>
+
+  <div class="section">
+    <h2>5. Type de window.ChatSeller.init</h2>
+    <pre id="init-type">⏳ Vérification...</pre>
+  </div>
+
+  <script>
+    console.log('🔍 DEBUG: Début du script');
+
+    // Chargement du widget
+    const script = document.createElement('script');
+    script.src = 'http://localhost:8080/dist/embed.js?v=' + Date.now();
+
+    script.onload = function() {
+      console.log('✅ Script chargé');
+      document.getElementById('loading-status').innerHTML = '<span class="success">✅ embed.js chargé avec succès</span>';
+
+      // Attendre un peu pour que le code s'exécute
+      setTimeout(function() {
+        debugAPI();
+      }, 500);
+    };
+
+    script.onerror = function(e) {
+      console.error('❌ Erreur chargement:', e);
+      document.getElementById('loading-status').innerHTML = '<span class="error">❌ Erreur de chargement</span>';
+    };
+
+    document.head.appendChild(script);
+
+    function debugAPI() {
+      console.log('🔍 DEBUG: Analyse de window.ChatSeller');
+
+      // 1. ChatSeller existe ?
+      if (typeof window.ChatSeller !== 'undefined') {
+        document.getElementById('chatseller-status').innerHTML = '<span class="success">✅ window.ChatSeller existe</span>';
+        console.log('✅ window.ChatSeller existe');
+      } else {
+        document.getElementById('chatseller-status').innerHTML = '<span class="error">❌ window.ChatSeller n\'existe pas !</span>';
+        console.error('❌ window.ChatSeller n\'existe pas');
+        return;
+      }
+
+      // 2. Lister toutes les propriétés
+      try {
+        const props = Object.keys(window.ChatSeller);
+        console.log('📋 Propriétés de ChatSeller:', props);
+
+        let propsHTML = '<span class="success">✅ Propriétés trouvées:</span>\n';
+        props.forEach(prop => {
+          const type = typeof window.ChatSeller[prop];
+          propsHTML += `  - ${prop}: <span class="warning">${type}</span>\n`;
+        });
+
+        document.getElementById('chatseller-props').innerHTML = propsHTML;
+      } catch (e) {
+        document.getElementById('chatseller-props').innerHTML = '<span class="error">❌ Erreur: ' + e.message + '</span>';
+      }
+
+      // 3. init existe ?
+      if (typeof window.ChatSeller.init !== 'undefined') {
+        document.getElementById('init-status').innerHTML = '<span class="success">✅ window.ChatSeller.init existe</span>';
+        console.log('✅ window.ChatSeller.init existe');
+      } else {
+        document.getElementById('init-status').innerHTML = '<span class="error">❌ window.ChatSeller.init n\'existe PAS !</span>';
+        console.error('❌ window.ChatSeller.init n\'existe pas');
+      }
+
+      // 4. Type de init
+      const initType = typeof window.ChatSeller.init;
+      if (initType === 'function') {
+        document.getElementById('init-type').innerHTML = '<span class="success">✅ Type: function (correct)</span>';
+        console.log('✅ init est une fonction');
+
+        // Tester l'appel
+        try {
+          console.log('🧪 Test d\'appel de init()...');
+          window.ChatSeller.init({
+            shopId: 'test-123',
+            debug: true,
+            forceDisplay: true
+          });
+          console.log('✅ Appel de init() réussi !');
+        } catch (e) {
+          console.error('❌ Erreur lors de l\'appel:', e);
+        }
+      } else {
+        document.getElementById('init-type').innerHTML = `<span class="error">❌ Type: ${initType} (devrait être "function")</span>`;
+        console.error('❌ init n\'est pas une fonction, type:', initType);
+      }
+
+      // Afficher l'objet complet dans la console
+      console.log('📦 window.ChatSeller complet:', window.ChatSeller);
+    }
+  </script>
+</body>
+</html>
