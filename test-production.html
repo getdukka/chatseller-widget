@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Widget ChatSeller - Production</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      padding: 2rem;
+      background: linear-gradient(135deg, #E91E63, #9C27B0);
+      color: white;
+      border-radius: 12px;
+    }
+
+    .header h1 {
+      margin: 0 0 0.5rem 0;
+      font-size: 2rem;
+    }
+
+    .header p {
+      margin: 0;
+      opacity: 0.9;
+    }
+
+    .instructions {
+      background: #f8f9fa;
+      border-left: 4px solid #E91E63;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border-radius: 8px;
+    }
+
+    .instructions h2 {
+      margin-top: 0;
+      color: #E91E63;
+    }
+
+    .instructions ol {
+      margin: 0;
+      padding-left: 1.5rem;
+    }
+
+    .instructions li {
+      margin-bottom: 0.75rem;
+    }
+
+    .config-section {
+      background: #fff3cd;
+      border: 2px solid #ffc107;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .config-section h3 {
+      margin-top: 0;
+      color: #856404;
+    }
+
+    .config-code {
+      background: #2d2d2d;
+      color: #f8f8f2;
+      padding: 1rem;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+      margin-top: 1rem;
+    }
+
+    .status {
+      background: #f8f9fa;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+      font-family: monospace;
+      font-size: 0.9rem;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .status div {
+      padding: 0.25rem 0;
+    }
+
+    .success { color: #28a745; font-weight: bold; }
+    .error { color: #dc3545; font-weight: bold; }
+    .warning { color: #ffc107; }
+    .info { color: #17a2b8; }
+
+    .product-demo {
+      margin: 2rem 0;
+      padding: 2rem;
+      border: 2px dashed #dee2e6;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .product-demo h2 {
+      color: #495057;
+    }
+
+    .cta-button {
+      background: #1a1a1a;
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin: 1rem 0.5rem;
+    }
+
+    .cta-button:hover {
+      background: #333;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🧪 Test Widget ChatSeller</h1>
+      <p>Version Production - CDN widget.chatseller.app</p>
+    </div>
+
+    <div class="config-section">
+      <h3>⚠️ Configuration requise</h3>
+      <p>Avant de tester, vous DEVEZ remplacer dans le code ci-dessous (ligne ~140) :</p>
+      <div class="config-code">
+shopId: 'VOTRE_SHOP_ID_ICI',  ← Remplacez par votre vrai Shop ID<br>
+agentId: 'VOTRE_AGENT_ID_ICI', ← Remplacez par votre vrai Agent ID
+      </div>
+      <p style="margin-top: 1rem;"><strong>Trouvez vos IDs dans le dashboard ChatSeller :</strong></p>
+      <ul>
+        <li><strong>Shop ID</strong> : Dans l'onglet "Installer" de votre agent</li>
+        <li><strong>Agent ID</strong> : Dans l'URL de la page agent (/agent-ia/<strong>[ID]</strong>)</li>
+      </ul>
+    </div>
+
+    <div class="instructions">
+      <h2>📋 Instructions de test</h2>
+      <ol>
+        <li><strong>Ouvrez ce fichier</strong> dans un éditeur de texte (VS Code, Notepad++, etc.)</li>
+        <li><strong>Cherchez ligne ~140</strong> la configuration <code>window.ChatSellerConfig</code></li>
+        <li><strong>Remplacez</strong> VOTRE_SHOP_ID_ICI et VOTRE_AGENT_ID_ICI par vos vraies valeurs</li>
+        <li><strong>Sauvegardez</strong> le fichier</li>
+        <li><strong>Ouvrez</strong> ce fichier dans votre navigateur (double-clic)</li>
+        <li><strong>Appuyez sur F12</strong> pour ouvrir la console</li>
+        <li><strong>Vérifiez les logs</strong> commençant par <code>🔧 [TEST]</code></li>
+      </ol>
+    </div>
+
+    <div class="product-demo">
+      <h2>Produit de démonstration</h2>
+      <p>Sérum Anti-Âge Premium</p>
+      <p style="font-size: 1.5rem; font-weight: bold; color: #E91E63;">49,90 €</p>
+
+      <!-- Le widget s'affichera ici (si position: 'above-cta') -->
+      <div id="chatseller-widget"></div>
+
+      <button class="cta-button">🛒 Ajouter au panier</button>
+    </div>
+
+    <div class="status">
+      <div id="status-log">
+        <div class="info">📊 En attente du chargement du widget...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== WIDGET CHATSELLER - PRODUCTION ========== -->
+  <script>
+  console.log('🔧 [TEST] Script de test chargé');
+
+  // Fonction de logging
+  function logStatus(message, type = 'info') {
+    const log = document.getElementById('status-log');
+    const timestamp = new Date().toLocaleTimeString();
+    const className = type;
+    log.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+    console.log(`[${type.toUpperCase()}] [${timestamp}] ${message}`);
+  }
+
+  (function() {
+    'use strict';
+
+    console.log('🔧 [TEST] Début initialisation ChatSeller');
+    logStatus('🔧 Début initialisation ChatSeller', 'info');
+
+    // ⚠️ CONFIGURATION À PERSONNALISER ⚠️
+    window.ChatSellerConfig = {
+      shopId: 'b4b2639b-687b-4263-a4ce-f0e8ace1ab63',        // ← REMPLACEZ ICI
+      agentId: 'dfa9c078-829e-497a-8d66-4c7210279709',      // ← REMPLACEZ ICI
+      apiUrl: 'https://chatseller-api-production.up.railway.app',
+      buttonText: 'Parler à une conseillère beauté',
+      primaryColor: '#E91E63',
+      position: 'above-cta',
+      floatingPosition: 'bottom-right',
+      theme: 'modern',
+      language: 'fr',
+      borderRadius: 'full',
+      autoDetectProduct: true,
+      debug: true, // Mode debug activé pour voir les logs
+      agentConfig: {
+        id: 'dfa9c078-829e-497a-8d66-4c7210279709',         // ← REMPLACEZ ICI (même que agentId)
+        name: 'Katia',
+        title: 'Conseillère beauté',
+        welcomeMessage: 'Bonjour ! Je suis Katia, votre conseillère beauté. Comment puis-je vous aider ?',
+        fallbackMessage: 'Je transmets votre question à notre équipe beauté.',
+        personality: 'friendly'
+      }
+    };
+
+    console.log('🔧 [TEST] Config définie:', window.ChatSellerConfig);
+    logStatus('✅ Configuration définie', 'success');
+
+    // Vérification des IDs
+    if (window.ChatSellerConfig.shopId === 'VOTRE_SHOP_ID_ICI') {
+      console.error('❌ [TEST] ERREUR: shopId non configuré !');
+      logStatus('❌ ERREUR: Vous devez remplacer VOTRE_SHOP_ID_ICI par votre vrai Shop ID', 'error');
+      logStatus('⚠️ Éditez ce fichier HTML et cherchez "VOTRE_SHOP_ID_ICI"', 'warning');
+      return;
+    }
+
+    if (window.ChatSellerConfig.agentId === 'VOTRE_AGENT_ID_ICI') {
+      console.error('❌ [TEST] ERREUR: agentId non configuré !');
+      logStatus('❌ ERREUR: Vous devez remplacer VOTRE_AGENT_ID_ICI par votre vrai Agent ID', 'error');
+      logStatus('⚠️ Éditez ce fichier HTML et cherchez "VOTRE_AGENT_ID_ICI"', 'warning');
+      return;
+    }
+
+    logStatus('✅ IDs configurés correctement', 'success');
+
+    // Protection anti-double chargement
+    if (window.ChatSellerInitialized) {
+      console.log('🔧 [TEST] Widget déjà initialisé, arrêt');
+      logStatus('⚠️ Widget déjà initialisé', 'warning');
+      return;
+    }
+    window.ChatSellerInitialized = true;
+
+    // Chargement du widget
+    function loadWidget() {
+      console.log('🔧 [TEST] loadWidget() appelé');
+      logStatus('🔧 Chargement du widget...', 'info');
+
+      if (window.ChatSellerLoaded) {
+        console.log('🔧 [TEST] Widget déjà chargé, arrêt');
+        logStatus('⚠️ Widget déjà chargé', 'warning');
+        return;
+      }
+      window.ChatSellerLoaded = true;
+
+      console.log('🔧 [TEST] Création du script embed.js');
+      logStatus('📦 Téléchargement de embed.js depuis CDN...', 'info');
+
+      var script = document.createElement('script');
+      // ✅ VERSION LOCALE POUR TEST (au lieu du CDN)
+      script.src = 'http://localhost:8080/dist/embed.js?v=' + Date.now();
+      script.async = true;
+
+      script.onload = function() {
+        console.log('✅ [TEST] embed.js chargé avec succès');
+        logStatus('✅ embed.js chargé avec succès depuis le CDN', 'success');
+
+        var attempts = 0;
+
+        function tryInit() {
+          console.log('🔧 [TEST] Tentative init #' + (attempts + 1));
+
+          if (window.ChatSeller && window.ChatSeller.init) {
+            console.log('✅ [TEST] window.ChatSeller.init trouvé, initialisation...');
+            logStatus('✅ ChatSeller détecté, initialisation...', 'success');
+
+            try {
+              window.ChatSeller.init(window.ChatSellerConfig);
+              logStatus('🎉 Widget initialisé avec succès !', 'success');
+              logStatus('👀 Cherchez le bouton du widget sur la page', 'info');
+            } catch (initError) {
+              console.error('❌ [TEST] Erreur lors de l\'init:', initError);
+              logStatus('❌ Erreur init: ' + initError.message, 'error');
+            }
+          } else if (attempts++ < 20) {
+            console.log('⏳ [TEST] window.ChatSeller pas encore prêt, nouvelle tentative dans 300ms');
+            setTimeout(tryInit, 300);
+          } else {
+            console.error('❌ [TEST] window.ChatSeller.init introuvable après 20 tentatives');
+            logStatus('❌ window.ChatSeller introuvable après 6 secondes', 'error');
+            logStatus('⚠️ Le widget n\'a pas pu s\'initialiser', 'error');
+          }
+        }
+        tryInit();
+      };
+
+      script.onerror = function(e) {
+        console.error('❌ [TEST] Erreur chargement embed.js:', e);
+        logStatus('❌ Erreur chargement embed.js depuis le CDN', 'error');
+        logStatus('⚠️ Vérifiez que https://widget.chatseller.app/embed.js est accessible', 'warning');
+        logStatus('💡 Testez l\'URL dans votre navigateur', 'info');
+      };
+
+      console.log('🔧 [TEST] Ajout du script au DOM');
+      document.head.appendChild(script);
+    }
+
+    if (document.readyState === 'loading') {
+      console.log('🔧 [TEST] Document en chargement, attente DOMContentLoaded');
+      logStatus('⏳ En attente du chargement de la page...', 'info');
+      document.addEventListener('DOMContentLoaded', loadWidget);
+    } else {
+      console.log('🔧 [TEST] Document déjà chargé, lancement dans 100ms');
+      logStatus('✅ Page chargée, lancement du widget...', 'success');
+      setTimeout(loadWidget, 100);
+    }
+
+    console.log('🔧 [TEST] Fin du script d\'initialisation');
+  })();
+  </script>
+  <!-- ========== FIN WIDGET ========== -->
+
+</body>
+</html>

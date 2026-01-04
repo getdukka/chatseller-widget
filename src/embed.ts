@@ -24,6 +24,7 @@ export interface ChatSellerConfig {
   theme?: 'modern' | 'minimal' | 'brand_adaptive'
   primaryColor?: string
   position?: 'auto' | 'above-cta' | 'below-cta' | 'beside-cta'
+  floatingPosition?: 'bottom-right' | 'bottom-left'
   buttonText?: string
   borderRadius?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full'
   language?: 'fr' | 'en' | 'wo'
@@ -1376,11 +1377,496 @@ class ChatSeller {
       container.id = 'chatseller-widget'
       container.className = 'cs-chatseller-widget'
       container.setAttribute('data-chatseller', 'main-widget')
-      this.insertWidgetAtPosition(container)
+      
+      // ✅ NOUVEAU : Détecter le type de page pour adapter l'affichage
+      const pageType = this.detectPageType()
+      container.setAttribute('data-page-type', pageType)
+      
+      this.insertWidgetBasedOnPageType(container, pageType)
     }
 
     this.widgetElement = container
     this.renderWidget()
+  }
+
+  // ✅ NOUVELLE MÉTHODE : Détection type de page améliorée
+  private detectPageType(): 'product' | 'category' | 'home' | 'other' {
+    try {
+      // ✅ DÉTECTION PAGE PRODUIT
+      if (this.isProductPage()) {
+        return 'product'
+      }
+      
+      // ✅ DÉTECTION PAGE CATÉGORIE/COLLECTION
+      const categoryIndicators = [
+        () => window.location.pathname.includes('/collections/'),
+        () => window.location.pathname.includes('/category/'),
+        () => window.location.pathname.includes('/catalog/'),
+        () => document.querySelector('.collection-header, .category-header, .products-grid'),
+        () => document.querySelector('[class*="collection"], [class*="category"]')
+      ]
+      
+      if (categoryIndicators.some(indicator => {
+        try { return indicator() } catch { return false }
+      })) {
+        return 'category'
+      }
+      
+      // ✅ DÉTECTION PAGE D'ACCUEIL
+      const homeIndicators = [
+        () => window.location.pathname === '/' || window.location.pathname === '/index.html',
+        () => document.querySelector('.homepage, .home-banner, .hero-section'),
+        () => document.querySelector('[class*="home"], [class*="hero"]')
+      ]
+      
+      if (homeIndicators.some(indicator => {
+        try { return indicator() } catch { return false }
+      })) {
+        return 'home'
+      }
+      
+      return 'other'
+      
+    } catch (error) {
+      console.warn('⚠️ Erreur détection type page:', error)
+      return 'other'
+    }
+  }
+
+  // ✅ NOUVELLE MÉTHODE : Insertion selon type de page
+  private insertWidgetBasedOnPageType(container: HTMLElement, pageType: string): void {
+    console.log(`🎯 [WIDGET PLACEMENT] Type de page: ${pageType}`)
+    
+    switch (pageType) {
+      case 'product':
+        this.insertOnProductPage(container)
+        break
+        
+      case 'category':
+        this.insertOnCategoryPage(container)
+        break
+        
+      case 'home':
+        this.insertOnHomePage(container)
+        break
+        
+      default:
+        this.insertFloatingWidget(container)
+    }
+  }
+
+  // ✅ MÉTHODE AMÉLIORÉE : Insertion sur page produit
+  private insertOnProductPage(container: HTMLElement): void {
+    console.log('🛍️ [PRODUCT PAGE] Insertion widget sur page produit')
+    
+    const position = this.config.position || 'above-cta'
+    
+    // ✅ SÉLECTEURS CTA ÉTENDUS BEAUTÉ
+    const ctaSelectors = [
+      // Shopify beauté spécialisés
+      'form[action*="/cart/add"] button[type="submit"]',
+      'form[action*="/cart/add"] [name="add"]',
+      '.product-form__cart button',
+      '.product-form__buttons button[name="add"]',
+      '.btn--add-to-cart',
+      '.product-form button[type="submit"]',
+      
+      // WooCommerce beauté
+      '.single_add_to_cart_button',
+      'button[name="add-to-cart"]',
+      
+      // Génériques beauté
+      'button[class*="add-to-cart"]',
+      'button[class*="buy"]',
+      '.buy-button',
+      '.add-to-basket'
+    ]
+
+    const isElementVisible = (element: Element): boolean => {
+      const style = window.getComputedStyle(element)
+      const htmlElement = element as HTMLElement
+      return style.display !== 'none' && 
+             style.visibility !== 'hidden' && 
+             style.opacity !== '0' &&
+             htmlElement.offsetWidth > 0 && 
+             htmlElement.offsetHeight > 0
+    }
+    
+    let targetElement: HTMLElement | null = null
+    
+    // Chercher le CTA visible
+    for (const selector of ctaSelectors) {
+      const element = document.querySelector(selector)
+      if (element && isElementVisible(element)) {
+        targetElement = element as HTMLElement
+        break
+      }
+    }
+
+    if (targetElement && targetElement.parentNode) {
+      try {
+        const targetParent = targetElement.parentNode as HTMLElement
+        
+        switch (position) {
+          case 'above-cta':
+            // ✅ STYLE SPÉCIAL BEAUTÉ
+            container.style.marginBottom = '12px'
+            targetParent.insertBefore(container, targetElement)
+            console.log('✅ Widget beauté inséré AVANT le CTA')
+            break
+            
+          case 'below-cta':
+            container.style.marginTop = '12px'
+            const nextSibling = targetElement.nextSibling
+            if (nextSibling) {
+              targetParent.insertBefore(container, nextSibling)
+            } else {
+              targetParent.appendChild(container)
+            }
+            console.log('✅ Widget beauté inséré APRÈS le CTA')
+            break
+            
+          case 'beside-cta':
+            // ✅ LAYOUT FLEX BEAUTÉ
+            const flexContainer = document.createElement('div')
+            flexContainer.style.cssText = `
+              display: flex; 
+              gap: 12px; 
+              align-items: stretch; 
+              flex-wrap: wrap;
+              margin: 8px 0;
+            `
+            targetParent.insertBefore(flexContainer, targetElement)
+            flexContainer.appendChild(targetElement)
+            flexContainer.appendChild(container)
+            console.log('✅ Widget beauté inséré À CÔTÉ du CTA')
+            break
+        }
+        return
+      } catch (insertError) {
+        console.warn('⚠️ Erreur insertion CTA:', insertError)
+      }
+    }
+    
+    // ✅ FALLBACK : Container spécialisé beauté
+    this.insertInBeautyContainer(container)
+  }
+
+  // ✅ NOUVELLE MÉTHODE : Insertion sur page catégorie
+  private insertOnCategoryPage(container: HTMLElement): void {
+    console.log('📂 [CATEGORY PAGE] Insertion widget flottant sur page catégorie')
+    
+    // Sur les pages catégories, toujours affichage flottant
+    this.insertFloatingWidget(container, true)
+  }
+
+  // ✅ NOUVELLE MÉTHODE : Insertion sur page d'accueil
+  private insertOnHomePage(container: HTMLElement): void {
+    console.log('🏠 [HOME PAGE] Insertion widget sur page d\'accueil')
+    
+    // Chercher un endroit approprié sur la homepage
+    const homeSelectors = [
+      '.hero-section',
+      '.home-banner', 
+      '.homepage-content',
+      '.main-content',
+      'main',
+      '.content'
+    ]
+    
+    let targetElement: HTMLElement | null = null
+    for (const selector of homeSelectors) {
+      const element = document.querySelector(selector)
+      if (element) {
+        targetElement = element as HTMLElement
+        break
+      }
+    }
+    
+    if (targetElement) {
+      // ✅ WIDGET INTÉGRÉ EN HAUT DU CONTENU PRINCIPAL
+      container.style.cssText = `
+        position: relative;
+        margin: 20px auto;
+        max-width: 500px;
+        padding: 0 20px;
+      `
+      targetElement.insertBefore(container, targetElement.firstChild)
+      console.log('✅ Widget beauté intégré en haut de la homepage')
+    } else {
+      // ✅ FALLBACK : Flottant
+      this.insertFloatingWidget(container, true)
+    }
+  }
+
+  // ✅ MÉTHODE AMÉLIORÉE : Widget flottant
+  private insertFloatingWidget(container: HTMLElement, isVisible: boolean = false): void {
+    console.log('💬 [FLOATING] Insertion widget flottant')
+    
+    // ✅ STYLES FLOTTANT BEAUTÉ ADAPTATIFS
+    const position = this.config.floatingPosition || 'bottom-right'
+    const primaryColor = this.config.primaryColor || '#8B5CF6'
+    
+    container.className = 'cs-chatseller-widget cs-floating-widget'
+    container.style.cssText = `
+      position: fixed !important;
+      ${position.includes('right') ? 'right: 20px;' : 'left: 20px;'}
+      bottom: 20px;
+      z-index: 999999 !important;
+      max-width: ${isVisible ? '280px' : '60px'} !important;
+      transition: all 0.3s ease !important;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+      border-radius: ${isVisible ? '16px' : '50%'} !important;
+      backdrop-filter: blur(10px) !important;
+    `
+    
+    // ✅ INSÉRER À LA FIN DU BODY
+    document.body.appendChild(container)
+    console.log('✅ Widget flottant beauté inséré')
+  }
+
+  // ✅ NOUVELLE MÉTHODE : Container beauté spécialisé
+  private insertInBeautyContainer(container: HTMLElement): void {
+    console.log('💄 [BEAUTY CONTAINER] Recherche container beauté')
+    
+    const beautySelectors = [
+      '.product-details',
+      '.product-info', 
+      '.product-description',
+      '.product-form',
+      '.product-content',
+      '.woocommerce-product-details',
+      '.product-single',
+      '.product-meta'
+    ]
+    
+    for (const selector of beautySelectors) {
+      const element = document.querySelector(selector)
+      if (element) {
+        container.style.margin = '16px 0'
+        element.appendChild(container)
+        console.log(`✅ Widget inséré dans container beauté: ${selector}`)
+        return
+      }
+    }
+    
+    // ✅ DERNIER RECOURS : Body
+    document.body.appendChild(container)
+    console.log('✅ Widget ajouté au body (fallback)')
+  }
+
+  // ✅ MÉTHODE AMÉLIORÉE : Rendu adaptatif
+  private renderWidget() {
+    if (!this.widgetElement) return
+
+    const pageType = this.widgetElement.getAttribute('data-page-type') || 'other'
+    const buttonText = this.getAdaptiveButtonText(pageType)
+    const primaryColor = this.config.primaryColor || '#8B5CF6'
+    const isFloating = this.widgetElement.classList.contains('cs-floating-widget')
+
+    // ✅ RENDU SELON TYPE DE PAGE ET FLOTTANT/INTÉGRÉ
+    if (isFloating) {
+      this.renderFloatingWidget(buttonText, primaryColor, pageType)
+    } else {
+      this.renderIntegratedWidget(buttonText, primaryColor, pageType)
+    }
+  }
+
+  // ✅ NOUVELLE MÉTHODE : Texte adaptatif selon contexte
+  private getAdaptiveButtonText(pageType: string): string {
+  const baseText = this.config.buttonText || 'Parler à la conseillère beauté'
+  
+  // ✅ ADAPTATION BEAUTÉ SELON LE CONTEXTE
+  switch (pageType) {
+    case 'product':
+      return baseText 
+      
+    case 'category':
+      return 'Parler à la conseillère beauté' 
+      
+    case 'home':
+      return 'Parler à la conseillère beauté' // Engageant beauté
+      
+    default:
+      return 'Parler à la conseillère beauté' // Compact beauté
+  }
+}
+
+  // ✅ NOUVELLE MÉTHODE : Rendu widget flottant
+  private renderFloatingWidget(buttonText: string, primaryColor: string, pageType: string) {
+    const isCompact = pageType !== 'home'
+    
+    if (isCompact) {
+      // ✅ VERSION COMPACTE (icône + tooltip)
+      this.widgetElement!.innerHTML = `
+        <div class="cs-floating-compact" style="
+          width: 60px;
+          height: 60px;
+          background: linear-gradient(135deg, ${primaryColor} 0%, ${this.adjustColor(primaryColor, -15)} 100%);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          box-shadow: 0 8px 25px rgba(${this.hexToRgb(primaryColor)}, 0.4);
+          transition: all 0.3s ease;
+          position: relative;
+        " 
+        onmouseover="this.style.transform='scale(1.1)'"
+        onmouseout="this.style.transform='scale(1)'"
+        onclick="this.parentElement.querySelector('.cs-floating-expanded').style.display='block'; this.style.display='none';"
+        >
+          <svg width="24" height="24" fill="white" viewBox="0 0 24 24">
+            <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.906-1.479L3 21l2.521-5.094A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"/>
+          </svg>
+          
+          <!-- Tooltip -->
+          <div style="
+            position: absolute;
+            ${this.config.floatingPosition?.includes('right') ? 'right: 70px;' : 'left: 70px;'}
+            top: 50%;
+            transform: translateY(-50%);
+            background: #333;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 1000000;
+          " class="cs-tooltip">
+            ${buttonText}
+          </div>
+        </div>
+        
+        <div class="cs-floating-expanded" style="
+          display: none;
+          width: 240px;
+          background: white;
+          border-radius: 16px;
+          padding: 16px;
+          box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+        ">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+            <span style="font-weight: 600; color: #333;">${buttonText}</span>
+            <button onclick="this.parentElement.parentElement.style.display='none'; this.parentElement.parentElement.previousElementSibling.style.display='flex';" style="background: none; border: none; font-size: 18px; cursor: pointer;">×</button>
+          </div>
+          <button onclick="window.ChatSeller.open && window.ChatSeller.open()" style="
+            width: 100%;
+            background: ${primaryColor};
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+          ">
+            💬 Ouvrir le chat
+          </button>
+        </div>
+      `
+    } else {
+      // ✅ VERSION ÉTENDUE (sur homepage)
+      this.renderIntegratedWidget(buttonText, primaryColor, pageType)
+    }
+
+    // ✅ ÉVÉNEMENTS HOVER TOOLTIP
+    const compact = this.widgetElement!.querySelector('.cs-floating-compact')
+    const tooltip = this.widgetElement!.querySelector('.cs-tooltip') as HTMLElement
+    
+    if (compact && tooltip) {
+      compact.addEventListener('mouseenter', () => {
+        tooltip.style.opacity = '1'
+      })
+      compact.addEventListener('mouseleave', () => {
+        tooltip.style.opacity = '0'
+      })
+    }
+  }
+
+  // ✅ MÉTHODE EXISTANTE AMÉLIORÉE : Rendu widget intégré
+  private renderIntegratedWidget(buttonText: string, primaryColor: string, pageType: string) {
+    const darkerColor = this.adjustColor(primaryColor, -15)
+    const borderRadius = this.getBorderRadiusValue(this.config.borderRadius || 'full')
+    
+    this.widgetElement!.innerHTML = `
+      <button 
+        id="chatseller-trigger-btn"
+        class="cs-chat-trigger-button cs-beauty-button"
+        type="button"
+        aria-label="Ouvrir le chat avec votre conseillère beauté"
+        style="
+          width: 100% !important;
+          padding: 16px 24px !important;
+          background: linear-gradient(135deg, ${primaryColor} 0%, ${darkerColor} 100%) !important;
+          color: white !important;
+          border: none !important;
+          border-radius: ${borderRadius} !important;
+          font-size: 15px !important;
+          font-weight: 600 !important;
+          cursor: pointer !important;
+          transition: all 0.3s ease !important;
+          box-shadow: 0 8px 25px rgba(${this.hexToRgb(primaryColor)}, 0.3) !important;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          gap: 8px !important;
+          outline: none !important;
+          min-height: 56px !important;
+          margin: 0 !important;
+          opacity: 1 !important;
+          visibility: visible !important;
+          position: relative !important;
+          z-index: 999999 !important;
+          text-decoration: none !important;
+          user-select: none !important;
+        "
+      >
+        <!-- Icône beauté -->
+        <span style="font-size: 20px;">💄</span>
+        
+        <!-- Texte adaptatif -->
+        <span style="
+          flex: 1; 
+          display: block !important; 
+          text-align: center !important;
+          opacity: 1 !important;
+          visibility: visible !important;
+          font-size: inherit !important;
+          font-weight: inherit !important;
+          color: white !important;
+        ">${buttonText}</span>
+      </button>
+    `
+
+    // ✅ ÉVÉNEMENTS AMÉLIORÉS
+    const triggerBtn = this.widgetElement!.querySelector('#chatseller-trigger-btn') as HTMLElement
+    if (triggerBtn) {
+      const newBtn = triggerBtn.cloneNode(true) as HTMLElement
+      triggerBtn.parentNode?.replaceChild(newBtn, triggerBtn)
+      
+      newBtn.addEventListener('click', (event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        console.log('🖱️ Clic widget beauté:', pageType)
+        this.openChat()
+      })
+      
+      // ✅ EFFETS HOVER BEAUTÉ
+      const rgbColor = this.hexToRgb(primaryColor)
+      newBtn.addEventListener('mouseenter', () => {
+        newBtn.style.transform = 'translateY(-2px) scale(1.02)'
+        newBtn.style.boxShadow = `0 12px 35px rgba(${rgbColor}, 0.4)`
+      })
+      
+      newBtn.addEventListener('mouseleave', () => {
+        newBtn.style.transform = 'translateY(0) scale(1)'
+        newBtn.style.boxShadow = `0 8px 25px rgba(${rgbColor}, 0.3)`
+      })
+    }
   }
 
   private insertWidgetAtPosition(container: HTMLElement): void {
@@ -1638,136 +2124,6 @@ private isWooCommerce(): boolean {
     document.body.classList.contains('woocommerce')
   )
 }
-
-  private renderWidget() {
-    if (!this.widgetElement) return
-
-    const buttonText = this.config.buttonText || 'Parler à la vendeuse'
-    const primaryColor = this.config.primaryColor || '#8B5CF6'
-    const darkerColor = this.adjustColor(primaryColor, -15)
-    const borderRadius = this.getBorderRadiusValue(this.config.borderRadius || 'full')
-
-    // ✅ CORRECTION MAJEURE : BOUTON AVEC ICÔNE FORCÉE - SVG INLINE STRICT
-    this.widgetElement.innerHTML = `
-      <button 
-        id="chatseller-trigger-btn"
-        class="cs-chat-trigger-button"
-        type="button"
-        aria-label="Ouvrir le chat avec ${buttonText}"
-        style="
-          width: 100% !important;
-          padding: 16px 24px !important;
-          background: linear-gradient(135deg, ${primaryColor} 0%, ${darkerColor} 100%) !important;
-          color: white !important;
-          border: none !important;
-          border-radius: ${borderRadius} !important;
-          font-size: 15px !important;
-          font-weight: 600 !important;
-          cursor: pointer !important;
-          transition: all 0.3s ease !important;
-          box-shadow: 0 8px 25px rgba(${this.hexToRgb(primaryColor)}, 0.3) !important;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          gap: 8px !important;
-          outline: none !important;
-          min-height: 56px !important;
-          margin: 0 !important;
-          opacity: 1 !important;
-          visibility: visible !important;
-          position: relative !important;
-          z-index: 999999 !important;
-          text-decoration: none !important;
-          user-select: none !important;
-        "
-      >
-        <!-- ✅ CORRECTION ICÔNE : SVG INLINE FORCÉ AVEC PROTECTION MAXIMALE -->
-        <svg 
-          width="20" 
-          height="20" 
-          viewBox="0 0 24 24" 
-          fill="none" 
-          stroke="white" 
-          stroke-width="2" 
-          stroke-linecap="round" 
-          stroke-linejoin="round"
-          style="
-            flex-shrink: 0 !important; 
-            display: block !important; 
-            opacity: 1 !important; 
-            visibility: visible !important;
-            position: relative !important;
-            z-index: 999999 !important;
-            pointer-events: none !important;
-            min-width: 20px !important;
-            max-width: 20px !important;
-            min-height: 20px !important;
-            max-height: 20px !important;
-            color: white !important;
-            stroke: white !important;
-          "
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path 
-            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.906-1.479L3 21l2.521-5.094A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"
-            fill="none"
-            stroke="white"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            style="
-              opacity: 1 !important;
-              visibility: visible !important;
-              display: block !important;
-              pointer-events: none !important;
-              color: white !important;
-              stroke: white !important;
-            "
-          />
-        </svg>
-        <!-- ✅ TEXTE DU BOUTON -->
-        <span style="
-          flex: 1; 
-          display: block !important; 
-          text-align: center !important;
-          opacity: 1 !important;
-          visibility: visible !important;
-          font-size: inherit !important;
-          font-weight: inherit !important;
-          color: white !important;
-        ">${buttonText}</span>
-      </button>
-    `
-
-    // ✅ RESTAURÉ : EVENT LISTENER ROBUSTE
-    const triggerBtn = this.widgetElement.querySelector('#chatseller-trigger-btn') as HTMLElement
-    if (triggerBtn) {
-      // Supprimer les anciens listeners
-      const newBtn = triggerBtn.cloneNode(true) as HTMLElement
-      triggerBtn.parentNode?.replaceChild(newBtn, triggerBtn)
-      
-      // Ajouter le nouveau listener
-      newBtn.addEventListener('click', (event) => {
-        event.preventDefault()
-        event.stopPropagation()
-        console.log('🖱️ Clic sur bouton widget détecté')
-        this.openChat()
-      })
-      
-      // Hover effect avec couleur dynamique
-      const rgbColor = this.hexToRgb(primaryColor)
-      newBtn.addEventListener('mouseenter', () => {
-        newBtn.style.transform = 'translateY(-2px)'
-        newBtn.style.boxShadow = `0 12px 35px rgba(${rgbColor}, 0.4)`
-      })
-      
-      newBtn.addEventListener('mouseleave', () => {
-        newBtn.style.transform = 'translateY(0)'
-        newBtn.style.boxShadow = `0 8px 25px rgba(${rgbColor}, 0.3)`
-      })
-    }
-  }
 
   // ✅ RESTAURÉ : CORRECTION MAJEURE : Méthode openChat qui gère la réouverture
   private openChat() {
@@ -2112,19 +2468,22 @@ private isWooCommerce(): boolean {
 
   // ✅ NOUVELLE HELPER : Détecter type de produit depuis le nom
   private getProductTypeFromName(productName: string): string {
-    if (!productName) return 'produit'
-    
-    const name = productName.toLowerCase()
-    
-    // Détection intelligente du type
-    if (name.includes('jeu') || name.includes('game') || name.includes('cartes') || name.includes('poker')) return 'jeu'
-    if (name.includes('livre') || name.includes('book') || name.includes('roman') || name.includes('guide')) return 'livre'  
-    if (name.includes('cours') || name.includes('formation') || name.includes('training') || name.includes('apprentissage')) return 'formation'
-    if (name.includes('smartphone') || name.includes('téléphone') || name.includes('phone') || name.includes('mobile')) return 'smartphone'
-    if (name.includes('ordinateur') || name.includes('laptop') || name.includes('computer') || name.includes('pc')) return 'ordinateur'
-    if (name.includes('vêtement') || name.includes('tshirt') || name.includes('robe') || name.includes('pantalon')) return 'vêtement'
-    if (name.includes('service') || name.includes('consultation') || name.includes('accompagnement')) return 'service'
-    if (name.includes('bijou') || name.includes('collier') || name.includes('bracelet') || name.includes('bague')) return 'bijou'
+  if (!productName) return 'produit beauté'
+  
+  const name = productName.toLowerCase()
+  
+  // ✅ DÉTECTION SPÉCIALISÉE BEAUTÉ (priorité)
+  if (name.includes('sérum') || name.includes('serum')) return 'sérum'
+  if (name.includes('crème') || name.includes('cream') || name.includes('soin')) return 'soin'
+  if (name.includes('rouge') || name.includes('lipstick') || name.includes('lèvres')) return 'rouge à lèvres'
+  if (name.includes('fond de teint') || name.includes('foundation')) return 'fond de teint'
+  if (name.includes('mascara') || name.includes('cils')) return 'mascara'
+  if (name.includes('parfum') || name.includes('fragrance') || name.includes('eau de')) return 'parfum'
+  if (name.includes('shampoo') || name.includes('shampooing') || name.includes('cheveux')) return 'soin capillaire'
+  if (name.includes('vernis') || name.includes('ongles') || name.includes('nail')) return 'vernis à ongles'
+  if (name.includes('palette') || name.includes('ombre') || name.includes('eyeshadow')) return 'palette maquillage'
+  if (name.includes('blush') || name.includes('fard à joues')) return 'blush'
+  if (name.includes('poudre') || name.includes('powder')) return 'poudre'
     
     return 'produit'
   }
@@ -2718,13 +3077,16 @@ private isWooCommerce(): boolean {
   // API publique étendue avec nouvelles fonctionnalités
   getPublicAPI() {
     return {
+      // ✅ MÉTHODE D'INITIALISATION - CRITIQUE POUR LE WIDGET
+      init: (config: ChatSellerConfig) => this.init(config),
+
       // Méthodes de base existantes
       show: () => this.show(),
       hide: () => this.hide(),
       destroy: () => this.destroy(),
       refresh: () => this.refresh(),
       updateConfig: (newConfig: Partial<ChatSellerConfig>) => this.updateConfig(newConfig),
-      
+
       // ✅ NOUVELLES MÉTHODES PUBLIQUES
       updateAgentConfig: (newAgentConfig: any) => this.updateAgentConfiguration(newAgentConfig),
       refreshFromDashboard: (agentId?: string) => this.refreshConfigFromDashboard(agentId),
@@ -2735,13 +3097,13 @@ private isWooCommerce(): boolean {
         price: this.config.productPrice,
         customType: this.config.agentConfig?.customProductType
       }),
-      
+
       // Getters améliorés
       get isReady(): boolean { return this.isReady },
       get version(): string { return this.version },
       get isModalOpen(): boolean { return this.isModalOpen },
       get hasDetectedProduct(): boolean { return this.hasDetectedProduct },
-      
+
       // Debug amélioré
       debug: () => ({
         ...this.debug(),
