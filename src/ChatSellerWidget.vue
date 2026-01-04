@@ -1070,23 +1070,42 @@ const replaceWelcomeVariables = (message: string): string => {
     const shopName = 'cette boutique' // Peut être étendu plus tard
     const currentTime = new Date().getHours()
     const greeting = currentTime < 12 ? 'Bonjour' : currentTime < 18 ? 'Bonsoir' : 'Bonsoir'
-    
+
     let productType = 'produit'
     let productName = 'ce produit'
-    
+    let productPrice = ''
+
     if (productInfo.value?.name) {
       productName = productInfo.value.name
       productType = getProductType(productInfo.value.name)
     }
-    
+
+    if (productInfo.value?.price) {
+      productPrice = `${productInfo.value.price} CFA`
+    }
+
+    console.log('🔄 [VARIABLES] Remplacement des variables:', {
+      agentName,
+      agentTitle,
+      shopName,
+      productName,
+      productPrice
+    })
+
     return message
+      // ✅ Support syntaxe ${variable}
       .replace(/\$\{agentName\}/g, agentName)
       .replace(/\$\{agentTitle\}/g, agentTitle)
       .replace(/\$\{shopName\}/g, shopName)
       .replace(/\$\{productName\}/g, productName)
       .replace(/\$\{productType\}/g, productType)
       .replace(/\$\{greeting\}/g, greeting)
-      
+      .replace(/\$\{productPrice\}/g, productPrice)
+      // ✅ Support syntaxe {variable} pour Dashboard
+      .replace(/\{nomConseillere\}/g, agentName)
+      .replace(/\{nomMarque\}/g, shopName)
+      .replace(/\{prenom\}/g, 'Client')
+
   } catch (error) {
     console.error('❌ [VARIABLES] Erreur remplacement variables:', error)
     return message // Retourner message original en cas d'erreur
