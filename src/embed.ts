@@ -2237,17 +2237,17 @@ private isWooCommerce(): boolean {
       // ✅ CORRECTION CRITIQUE : Configuration complète pour Vue
       const widgetConfig = {
         shopId: this.config.shopId,
+        shopName: this.config.agentConfig?.shopName || 'notre boutique',
         apiUrl: this.config.apiUrl,
         agentConfig: {
           id: this.config.agentConfig?.id || this.config.agentId,
           name: this.config.agentConfig?.name || 'Rose',
-          title: this.config.agentConfig?.title || 'Vendeuse', 
+          title: this.config.agentConfig?.title || 'Vendeuse',
           avatar: this.config.agentConfig?.avatar,
           welcomeMessage: this.config.agentConfig?.welcomeMessage,
           fallbackMessage: this.config.agentConfig?.fallbackMessage,
           personality: this.config.agentConfig?.personality || 'friendly',
-          customProductType: this.config.agentConfig?.customProductType,
-          shopName: this.config.agentConfig?.shopName || 'notre boutique'
+          customProductType: this.config.agentConfig?.customProductType
         },
         primaryColor: this.config.primaryColor,
         buttonText: this.config.buttonText,

@@ -285,6 +285,7 @@ import type { CSSProperties } from 'vue'
 interface Props {
   config?: {
     shopId?: string
+    shopName?: string
     apiUrl?: string
     agentConfig?: {
       id?: string
@@ -1067,7 +1068,7 @@ const replaceWelcomeVariables = (message: string): string => {
   try {
     const agentName = configData.value.agentConfig?.name || 'Assistant'
     const agentTitle = configData.value.agentConfig?.title || 'Conseiller'
-    const shopName = 'cette boutique' // Peut être étendu plus tard
+    const shopName = configData.value.shopName || 'cette boutique'
     const currentTime = new Date().getHours()
     const greeting = currentTime < 12 ? 'Bonjour' : currentTime < 18 ? 'Bonsoir' : 'Bonsoir'
 
@@ -1281,12 +1282,11 @@ const sendApiMessage = async (message: string, isFirstUserMessage: boolean = fal
     
     const response = await fetch(endpoint, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Origin': window.location.origin,
         'X-Message-Count': messages.value.filter(m => m.role === 'assistant').length.toString(),
-        'X-Is-First-User-Message': isFirstUserMessage.toString() // ✅ NOUVEAU : Header pour indiquer le contexte
+        'X-Is-First-User-Message': isFirstUserMessage.toString()
       },
       body: JSON.stringify(payload),
       mode: 'cors',
