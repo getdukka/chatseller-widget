@@ -1619,8 +1619,8 @@ class ChatSeller {
             container.style.marginBottom = '12px'
             targetParent.insertBefore(container, targetElement)
             console.log('✅ Widget beauté inséré AVANT le CTA')
-            break
-            
+            return
+
           case 'below-cta':
             container.style.marginTop = '12px'
             const nextSibling = targetElement.nextSibling
@@ -1630,15 +1630,15 @@ class ChatSeller {
               targetParent.appendChild(container)
             }
             console.log('✅ Widget beauté inséré APRÈS le CTA')
-            break
-            
+            return
+
           case 'beside-cta':
             // ✅ LAYOUT FLEX BEAUTÉ
             const flexContainer = document.createElement('div')
             flexContainer.style.cssText = `
-              display: flex; 
-              gap: 12px; 
-              align-items: stretch; 
+              display: flex;
+              gap: 12px;
+              align-items: stretch;
               flex-wrap: wrap;
               margin: 8px 0;
             `
@@ -1646,9 +1646,21 @@ class ChatSeller {
             flexContainer.appendChild(targetElement)
             flexContainer.appendChild(container)
             console.log('✅ Widget beauté inséré À CÔTÉ du CTA')
-            break
+            return
+
+          case 'bottom-right':
+          case 'bottom-left':
+            // ✅ POSITIONS FLOTTANTES - utiliser le mode flottant
+            console.log(`💬 [PRODUCT PAGE] Position flottante détectée: ${position}`)
+            this.insertFloatingWidget(container)
+            return
+
+          default:
+            // ✅ Position non reconnue, fallback en mode flottant
+            console.log(`⚠️ [PRODUCT PAGE] Position non reconnue: ${position}, mode flottant`)
+            this.insertFloatingWidget(container)
+            return
         }
-        return
       } catch (insertError) {
         console.warn('⚠️ Erreur insertion CTA:', insertError)
       }
