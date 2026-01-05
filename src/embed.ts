@@ -1612,8 +1612,15 @@ class ChatSeller {
     if (targetElement && targetElement.parentNode) {
       try {
         const targetParent = targetElement.parentNode as HTMLElement
-        
-        switch (position) {
+
+        // ✅ Sur page produit, si position flottante configurée, utiliser below-cta par défaut
+        let effectivePosition = position
+        if (position === 'bottom-right' || position === 'bottom-left') {
+          effectivePosition = 'below-cta'
+          console.log(`🔄 [PRODUCT PAGE] Position flottante "${position}" convertie en "below-cta" pour page produit`)
+        }
+
+        switch (effectivePosition) {
           case 'above-cta':
             // ✅ STYLE SPÉCIAL BEAUTÉ
             container.style.marginBottom = '12px'
@@ -1648,17 +1655,16 @@ class ChatSeller {
             console.log('✅ Widget beauté inséré À CÔTÉ du CTA')
             return
 
-          case 'bottom-right':
-          case 'bottom-left':
-            // ✅ POSITIONS FLOTTANTES - utiliser le mode flottant
-            console.log(`💬 [PRODUCT PAGE] Position flottante détectée: ${position}`)
-            this.insertFloatingWidget(container)
-            return
-
           default:
-            // ✅ Position non reconnue, fallback en mode flottant
-            console.log(`⚠️ [PRODUCT PAGE] Position non reconnue: ${position}, mode flottant`)
-            this.insertFloatingWidget(container)
+            // ✅ Position non reconnue, utiliser below-cta
+            console.log(`⚠️ [PRODUCT PAGE] Position non reconnue: ${effectivePosition}, utilisation below-cta`)
+            container.style.marginTop = '12px'
+            const next = targetElement.nextSibling
+            if (next) {
+              targetParent.insertBefore(container, next)
+            } else {
+              targetParent.appendChild(container)
+            }
             return
         }
       } catch (insertError) {
@@ -1736,7 +1742,7 @@ class ChatSeller {
     container.style.cssText = `
       position: fixed !important;
       ${position.includes('right') ? 'right: 20px !important;' : 'left: 20px !important;'}
-      bottom: 20px !important;
+      bottom: 90px !important;
       z-index: 2147483647 !important;
       width: 60px !important;
       height: 60px !important;
