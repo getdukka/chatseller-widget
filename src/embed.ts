@@ -150,6 +150,8 @@ class ChatSeller {
         console.log('✅ [LOAD CONFIG] Configuration reçue:', {
           shopName: configData.data.shop?.name,
           agentName: configData.data.agent?.name,
+          agentNull: configData.data.agent === null,
+          hasShopAgentConfig: !!configData.data.shop?.agentConfig,
           hasWelcomeMessage: !!configData.data.agent?.welcomeMessage,
           widgetConfig: configData.data.shop?.widgetConfig
         })
@@ -160,7 +162,10 @@ class ChatSeller {
           this.config.agentConfig.shopName = configData.data.shop.name
         }
 
+        // ✅ CORRECTION MAJEURE : Utiliser agent OU shop.agentConfig comme fallback
         if (configData.data.agent) {
+          // Agent trouvé - utiliser ses données
+          console.log('👤 [LOAD CONFIG] Agent trouvé, utilisation des données agent')
           this.config.agentConfig = {
             ...this.config.agentConfig,
             id: configData.data.agent.id,
@@ -172,6 +177,20 @@ class ChatSeller {
             personality: configData.data.agent.personality,
             customProductType: configData.data.agent.customProductType
           }
+        } else if (configData.data.shop?.agentConfig) {
+          // Agent non trouvé - utiliser shop.agentConfig comme fallback
+          console.log('⚠️ [LOAD CONFIG] Agent NULL, utilisation shop.agentConfig comme fallback')
+          const shopAgentConfig = configData.data.shop.agentConfig
+          this.config.agentConfig = {
+            ...this.config.agentConfig,
+            name: shopAgentConfig.name || 'Conseillère',
+            title: shopAgentConfig.title || 'Conseillère beauté',
+            avatar: shopAgentConfig.avatar,
+            welcomeMessage: shopAgentConfig.welcomeMessage,
+            fallbackMessage: shopAgentConfig.fallbackMessage
+          }
+        } else {
+          console.warn('⚠️ [LOAD CONFIG] Ni agent ni shop.agentConfig trouvés')
         }
 
         // ✅ CORRECTION MAJEURE : Mettre à jour TOUTES les configs visuelles depuis widgetConfig
@@ -214,7 +233,12 @@ class ChatSeller {
           console.warn('⚠️ [LOAD CONFIG] Aucun widgetConfig trouvé dans la réponse API')
         }
 
-        console.log('✅ [LOAD CONFIG] Configuration mise à jour avec succès')
+        console.log('✅ [LOAD CONFIG] Configuration finale:', {
+          agentName: this.config.agentConfig?.name,
+          agentTitle: this.config.agentConfig?.title,
+          primaryColor: this.config.primaryColor,
+          buttonText: this.config.buttonText
+        })
       }
 
     } catch (error) {
