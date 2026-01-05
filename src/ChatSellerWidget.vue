@@ -1181,35 +1181,52 @@ const sendMessage = async () => {
   scrollToBottom()
 
   try {
-    console.log('📤 [WIDGET] Envoi message à l\'API...')
-    
+    console.log('📤 [WIDGET] Envoi message à l\'API...', {
+      message: messageContent.substring(0, 50),
+      conversationId: conversationId.value
+    })
+
     // ✅ CORRECTION : Déterminer si c'est le premier message utilisateur
     const userMessageCount = messages.value.filter(m => m.role === 'user').length
     const isFirstUserMessage = userMessageCount === 1
-    
-    console.log('📤 [WIDGET] Premier message utilisateur:', isFirstUserMessage)
-    
+
+    console.log('📤 [WIDGET] Premier message utilisateur:', isFirstUserMessage, '(total user messages:', userMessageCount, ')')
+
     const response = await sendApiMessage(messageContent, isFirstUserMessage)
-    
-    if (response.success) {
+
+    console.log('📥 [WIDGET] Réponse API complète:', response)
+
+    if (response && response.success && response.data) {
       conversationId.value = response.data.conversationId
-      
-      const aiMessage: Message = {
-        id: uuidv4(),
-        role: 'assistant',
-        content: response.data.message,
-        timestamp: new Date()
+
+      // ✅ CORRECTION : Vérifier que response.data.message existe
+      if (response.data.message) {
+        const aiMessage: Message = {
+          id: uuidv4(),
+          role: 'assistant',
+          content: response.data.message,
+          timestamp: new Date()
+        }
+        messages.value.push(aiMessage)
+
+        console.log('✅ [WIDGET] Réponse IA reçue et affichée:', response.data.message.substring(0, 100))
+      } else {
+        console.error('❌ [WIDGET] Pas de message dans la réponse API:', response.data)
+        throw new Error('Réponse API invalide: pas de message')
       }
-      messages.value.push(aiMessage)
-      
-      console.log('✅ [WIDGET] Réponse IA reçue et affichée')
     } else {
-      throw new Error(response.error || 'Erreur API inconnue')
+      console.error('❌ [WIDGET] Réponse API invalide:', response)
+      throw new Error(response?.error || 'Erreur API inconnue')
     }
 
   } catch (error: unknown) {
-    console.error('❌ [WIDGET] Erreur envoi message:', error)
-    
+    console.error('❌ [WIDGET] Erreur complète envoi message:', {
+      error: error,
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
+    })
+
+    // ✅ Fallback intelligent avec le message original de l'utilisateur
     const aiMessage: Message = {
       id: uuidv4(),
       role: 'assistant',
@@ -1217,12 +1234,12 @@ const sendMessage = async () => {
       timestamp: new Date()
     }
     messages.value.push(aiMessage)
-    
+
   } finally {
     isTyping.value = false
     await nextTick()
     scrollToBottom()
-    
+
     // ✅ Sauvegarder conversation
     if (typeof window !== 'undefined' && (window as any).ChatSeller) {
       (window as any).ChatSeller.saveConversation(messages.value, conversationId.value)
@@ -1252,15 +1269,20 @@ const closeChat = () => {
   }
 }
 
-// ✅ API CALL CORRIGÉE AVEC GESTION CORS
+// ✅ API CALL CORRIGÉE AVEC GESTION CORS ET LOGS DÉTAILLÉS
 const sendApiMessage = async (message: string, isFirstUserMessage: boolean = false) => {
   const apiUrl = configData.value.apiUrl || 'https://chatseller-api-production.up.railway.app'
   const endpoint = `${apiUrl}/api/v1/public/chat`
-  
-  console.log('📤 [API CALL] Endpoint:', endpoint)
-  console.log('📤 [API CALL] ShopId:', configData.value.shopId)
-  console.log('📤 [API CALL] Premier message utilisateur:', isFirstUserMessage)
-  
+
+  console.log('📤 [API CALL] Configuration complète:', {
+    endpoint,
+    shopId: configData.value.shopId,
+    agentId: configData.value.agentConfig?.id,
+    agentName: configData.value.agentConfig?.name,
+    isFirstUserMessage,
+    conversationId: conversationId.value
+  })
+
   const payload = {
     shopId: configData.value.shopId || 'demo',
     message,
@@ -1275,11 +1297,11 @@ const sendApiMessage = async (message: string, isFirstUserMessage: boolean = fal
     isFirstMessage: false // ✅ CORRECTION : Toujours false car on gère l'accueil côté Widget
   }
 
-  console.log('📤 [API CALL] Payload complet:', payload)
+  console.log('📤 [API CALL] Payload complet:', JSON.stringify(payload, null, 2))
 
   try {
-    console.log('🌐 [API CALL] Début appel API...')
-    
+    console.log('🌐 [API CALL] Début appel API vers:', endpoint)
+
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
@@ -1293,20 +1315,34 @@ const sendApiMessage = async (message: string, isFirstUserMessage: boolean = fal
       credentials: 'omit'
     })
 
-    console.log('📥 [API CALL] Statut réponse:', response.status)
+    console.log('📥 [API CALL] Statut réponse:', response.status, response.statusText)
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error('❌ [API CALL] Erreur HTTP:', response.status, errorText)
+      console.error('❌ [API CALL] Erreur HTTP détaillée:', {
+        status: response.status,
+        statusText: response.statusText,
+        errorText: errorText.substring(0, 500)
+      })
       throw new Error(`API Error: ${response.status} - ${errorText}`)
     }
 
     const result = await response.json()
-    console.log('✅ [API CALL] Réponse API reçue:', result)
-    
+    console.log('✅ [API CALL] Réponse API reçue:', {
+      success: result.success,
+      hasData: !!result.data,
+      hasMessage: !!result.data?.message,
+      messagePreview: result.data?.message?.substring(0, 100),
+      conversationId: result.data?.conversationId
+    })
+
     return result
   } catch (error) {
-    console.error('❌ [WIDGET API] Network Error:', error)
+    console.error('❌ [WIDGET API] Network Error complète:', {
+      error,
+      message: error instanceof Error ? error.message : String(error),
+      name: error instanceof Error ? error.name : 'Unknown'
+    })
     throw error
   }
 }

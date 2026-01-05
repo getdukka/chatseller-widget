@@ -101,9 +101,11 @@ class ChatSeller {
     try {
       await this.waitForDOM()
 
-      // ✅ Charger la configuration depuis l'API
+      // ✅ Charger la configuration depuis l'API AVANT d'injecter le CSS
       await this.loadConfigFromAPI()
 
+      // ✅ CORRECTION : Injecter le CSS APRÈS le chargement de la config API
+      // pour que les couleurs dynamiques soient correctes
       this.injectCriticalCSS()
       this.cleanupExistingWidgets()
       this.createWidget()
@@ -148,7 +150,8 @@ class ChatSeller {
         console.log('✅ [LOAD CONFIG] Configuration reçue:', {
           shopName: configData.data.shop?.name,
           agentName: configData.data.agent?.name,
-          hasWelcomeMessage: !!configData.data.agent?.welcomeMessage
+          hasWelcomeMessage: !!configData.data.agent?.welcomeMessage,
+          widgetConfig: configData.data.shop?.widgetConfig
         })
 
         // ✅ Mettre à jour la configuration avec les données de l'API
@@ -171,21 +174,41 @@ class ChatSeller {
           }
         }
 
-        // ✅ Mettre à jour les configs visuelles si fournies
+        // ✅ CORRECTION MAJEURE : Mettre à jour TOUTES les configs visuelles depuis widgetConfig
         if (configData.data.shop?.widgetConfig) {
           const widgetConfig = configData.data.shop.widgetConfig
           console.log('🎨 [LOAD CONFIG] widgetConfig reçu:', widgetConfig)
 
-          if (widgetConfig.primaryColor) this.config.primaryColor = widgetConfig.primaryColor
-          if (widgetConfig.buttonText) this.config.buttonText = widgetConfig.buttonText
-          if (widgetConfig.position) this.config.position = widgetConfig.position
-          if (widgetConfig.borderRadius) this.config.borderRadius = widgetConfig.borderRadius
+          // ✅ Appliquer TOUTES les propriétés visuelles de widgetConfig
+          if (widgetConfig.primaryColor !== undefined) {
+            this.config.primaryColor = widgetConfig.primaryColor
+          }
+          if (widgetConfig.buttonText !== undefined) {
+            this.config.buttonText = widgetConfig.buttonText
+          }
+          if (widgetConfig.position !== undefined) {
+            this.config.position = widgetConfig.position
+          }
+          if (widgetConfig.floatingPosition !== undefined) {
+            this.config.floatingPosition = widgetConfig.floatingPosition
+          }
+          if (widgetConfig.borderRadius !== undefined) {
+            this.config.borderRadius = widgetConfig.borderRadius
+          }
+          if (widgetConfig.theme !== undefined) {
+            this.config.theme = widgetConfig.theme
+          }
+          if (widgetConfig.language !== undefined) {
+            this.config.language = widgetConfig.language
+          }
 
           console.log('🎨 [LOAD CONFIG] Config visuelle après mise à jour:', {
             primaryColor: this.config.primaryColor,
             borderRadius: this.config.borderRadius,
             buttonText: this.config.buttonText,
-            position: this.config.position
+            position: this.config.position,
+            floatingPosition: this.config.floatingPosition,
+            theme: this.config.theme
           })
         } else {
           console.warn('⚠️ [LOAD CONFIG] Aucun widgetConfig trouvé dans la réponse API')
