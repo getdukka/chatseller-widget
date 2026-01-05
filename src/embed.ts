@@ -174,10 +174,21 @@ class ChatSeller {
         // ✅ Mettre à jour les configs visuelles si fournies
         if (configData.data.shop?.widgetConfig) {
           const widgetConfig = configData.data.shop.widgetConfig
+          console.log('🎨 [LOAD CONFIG] widgetConfig reçu:', widgetConfig)
+
           if (widgetConfig.primaryColor) this.config.primaryColor = widgetConfig.primaryColor
           if (widgetConfig.buttonText) this.config.buttonText = widgetConfig.buttonText
           if (widgetConfig.position) this.config.position = widgetConfig.position
           if (widgetConfig.borderRadius) this.config.borderRadius = widgetConfig.borderRadius
+
+          console.log('🎨 [LOAD CONFIG] Config visuelle après mise à jour:', {
+            primaryColor: this.config.primaryColor,
+            borderRadius: this.config.borderRadius,
+            buttonText: this.config.buttonText,
+            position: this.config.position
+          })
+        } else {
+          console.warn('⚠️ [LOAD CONFIG] Aucun widgetConfig trouvé dans la réponse API')
         }
 
         console.log('✅ [LOAD CONFIG] Configuration mise à jour avec succès')
@@ -1800,6 +1811,14 @@ class ChatSeller {
     const buttonText = this.getAdaptiveButtonText(pageType)
     const primaryColor = this.config.primaryColor || '#8B5CF6'
     const isFloating = this.widgetElement.classList.contains('cs-floating-widget')
+
+    console.log('🎨 [RENDER] Rendu widget avec:', {
+      pageType,
+      primaryColor,
+      borderRadius: this.config.borderRadius,
+      buttonText,
+      isFloating
+    })
 
     // ✅ RENDU SELON TYPE DE PAGE ET FLOTTANT/INTÉGRÉ
     if (isFloating) {
