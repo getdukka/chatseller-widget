@@ -102,20 +102,91 @@ class ChatSeller {
 
     try {
       await this.waitForDOM()
+
+      // ✅ NOUVEAU : Charger la configuration depuis l'API si shopId est un UUID valide
+      await this.loadConfigFromAPI()
+
       this.injectCriticalCSS()
       this.cleanupExistingWidgets()
       this.createWidget()
-      
+
       if (this.config.autoDetectProduct) {
         this.detectProductInfo()
       }
-      
+
       this.isInitialized = true
       console.log('✅ ChatSeller widget initialisé')
-      
+
     } catch (error) {
       console.error('❌ Échec initialisation ChatSeller:', error)
       this.createFallbackWidget()
+    }
+  }
+
+  // ✅ NOUVELLE MÉTHODE : Charger la configuration depuis l'API publique
+  private async loadConfigFromAPI(): Promise<void> {
+    try {
+      const shopId = this.config.shopId
+      if (!shopId || shopId === 'demo') {
+        console.log('⚠️ [LOAD CONFIG] Mode démo, pas de chargement API')
+        return
+      }
+
+      const apiUrl = this.config.apiUrl || 'https://chatseller-api-production.up.railway.app'
+      const configUrl = `${apiUrl}/api/v1/public/shops/${shopId}/config`
+
+      console.log('🔄 [LOAD CONFIG] Chargement configuration depuis:', configUrl)
+
+      const response = await fetch(configUrl)
+
+      if (!response.ok) {
+        console.warn('⚠️ [LOAD CONFIG] Erreur API:', response.status, '- utilisation config locale')
+        return
+      }
+
+      const configData = await response.json()
+
+      if (configData.success && configData.data) {
+        console.log('✅ [LOAD CONFIG] Configuration reçue:', {
+          shopName: configData.data.shop?.name,
+          agentName: configData.data.agent?.name,
+          hasWelcomeMessage: !!configData.data.agent?.welcomeMessage
+        })
+
+        // ✅ Mettre à jour la configuration avec les données de l'API
+        if (configData.data.shop) {
+          this.config.agentConfig = this.config.agentConfig || {}
+          this.config.agentConfig.shopName = configData.data.shop.name
+        }
+
+        if (configData.data.agent) {
+          this.config.agentConfig = {
+            ...this.config.agentConfig,
+            id: configData.data.agent.id,
+            name: configData.data.agent.name,
+            title: configData.data.agent.title,
+            avatar: configData.data.agent.avatar,
+            welcomeMessage: configData.data.agent.welcomeMessage,
+            fallbackMessage: configData.data.agent.fallbackMessage,
+            personality: configData.data.agent.personality,
+            customProductType: configData.data.agent.customProductType
+          }
+        }
+
+        // ✅ Mettre à jour les configs visuelles si fournies
+        if (configData.data.shop?.widgetConfig) {
+          const widgetConfig = configData.data.shop.widgetConfig
+          if (widgetConfig.primaryColor) this.config.primaryColor = widgetConfig.primaryColor
+          if (widgetConfig.buttonText) this.config.buttonText = widgetConfig.buttonText
+          if (widgetConfig.position) this.config.position = widgetConfig.position
+          if (widgetConfig.borderRadius) this.config.borderRadius = widgetConfig.borderRadius
+        }
+
+        console.log('✅ [LOAD CONFIG] Configuration mise à jour avec succès')
+      }
+
+    } catch (error) {
+      console.warn('⚠️ [LOAD CONFIG] Erreur chargement config:', error, '- utilisation config locale')
     }
   }
 
