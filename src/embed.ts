@@ -73,37 +73,35 @@ class ChatSeller {
   }
 
   async init(config: ChatSellerConfig) {
+    // ✅ PROTECTION ANTI-DOUBLE INITIALISATION
     if (this.isInitialized) {
-      console.warn('🟡 ChatSeller déjà initialisé')
+      console.warn('🟡 ChatSeller déjà initialisé, ignoré')
+      return
+    }
+
+    // ✅ Marquer comme en cours d'initialisation immédiatement
+    this.isInitialized = true
+
+    console.log('🚀 [INIT] Initialisation ChatSeller widget...', config.shopId)
+    this.config = { ...this.config, ...config }
+
+    if (!this.config.shopId) {
+      console.error('❌ ChatSeller: shopId requis')
+      this.isInitialized = false
       return
     }
 
     // ✅ Autoriser l'initialisation sur toutes les pages (mode flottant sur pages non-produit)
-    if (!this.isProductPage() && !this.config.forceDisplay) {
-      console.log('🚫 [INIT] Page non-produit sans forceDisplay, initialisation annulée')
-      return
-    }
-
-    console.log('🚀 Initialisation ChatSeller widget...', config.shopId)
-    this.config = { ...this.config, ...config }
-
-    if (!this.config.shopId) {
-      console.error('❌ ChatSeller: shopId requis')
-      return
-    }
-
-    console.log('🚀 Initialisation ChatSeller widget...', config.shopId)
-    this.config = { ...this.config, ...config }
-
-    if (!this.config.shopId) {
-      console.error('❌ ChatSeller: shopId requis')
+    if (!this.isProductPage() && !this.config.forceDisplay && !this.config.floatingPosition) {
+      console.log('🚫 [INIT] Page non-produit sans forceDisplay/floatingPosition, initialisation annulée')
+      this.isInitialized = false
       return
     }
 
     try {
       await this.waitForDOM()
 
-      // ✅ NOUVEAU : Charger la configuration depuis l'API si shopId est un UUID valide
+      // ✅ Charger la configuration depuis l'API
       await this.loadConfigFromAPI()
 
       this.injectCriticalCSS()
@@ -114,11 +112,11 @@ class ChatSeller {
         this.detectProductInfo()
       }
 
-      this.isInitialized = true
-      console.log('✅ ChatSeller widget initialisé')
+      console.log('✅ [INIT] ChatSeller widget initialisé avec succès')
 
     } catch (error) {
-      console.error('❌ Échec initialisation ChatSeller:', error)
+      console.error('❌ [INIT] Échec initialisation ChatSeller:', error)
+      this.isInitialized = false
       this.createFallbackWidget()
     }
   }
@@ -1553,9 +1551,10 @@ class ChatSeller {
   // ✅ MÉTHODE AMÉLIORÉE : Insertion sur page produit
   private insertOnProductPage(container: HTMLElement): void {
     console.log('🛍️ [PRODUCT PAGE] Insertion widget sur page produit')
-    
-    const position = this.config.position || 'above-cta'
-    
+    console.log('🛍️ [PRODUCT PAGE] Position configurée:', this.config.position)
+
+    const position = this.config.position || 'below-cta'
+
     // ✅ SÉLECTEURS CTA ÉTENDUS BEAUTÉ
     const ctaSelectors = [
       // Shopify beauté spécialisés
@@ -1565,6 +1564,11 @@ class ChatSeller {
       '.product-form__buttons button[name="add"]',
       '.btn--add-to-cart',
       '.product-form button[type="submit"]',
+
+      // Shopify Dawn theme
+      '.product-form__submit',
+      'button[name="add"]',
+      '.shopify-payment-button button',
 
       // WooCommerce beauté
       '.single_add_to_cart_button',
@@ -1589,13 +1593,19 @@ class ChatSeller {
     }
     
     let targetElement: HTMLElement | null = null
-    
+
     // Chercher le CTA visible
+    console.log('🔍 [PRODUCT PAGE] Recherche CTA...')
     for (const selector of ctaSelectors) {
       const element = document.querySelector(selector)
-      if (element && isElementVisible(element)) {
-        targetElement = element as HTMLElement
-        break
+      if (element) {
+        const visible = isElementVisible(element)
+        console.log(`  - ${selector}: trouvé=${!!element}, visible=${visible}`)
+        if (visible) {
+          targetElement = element as HTMLElement
+          console.log(`✅ [PRODUCT PAGE] CTA trouvé: ${selector}`)
+          break
+        }
       }
     }
 
