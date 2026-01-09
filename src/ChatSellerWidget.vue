@@ -967,68 +967,123 @@ const securityStyle = computed((): CSSProperties => ({
 
 // ✅ FONCTIONS COMPLÈTES RESTAURÉES
 
-const sendWelcomeMessage = async () => {
+// ✅ NOUVELLE FONCTION : Initialiser conversation via API /init
+const initConversation = async () => {
   try {
-    console.log('👋 [WELCOME] Début envoi message d\'accueil...')
-    
+    console.log('🎬 [INIT] Initialisation conversation via API...')
+
     // ✅ PRIORITÉ 1 : Vérifier conversation sauvegardée
     if (typeof window !== 'undefined' && (window as any).ChatSeller) {
       const savedConversation = (window as any).ChatSeller.loadConversation()
-      
+
       if (savedConversation && savedConversation.messages && savedConversation.messages.length > 0) {
         messages.value = savedConversation.messages.map((msg: any) => ({
           ...msg,
           timestamp: new Date(msg.timestamp)
         }))
         conversationId.value = savedConversation.conversationId
-        console.log('📂 [WELCOME] Conversation restaurée:', {
+        console.log('📂 [INIT] Conversation restaurée:', {
           messages: messages.value.length,
-          product: savedConversation.productInfo?.name
+          conversationId: conversationId.value
         })
-        return
-      }
-      
-      if (savedConversation?.isNewProductConversation) {
-        console.log('🔄 [WELCOME] Nouveau produit détecté')
-        const transitionMessage = `Re-${getTimeBasedGreeting().toLowerCase()} 👋 
-
-Je vois que vous vous intéressez maintenant à "${productInfo.value?.name}". Comment puis-je vous aider ? 😊`
-        
-        const welcomeMsg: Message = {
-          id: uuidv4(),
-          role: 'assistant',
-          content: transitionMessage,
-          timestamp: new Date()
-        }
-        messages.value.push(welcomeMsg)
         return
       }
     }
 
-    // ✅ PRIORITÉ 2 : Message d'accueil depuis configuration
-    console.log('📝 [WELCOME] Génération message d\'accueil depuis config...')
-    
+    // ✅ PRIORITÉ 2 : Appeler API /init pour créer conversation et recevoir message de bienvenue
+    const apiUrl = configData.value.apiUrl || 'https://chatseller-api-production.up.railway.app'
+    const endpoint = `${apiUrl}/api/v1/chat/init`
+
+    console.log('🌐 [INIT] Appel API init:', endpoint)
+
+    const payload = {
+      shopId: configData.value.shopId || 'demo',
+      agentId: configData.value.agentConfig?.id,
+      productContext: productInfo.value ? {
+        id: productInfo.value.id,
+        name: productInfo.value.name,
+        price: productInfo.value.price,
+        url: productInfo.value.url
+      } : null
+    }
+
+    console.log('📤 [INIT] Payload:', payload)
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(payload),
+      mode: 'cors',
+      credentials: 'omit'
+    })
+
+    if (!response.ok) {
+      throw new Error(`Init API Error: ${response.status}`)
+    }
+
+    const result = await response.json()
+    console.log('📥 [INIT] Réponse API:', result)
+
+    if (result.success && result.data) {
+      // ✅ Sauvegarder conversationId
+      conversationId.value = result.data.conversationId
+
+      // ✅ Afficher le message de bienvenue reçu de l'API
+      const welcomeMsg: Message = {
+        id: uuidv4(),
+        role: 'assistant',
+        content: result.data.welcomeMessage,
+        timestamp: new Date()
+      }
+      messages.value.push(welcomeMsg)
+
+      console.log('✅ [INIT] Conversation initialisée:', {
+        conversationId: conversationId.value,
+        welcomeMessage: result.data.welcomeMessage.substring(0, 50) + '...'
+      })
+
+      // Scroll vers le bas
+      await nextTick()
+      scrollToBottom()
+    } else {
+      throw new Error('Init API response invalid')
+    }
+
+  } catch (error) {
+    console.error('❌ [INIT] Erreur initialisation:', error)
+
+    // ✅ Fallback : Générer message d'accueil côté client
+    console.log('🔄 [INIT] Fallback sur message local...')
+    await sendWelcomeMessageFallback()
+  }
+}
+
+// ✅ FONCTION FALLBACK : Message d'accueil local (si API /init échoue)
+const sendWelcomeMessageFallback = async () => {
+  try {
+    console.log('📝 [FALLBACK] Génération message d\'accueil local...')
+
     let welcomeMessage = ''
-    
-    // ✅ CORRECTION MAJEURE : Utiliser welcomeMessage personnalisé de l'agent
+
+    // ✅ Utiliser welcomeMessage personnalisé de l'agent
     if (configData.value.agentConfig?.welcomeMessage) {
-      console.log('✅ [WELCOME] Message personnalisé trouvé')
+      console.log('✅ [FALLBACK] Message personnalisé trouvé')
       welcomeMessage = replaceWelcomeVariables(configData.value.agentConfig.welcomeMessage)
     } else {
-      // ✅ Fallback : Message par défaut intelligent
+      // ✅ Message par défaut intelligent
       const greeting = getTimeBasedGreeting()
       const agentName = configData.value.agentConfig?.name || 'Assistant'
       const agentTitle = configData.value.agentConfig?.title || 'Conseiller'
-      
+
       if (productInfo.value?.name) {
-        const productType = getProductType(productInfo.value.name)
-        welcomeMessage = `${greeting} 👋 Je suis ${agentName}, ${agentTitle}.
+        welcomeMessage = `${greeting} ! Je suis ${agentName}, ${agentTitle}.
 
-Je vois que vous vous intéressez à notre ${productType} **"${productInfo.value.name}"**. Excellent choix ! ✨
-
-Comment puis-je vous aider avec ce ${productType} ? 😊`
+Je vois que vous vous intéressez à "${productInfo.value.name}". Comment puis-je vous aider ? 😊`
       } else {
-        welcomeMessage = `${greeting} 👋 Je suis ${agentName}, ${agentTitle}.
+        welcomeMessage = `${greeting} ! Je suis ${agentName}, ${agentTitle}.
 
 Comment puis-je vous aider aujourd'hui ? 😊`
       }
@@ -1041,18 +1096,18 @@ Comment puis-je vous aider aujourd'hui ? 😊`
       content: welcomeMessage,
       timestamp: new Date()
     }
-    
+
     messages.value.push(welcomeMsg)
-    console.log('✅ [WELCOME] Message d\'accueil ajouté:', welcomeMessage.substring(0, 50) + '...')
-    
+    console.log('✅ [FALLBACK] Message d\'accueil ajouté')
+
     // Scroll vers le bas
     await nextTick()
     scrollToBottom()
 
   } catch (error) {
-    console.error('❌ [WELCOME] Erreur message d\'accueil:', error)
-    
-    // ✅ Fallback minimal en cas d'erreur
+    console.error('❌ [FALLBACK] Erreur message d\'accueil:', error)
+
+    // ✅ Fallback minimal
     const fallbackMessage: Message = {
       id: uuidv4(),
       role: 'assistant',
@@ -1256,10 +1311,10 @@ const resetChat = () => {
   if (typeof window !== 'undefined' && (window as any).ChatSeller) {
     (window as any).ChatSeller.resetConversation()
   }
-  
+
   messages.value = []
   conversationId.value = null
-  sendWelcomeMessage()
+  initConversation()
   console.log('🔄 Chat réinitialisé')
 }
 
@@ -1699,10 +1754,10 @@ onMounted(() => {
     productInfo: productInfo.value?.name || 'AUCUN'
   })
   
-  // ✅ CORRECTION MAJEURE : Déclencher message d'accueil IMMÉDIATEMENT
+  // ✅ CORRECTION MAJEURE : Initialiser conversation via API
   nextTick(() => {
-    sendWelcomeMessage()
-    console.log('✅ [WIDGET VUE] Message d\'accueil déclenché')
+    initConversation()
+    console.log('✅ [WIDGET VUE] Initialisation conversation déclenchée')
   })
   
   // ✅ GESTION MOBILE VIEWPORT AMÉLIORÉE
