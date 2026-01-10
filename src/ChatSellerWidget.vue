@@ -67,7 +67,18 @@
               <div class="cs-message-text cs-assistant-text" :style="assistantTextStyle">
                 <div class="cs-agent-name-in-bubble" :style="agentNameInBubbleStyle">{{ agentName }}</div>
                 <div class="cs-agent-title-in-bubble" :style="agentTitleInBubbleStyle">{{ agentTitle }}</div>
-                <div v-html="formatMessage(message.content)"></div>
+
+                <!-- ✅ CARTE PRODUIT SI content_type === 'product_card' -->
+                <ProductCard
+                  v-if="message.content_type === 'product_card' && message.product_card"
+                  :product="message.product_card"
+                  @click="handleProductClick"
+                  style="margin: 8px 0;"
+                />
+
+                <!-- ✅ MESSAGE TEXTE (avec ou sans carte produit) -->
+                <div v-if="message.content" v-html="formatMessage(message.content)"></div>
+
                 <div class="cs-message-time" :style="messageTimeStyle">{{ formatTime(message.timestamp) }}</div>
               </div>
             </div>
@@ -281,6 +292,7 @@
 import { ref, computed, onMounted, nextTick, watch } from 'vue'
 import { v4 as uuidv4 } from 'uuid'
 import type { CSSProperties } from 'vue'
+import ProductCard from './components/ProductCard.vue'
 
 interface Props {
   config?: {
@@ -325,6 +337,16 @@ interface Message {
   role: 'user' | 'assistant'
   content: string
   timestamp: Date
+  content_type?: 'text' | 'product_card'
+  product_card?: {
+    id: string
+    name: string
+    description?: string
+    reason?: string
+    price: number
+    image_url?: string
+    url?: string
+  }
 }
 
 // ✅ STATE COMPLET RESTAURÉ
@@ -1260,9 +1282,15 @@ const sendMessage = async () => {
           id: uuidv4(),
           role: 'assistant',
           content: response.data.message,
-          timestamp: new Date()
+          timestamp: new Date(),
+          content_type: response.data.content_type || 'text',
+          ...(response.data.product_card && { product_card: response.data.product_card })
         }
         messages.value.push(aiMessage)
+
+        if (response.data.content_type === 'product_card') {
+          console.log('🛍️ [WIDGET] Carte produit reçue:', response.data.product_card?.name)
+        }
 
         console.log('✅ [WIDGET] Réponse IA reçue et affichée:', response.data.message.substring(0, 100))
       } else {
@@ -1305,6 +1333,17 @@ const sendMessage = async () => {
 const handleVoiceMessage = () => {
   console.log('🎤 Message vocal demandé')
   alert('Fonctionnalité vocale bientôt disponible !')
+}
+
+const handleProductClick = (productId: string) => {
+  console.log('🛍️ Clic sur produit:', productId)
+  // Analytics: Track product click
+  if (typeof window !== 'undefined' && (window as any).gtag) {
+    (window as any).gtag('event', 'product_click', {
+      product_id: productId,
+      source: 'chat_recommendation'
+    })
+  }
 }
 
 const resetChat = () => {
