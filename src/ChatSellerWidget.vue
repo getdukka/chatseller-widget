@@ -209,7 +209,18 @@
               <div class="cs-mobile-message-text cs-mobile-assistant-text" :style="assistantTextStyle">
                 <div class="cs-agent-name-in-bubble" :style="agentNameInBubbleStyle">{{ agentName }}</div>
                 <div class="cs-agent-title-in-bubble" :style="agentTitleInBubbleStyle">{{ agentTitle }}</div>
-                <div v-html="formatMessage(message.content)"></div>
+
+                <!-- ✅ CARTE PRODUIT SI content_type === 'product_card' -->
+                <ProductCard
+                  v-if="message.content_type === 'product_card' && message.product_card"
+                  :product="message.product_card"
+                  @click="handleProductClick"
+                  style="margin: 8px 0;"
+                />
+
+                <!-- ✅ MESSAGE TEXTE (avec ou sans carte produit) -->
+                <div v-if="message.content" v-html="formatMessage(message.content)"></div>
+
                 <div class="cs-mobile-message-time" :style="messageTimeStyle">{{ formatTime(message.timestamp) }}</div>
               </div>
             </div>
