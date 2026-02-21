@@ -23,7 +23,7 @@ export interface ChatSellerConfig {
   productUrl?: string
   theme?: 'modern' | 'minimal' | 'brand_adaptive'
   primaryColor?: string
-  position?: 'auto' | 'above-cta' | 'below-cta' | 'beside-cta'
+  position?: 'auto' | 'above-cta' | 'below-cta' | 'beside-cta' | 'bottom-right' | 'bottom-left'
   floatingPosition?: 'bottom-right' | 'bottom-left'
   buttonText?: string
   borderRadius?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full'
