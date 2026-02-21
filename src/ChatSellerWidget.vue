@@ -105,29 +105,27 @@
         </div>
       </div>
 
+      <!-- ✅ CART BANNER (affiché quand panier non vide et pas en checkout) -->
+      <CartBanner
+        v-if="cartItems.length > 0 && !orderMode"
+        :items="cartItems"
+        :primary-color="primaryColor"
+        @checkout="startCheckout"
+        @remove="removeFromCart"
+      />
+
       <!-- ✅ INPUT SECTION -->
       <div class="cs-input-section-desktop" :style="inputSectionStyle">
 
-        <!-- ✅ ORDER FLOW (affiché quand orderMode est actif) -->
+        <!-- ✅ CHECKOUT FLOW (collecte infos client) -->
         <div v-if="orderMode" class="cs-order-flow">
           <div class="cs-order-header">
             <span class="cs-order-step-label">{{ orderStepLabel }}</span>
             <button class="cs-order-cancel-btn" @click="cancelOrder">✕ Annuler</button>
           </div>
 
-          <!-- Quantité : boutons rapides + input personnalisé -->
-          <div v-if="orderStep === 'quantity'" class="cs-order-qty-section">
-            <div class="cs-order-qty-buttons">
-              <button v-for="q in [1, 2, 3]" :key="q" class="cs-order-qty-btn" :style="{ borderColor: primaryColor, color: primaryColor }" @click="submitOrderStep(String(q))">{{ q }}</button>
-            </div>
-            <div class="cs-order-input-row">
-              <input type="number" v-model="orderInputValue" min="1" max="99" placeholder="Autre..." class="cs-order-text-input" />
-              <button class="cs-order-submit" :style="{ background: primaryColor }" @click="submitOrderStep(orderInputValue)" :disabled="!orderInputValue">→</button>
-            </div>
-          </div>
-
           <!-- Paiement : boutons radio -->
-          <div v-else-if="orderStep === 'payment'" class="cs-order-payment-section">
+          <div v-if="orderStep === 'payment'" class="cs-order-payment-section">
             <button v-for="m in orderPaymentMethods" :key="m" class="cs-order-payment-btn" @click="submitOrderStep(m)">{{ m }}</button>
           </div>
 
@@ -294,27 +292,26 @@
         </div>
       </div>
 
+      <!-- ✅ CART BANNER MOBILE -->
+      <CartBanner
+        v-if="cartItems.length > 0 && !orderMode"
+        :items="cartItems"
+        :primary-color="primaryColor"
+        @checkout="startCheckout"
+        @remove="removeFromCart"
+      />
+
       <!-- ✅ Input Mobile avec gestion clavier CORRIGÉE -->
       <div class="cs-mobile-input-section" :style="mobileInputSectionStyle">
 
-        <!-- ✅ ORDER FLOW MOBILE -->
+        <!-- ✅ CHECKOUT FLOW MOBILE -->
         <div v-if="orderMode" class="cs-order-flow">
           <div class="cs-order-header">
             <span class="cs-order-step-label">{{ orderStepLabel }}</span>
             <button class="cs-order-cancel-btn" @click="cancelOrder">✕ Annuler</button>
           </div>
 
-          <div v-if="orderStep === 'quantity'" class="cs-order-qty-section">
-            <div class="cs-order-qty-buttons">
-              <button v-for="q in [1, 2, 3]" :key="q" class="cs-order-qty-btn" :style="{ borderColor: primaryColor, color: primaryColor }" @click="submitOrderStep(String(q))">{{ q }}</button>
-            </div>
-            <div class="cs-order-input-row">
-              <input type="number" v-model="orderInputValue" min="1" max="99" placeholder="Autre..." class="cs-order-text-input" />
-              <button class="cs-order-submit" :style="{ background: primaryColor }" @click="submitOrderStep(orderInputValue)" :disabled="!orderInputValue">→</button>
-            </div>
-          </div>
-
-          <div v-else-if="orderStep === 'payment'" class="cs-order-payment-section">
+          <div v-if="orderStep === 'payment'" class="cs-order-payment-section">
             <button v-for="m in orderPaymentMethods" :key="m" class="cs-order-payment-btn" @click="submitOrderStep(m)">{{ m }}</button>
           </div>
 
@@ -394,6 +391,8 @@ import { ref, computed, onMounted, nextTick, watch } from 'vue'
 import { v4 as uuidv4 } from 'uuid'
 import type { CSSProperties } from 'vue'
 import ProductCard from './components/ProductCard.vue'
+import CartBanner from './components/CartBanner.vue'
+import type { CartItem } from './components/CartBanner.vue'
 
 interface Props {
   config?: {
@@ -438,7 +437,7 @@ interface Message {
   role: 'user' | 'assistant'
   content: string
   timestamp: Date
-  content_type?: 'text' | 'product_card'
+  content_type?: 'text' | 'product_card' | 'cart_update'
   product_card?: {
     id: string
     name: string
@@ -463,32 +462,31 @@ const mobileMessagesEndRef = ref<HTMLElement>()
 const mobileInput = ref<HTMLInputElement>()
 const keyboardVisible = ref(false)
 
-// ✅ ORDER FLOW STATE
-type OrderStep = 'quantity' | 'name' | 'phone' | 'address' | 'payment' | 'confirmation'
+// ✅ CART STATE (panier conversationnel)
+const cartItems = ref<CartItem[]>([])
 
-interface OrderData {
-  productId?: string
-  productName: string
-  productPrice: number
-  quantity: number
+// ✅ ORDER FLOW STATE (checkout flow — collecte infos client)
+type OrderStep = 'name' | 'phone' | 'address' | 'payment' | 'confirmation'
+
+const orderMode = ref(false)
+const orderStep = ref<OrderStep>('name')
+const orderInputValue = ref('')
+
+interface CheckoutData {
   name: string
   phone: string
   address: string
   paymentMethod: string
 }
 
-const orderMode = ref(false)
-const orderStep = ref<OrderStep>('quantity')
-const orderInputValue = ref('')
-const orderData = ref<Partial<OrderData>>({})
+const checkoutData = ref<Partial<CheckoutData>>({})
 
 const orderPaymentMethods = ['Paiement à la livraison', 'Mobile Money', 'Virement bancaire']
 
-const ORDER_STEPS: OrderStep[] = ['quantity', 'name', 'phone', 'address', 'payment', 'confirmation']
+const ORDER_STEPS: OrderStep[] = ['name', 'phone', 'address', 'payment', 'confirmation']
 
 const orderStepLabel = computed(() => {
   const labels: Record<OrderStep, string> = {
-    quantity: '🛍️ Quantité souhaitée',
     name: '👤 Votre nom',
     phone: '📞 Votre téléphone',
     address: '📍 Adresse de livraison',
@@ -500,7 +498,6 @@ const orderStepLabel = computed(() => {
 
 const orderInputPlaceholder = computed(() => {
   const placeholders: Record<OrderStep, string> = {
-    quantity: '',
     name: 'Prénom et nom...',
     phone: '+221 77 000 00 00',
     address: 'Quartier, Ville...',
@@ -508,6 +505,15 @@ const orderInputPlaceholder = computed(() => {
     confirmation: ''
   }
   return placeholders[orderStep.value]
+})
+
+// ✅ CART COMPUTED
+const cartTotal = computed(() => {
+  return cartItems.value.reduce((sum, item) => sum + item.price * item.quantity, 0)
+})
+
+const cartItemCount = computed(() => {
+  return cartItems.value.reduce((sum, item) => sum + item.quantity, 0)
 })
 
 // ✅ RESTAURÉ : SYSTÈME DE PERSISTANCE CONVERSATION
@@ -1440,6 +1446,12 @@ const sendMessage = async () => {
           console.log('🛍️ [WIDGET] Carte produit reçue:', response.data.product_card?.name)
         }
 
+        // ✅ Si l'IA a ajouté un produit au panier via tool call add_to_cart
+        if (response.data.content_type === 'cart_update' && response.data.cart_item) {
+          console.log('🛒 [WIDGET] Ajout IA au panier:', response.data.cart_item.name)
+          addToCartFromAI(response.data.cart_item)
+        }
+
         console.log('✅ [WIDGET] Réponse IA reçue et affichée:', response.data.message.substring(0, 100))
       } else {
         console.error('❌ [WIDGET] Pas de message dans la réponse API:', response.data)
@@ -1493,32 +1505,124 @@ const handleProductClick = (productId: string) => {
   }
 }
 
-// ✅ DÉCLENCHÉ PAR LE BOUTON "Commander" DE PRODUCTCARD
+// ✅ AJOUTER AU PANIER (déclenché par bouton "Commander" de ProductCard)
 const handleOrderRequest = (product: { id: string; name: string; price: number; image_url?: string; url?: string }) => {
-  console.log('🛒 [ORDER] Début flow commande pour:', product.name)
+  console.log('🛒 [CART] Ajout au panier:', product.name)
 
-  orderData.value = {
-    productId: product.id,
-    productName: product.name,
-    productPrice: product.price,
-    quantity: 1
+  // Vérifier si le produit est déjà dans le panier
+  const existingIndex = cartItems.value.findIndex(item => item.id === product.id)
+
+  if (existingIndex >= 0) {
+    // Incrémenter la quantité
+    cartItems.value[existingIndex].quantity += 1
+    const qty = cartItems.value[existingIndex].quantity
+
+    const assistantMsg: Message = {
+      id: uuidv4(),
+      role: 'assistant',
+      content: `**${product.name}** est déjà dans votre panier ! J'ai mis à jour la quantité à ${qty}. 🛒`,
+      timestamp: new Date()
+    }
+    messages.value.push(assistantMsg)
+  } else {
+    // Ajouter un nouvel item
+    cartItems.value.push({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      quantity: 1,
+      image_url: product.image_url,
+      url: product.url
+    })
+
+    const itemCount = cartItems.value.length
+    let content = `**${product.name}** ajouté au panier ! 🛍️`
+    if (itemCount > 1) {
+      content += `\n\nVous avez ${itemCount} articles dans votre panier (${cartTotal.value.toLocaleString('fr-FR')} FCFA). Vous pouvez continuer vos achats ou cliquer sur **"Finaliser"** pour commander.`
+    } else {
+      content += `\n\nVous pouvez continuer à discuter et ajouter d'autres produits, ou cliquer sur **"Finaliser"** quand vous êtes prêt(e).`
+    }
+
+    const assistantMsg: Message = {
+      id: uuidv4(),
+      role: 'assistant',
+      content,
+      timestamp: new Date()
+    }
+    messages.value.push(assistantMsg)
   }
-  orderStep.value = 'quantity'
-  orderInputValue.value = ''
-  orderMode.value = true
 
-  // Message assistant qui lance le flow
+  nextTick(() => scrollToBottom())
+}
+
+// ✅ AJOUTER AU PANIER VIA L'IA (tool call add_to_cart)
+const addToCartFromAI = (product: { id: string; name: string; price: number; quantity?: number; image_url?: string; url?: string }) => {
+  console.log('🤖 [CART] Ajout IA au panier:', product.name)
+
+  const existingIndex = cartItems.value.findIndex(item => item.id === product.id)
+  const qty = product.quantity || 1
+
+  if (existingIndex >= 0) {
+    cartItems.value[existingIndex].quantity += qty
+  } else {
+    cartItems.value.push({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      quantity: qty,
+      image_url: product.image_url,
+      url: product.url
+    })
+  }
+
+  nextTick(() => scrollToBottom())
+}
+
+// ✅ RETIRER DU PANIER
+const removeFromCart = (index: number) => {
+  const removed = cartItems.value[index]
+  cartItems.value.splice(index, 1)
+  console.log('🗑️ [CART] Retiré du panier:', removed?.name)
+
+  if (cartItems.value.length === 0) {
+    const msg: Message = {
+      id: uuidv4(),
+      role: 'assistant',
+      content: 'Votre panier est maintenant vide. N\'hésitez pas à me demander des recommandations ! 😊',
+      timestamp: new Date()
+    }
+    messages.value.push(msg)
+    nextTick(() => scrollToBottom())
+  }
+}
+
+// ✅ LANCER LE CHECKOUT (collecte infos client)
+const startCheckout = () => {
+  if (cartItems.value.length === 0) return
+
+  console.log('🛒 [CHECKOUT] Début checkout avec', cartItems.value.length, 'articles')
+
+  orderMode.value = true
+  orderStep.value = 'name'
+  orderInputValue.value = ''
+  checkoutData.value = {}
+
+  // Récapitulatif panier dans le chat
+  const itemsList = cartItems.value.map(item =>
+    `• **${item.name}** × ${item.quantity} — ${(item.price * item.quantity).toLocaleString('fr-FR')} FCFA`
+  ).join('\n')
+
   const assistantMsg: Message = {
     id: uuidv4(),
     role: 'assistant',
-    content: `Super choix ! 🛍️ Combien d'exemplaires de **${product.name}** souhaitez-vous commander ?`,
+    content: `Parfait ! Voici votre panier :\n\n${itemsList}\n\n**Total : ${cartTotal.value.toLocaleString('fr-FR')} FCFA**\n\nPour finaliser votre commande, j'ai besoin de quelques informations. Quel est votre nom complet ?`,
     timestamp: new Date()
   }
   messages.value.push(assistantMsg)
   nextTick(() => scrollToBottom())
 }
 
-// ✅ SOUMISSION D'UNE ÉTAPE
+// ✅ SOUMISSION D'UNE ÉTAPE DU CHECKOUT
 const submitOrderStep = async (value: string) => {
   if (!value?.toString().trim()) return
 
@@ -1536,16 +1640,14 @@ const submitOrderStep = async (value: string) => {
 
   // Sauvegarder la valeur selon l'étape
   const step = orderStep.value
-  if (step === 'quantity') {
-    orderData.value.quantity = parseInt(val) || 1
-  } else if (step === 'name') {
-    orderData.value.name = val
+  if (step === 'name') {
+    checkoutData.value.name = val
   } else if (step === 'phone') {
-    orderData.value.phone = val
+    checkoutData.value.phone = val
   } else if (step === 'address') {
-    orderData.value.address = val
+    checkoutData.value.address = val
   } else if (step === 'payment') {
-    orderData.value.paymentMethod = val
+    checkoutData.value.paymentMethod = val
   }
 
   // Avancer au step suivant
@@ -1555,17 +1657,18 @@ const submitOrderStep = async (value: string) => {
 
   // Message assistant pour le step suivant
   let nextQuestion = ''
-  if (nextStep === 'name') {
-    nextQuestion = `Parfait ! Quel est votre nom complet ?`
-  } else if (nextStep === 'phone') {
-    nextQuestion = `Merci ${orderData.value.name?.split(' ')[0] || ''} ! Quel est votre numéro de téléphone ?`
+  if (nextStep === 'phone') {
+    nextQuestion = `Merci ${checkoutData.value.name?.split(' ')[0] || ''} ! Quel est votre numéro de téléphone ?`
   } else if (nextStep === 'address') {
     nextQuestion = `À quelle adresse souhaitez-vous être livré(e) ?`
   } else if (nextStep === 'payment') {
     nextQuestion = `Quel mode de paiement préférez-vous ?`
   } else if (nextStep === 'confirmation') {
-    const total = (orderData.value.productPrice || 0) * (orderData.value.quantity || 1)
-    nextQuestion = `📋 **Récapitulatif de votre commande :**\n\n• **${orderData.value.productName}** × ${orderData.value.quantity} — ${total.toLocaleString('fr-FR')} FCFA\n• 👤 ${orderData.value.name}\n• 📞 ${orderData.value.phone}\n• 📍 ${orderData.value.address || 'Non renseigné'}\n• 💳 ${orderData.value.paymentMethod}\n\nTout est correct ?`
+    const itemsList = cartItems.value.map(item =>
+      `• **${item.name}** × ${item.quantity} — ${(item.price * item.quantity).toLocaleString('fr-FR')} FCFA`
+    ).join('\n')
+
+    nextQuestion = `📋 **Récapitulatif de votre commande :**\n\n${itemsList}\n\n**Total : ${cartTotal.value.toLocaleString('fr-FR')} FCFA**\n\n• 👤 ${checkoutData.value.name}\n• 📞 ${checkoutData.value.phone}\n• 📍 ${checkoutData.value.address || 'Non renseigné'}\n• 💳 ${checkoutData.value.paymentMethod}\n\nTout est correct ?`
   }
 
   if (nextQuestion) {
@@ -1582,13 +1685,23 @@ const submitOrderStep = async (value: string) => {
   scrollToBottom()
 }
 
-// ✅ CONFIRMER ET ENVOYER LA COMMANDE
+// ✅ CONFIRMER ET ENVOYER LA COMMANDE (multi-produits)
 const completeOrder = async () => {
   if (isLoading.value) return
   isLoading.value = true
 
   try {
     const apiUrl = configData.value.apiUrl || 'https://chatseller-api-production.up.railway.app'
+
+    // Construire le tableau product_items depuis le panier
+    const productItemsPayload = cartItems.value.map(item => ({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+      ai_recommended: true
+    }))
+
     const response = await fetch(`${apiUrl}/api/v1/public/orders/complete`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1597,14 +1710,12 @@ const completeOrder = async () => {
       body: JSON.stringify({
         shopId: configData.value.shopId,
         conversationId: conversationId.value,
-        customerName: orderData.value.name,
-        customerPhone: orderData.value.phone,
-        customerAddress: orderData.value.address,
-        paymentMethod: orderData.value.paymentMethod,
-        productId: orderData.value.productId,
-        productName: orderData.value.productName,
-        productPrice: orderData.value.productPrice,
-        quantity: orderData.value.quantity
+        customerName: checkoutData.value.name,
+        customerPhone: checkoutData.value.phone,
+        customerAddress: checkoutData.value.address,
+        paymentMethod: checkoutData.value.paymentMethod,
+        productItems: productItemsPayload,
+        totalAmount: cartTotal.value
       })
     })
 
@@ -1624,11 +1735,19 @@ const completeOrder = async () => {
       if (typeof window !== 'undefined' && (window as any).gtag) {
         (window as any).gtag('event', 'purchase', {
           transaction_id: result.data.orderId,
-          value: (orderData.value.productPrice || 0) * (orderData.value.quantity || 1),
+          value: cartTotal.value,
           currency: 'XOF',
-          items: [{ item_id: orderData.value.productId, item_name: orderData.value.productName, quantity: orderData.value.quantity }]
+          items: cartItems.value.map(item => ({
+            item_id: item.id,
+            item_name: item.name,
+            price: item.price,
+            quantity: item.quantity
+          }))
         })
       }
+
+      // Vider le panier après commande réussie
+      cartItems.value = []
     } else {
       throw new Error(result.error || 'Erreur inconnue')
     }
@@ -1644,29 +1763,29 @@ const completeOrder = async () => {
   } finally {
     isLoading.value = false
     orderMode.value = false
-    orderStep.value = 'quantity'
-    orderData.value = {}
+    orderStep.value = 'name'
+    checkoutData.value = {}
     await nextTick()
     scrollToBottom()
   }
 }
 
-// ✅ ANNULER LA COMMANDE EN COURS
+// ✅ ANNULER LE CHECKOUT (garde le panier intact)
 const cancelOrder = () => {
   orderMode.value = false
-  orderStep.value = 'quantity'
+  orderStep.value = 'name'
   orderInputValue.value = ''
-  orderData.value = {}
+  checkoutData.value = {}
 
   const cancelMsg: Message = {
     id: uuidv4(),
     role: 'assistant',
-    content: 'Commande annulée. N\'hésitez pas si vous avez d\'autres questions ! 😊',
+    content: 'Pas de souci ! Votre panier est toujours là. Vous pouvez continuer vos achats ou cliquer sur **"Finaliser"** quand vous êtes prêt(e). 😊',
     timestamp: new Date()
   }
   messages.value.push(cancelMsg)
   nextTick(() => scrollToBottom())
-  console.log('🚫 [ORDER] Commande annulée par l\'utilisateur')
+  console.log('🚫 [ORDER] Checkout annulé (panier conservé)')
 }
 
 const resetChat = () => {
@@ -1676,6 +1795,9 @@ const resetChat = () => {
 
   messages.value = []
   conversationId.value = null
+  cartItems.value = []
+  orderMode.value = false
+  checkoutData.value = {}
   initConversation()
   console.log('🔄 Chat réinitialisé')
 }
