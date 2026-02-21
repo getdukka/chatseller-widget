@@ -73,6 +73,7 @@
                   v-if="message.content_type === 'product_card' && message.product_card"
                   :product="message.product_card"
                   @click="handleProductClick"
+                  @order="handleOrderRequest"
                   style="margin: 8px 0;"
                 />
 
@@ -106,7 +107,53 @@
 
       <!-- ✅ INPUT SECTION -->
       <div class="cs-input-section-desktop" :style="inputSectionStyle">
-        <div class="cs-input-container" :style="inputContainerStyle">
+
+        <!-- ✅ ORDER FLOW (affiché quand orderMode est actif) -->
+        <div v-if="orderMode" class="cs-order-flow">
+          <div class="cs-order-header">
+            <span class="cs-order-step-label">{{ orderStepLabel }}</span>
+            <button class="cs-order-cancel-btn" @click="cancelOrder">✕ Annuler</button>
+          </div>
+
+          <!-- Quantité : boutons rapides + input personnalisé -->
+          <div v-if="orderStep === 'quantity'" class="cs-order-qty-section">
+            <div class="cs-order-qty-buttons">
+              <button v-for="q in [1, 2, 3]" :key="q" class="cs-order-qty-btn" :style="{ borderColor: primaryColor, color: primaryColor }" @click="submitOrderStep(String(q))">{{ q }}</button>
+            </div>
+            <div class="cs-order-input-row">
+              <input type="number" v-model="orderInputValue" min="1" max="99" placeholder="Autre..." class="cs-order-text-input" />
+              <button class="cs-order-submit" :style="{ background: primaryColor }" @click="submitOrderStep(orderInputValue)" :disabled="!orderInputValue">→</button>
+            </div>
+          </div>
+
+          <!-- Paiement : boutons radio -->
+          <div v-else-if="orderStep === 'payment'" class="cs-order-payment-section">
+            <button v-for="m in orderPaymentMethods" :key="m" class="cs-order-payment-btn" @click="submitOrderStep(m)">{{ m }}</button>
+          </div>
+
+          <!-- Confirmation -->
+          <div v-else-if="orderStep === 'confirmation'" class="cs-order-confirm-section">
+            <button class="cs-order-confirm-btn" :style="{ background: primaryColor }" @click="completeOrder" :disabled="isLoading">
+              <span v-if="!isLoading">✅ Confirmer ma commande</span>
+              <span v-else>⏳ Envoi en cours...</span>
+            </button>
+          </div>
+
+          <!-- Texte libre (name, phone, address) -->
+          <div v-else class="cs-order-input-row">
+            <input
+              :type="orderStep === 'phone' ? 'tel' : 'text'"
+              v-model="orderInputValue"
+              :placeholder="orderInputPlaceholder"
+              class="cs-order-text-input"
+              @keypress.enter="submitOrderStep(orderInputValue)"
+            />
+            <button class="cs-order-submit" :style="{ background: primaryColor }" @click="submitOrderStep(orderInputValue)" :disabled="!orderInputValue?.trim()">→</button>
+          </div>
+        </div>
+
+        <!-- ✅ INPUT CLASSIQUE -->
+        <div v-else class="cs-input-container" :style="inputContainerStyle">
           <input
             v-model="currentMessage"
             @keypress.enter="sendMessage"
@@ -115,7 +162,7 @@
             :style="messageInputStyle"
             :disabled="isTyping || isLoading"
           />
-          
+
           <!-- ✅ BOUTON MICRO EN GRIS -->
           <button
             @click="handleVoiceMessage"
@@ -127,7 +174,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
             </svg>
           </button>
-          
+
           <!-- ✅ BOUTON SEND COULEUR DYNAMIQUE -->
           <button
             @click="sendMessage"
@@ -141,7 +188,7 @@
             <div v-else class="cs-loading-spinner" :style="loadingSpinnerStyle"></div>
           </button>
         </div>
-        
+
         <!-- ✅ FOOTER CORRIGÉ - DEUX COLONNES -->
         <div class="cs-footer-info" :style="footerInfoStyle">
           <span class="cs-powered-by" :style="poweredByStyle">
@@ -215,6 +262,7 @@
                   v-if="message.content_type === 'product_card' && message.product_card"
                   :product="message.product_card"
                   @click="handleProductClick"
+                  @order="handleOrderRequest"
                   style="margin: 8px 0;"
                 />
 
@@ -248,7 +296,49 @@
 
       <!-- ✅ Input Mobile avec gestion clavier CORRIGÉE -->
       <div class="cs-mobile-input-section" :style="mobileInputSectionStyle">
-        <div class="cs-mobile-input-container" :style="mobileInputContainerStyle">
+
+        <!-- ✅ ORDER FLOW MOBILE -->
+        <div v-if="orderMode" class="cs-order-flow">
+          <div class="cs-order-header">
+            <span class="cs-order-step-label">{{ orderStepLabel }}</span>
+            <button class="cs-order-cancel-btn" @click="cancelOrder">✕ Annuler</button>
+          </div>
+
+          <div v-if="orderStep === 'quantity'" class="cs-order-qty-section">
+            <div class="cs-order-qty-buttons">
+              <button v-for="q in [1, 2, 3]" :key="q" class="cs-order-qty-btn" :style="{ borderColor: primaryColor, color: primaryColor }" @click="submitOrderStep(String(q))">{{ q }}</button>
+            </div>
+            <div class="cs-order-input-row">
+              <input type="number" v-model="orderInputValue" min="1" max="99" placeholder="Autre..." class="cs-order-text-input" />
+              <button class="cs-order-submit" :style="{ background: primaryColor }" @click="submitOrderStep(orderInputValue)" :disabled="!orderInputValue">→</button>
+            </div>
+          </div>
+
+          <div v-else-if="orderStep === 'payment'" class="cs-order-payment-section">
+            <button v-for="m in orderPaymentMethods" :key="m" class="cs-order-payment-btn" @click="submitOrderStep(m)">{{ m }}</button>
+          </div>
+
+          <div v-else-if="orderStep === 'confirmation'" class="cs-order-confirm-section">
+            <button class="cs-order-confirm-btn" :style="{ background: primaryColor }" @click="completeOrder" :disabled="isLoading">
+              <span v-if="!isLoading">✅ Confirmer ma commande</span>
+              <span v-else>⏳ Envoi en cours...</span>
+            </button>
+          </div>
+
+          <div v-else class="cs-order-input-row">
+            <input
+              :type="orderStep === 'phone' ? 'tel' : 'text'"
+              v-model="orderInputValue"
+              :placeholder="orderInputPlaceholder"
+              class="cs-order-text-input"
+              @keypress.enter="submitOrderStep(orderInputValue)"
+            />
+            <button class="cs-order-submit" :style="{ background: primaryColor }" @click="submitOrderStep(orderInputValue)" :disabled="!orderInputValue?.trim()">→</button>
+          </div>
+        </div>
+
+        <!-- ✅ INPUT CLASSIQUE MOBILE -->
+        <div v-else class="cs-mobile-input-container" :style="mobileInputContainerStyle">
           <input
             ref="mobileInput"
             v-model="currentMessage"
@@ -260,7 +350,7 @@
             :style="messageInputStyle"
             :disabled="isTyping || isLoading"
           />
-          
+
           <!-- ✅ Bouton micro gris -->
           <button
             @click="handleVoiceMessage"
@@ -272,7 +362,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
             </svg>
           </button>
-          
+
           <!-- ✅ Bouton send couleur dynamique -->
           <button
             @click="sendMessage"
@@ -286,7 +376,7 @@
             <div v-else class="cs-mobile-loading-spinner" :style="loadingSpinnerStyle"></div>
           </button>
         </div>
-        
+
         <!-- ✅ FOOTER MOBILE CORRIGÉ -->
         <div class="cs-mobile-footer" :style="mobileFooterStyle">
           <span class="cs-mobile-powered" :style="poweredByStyle">
@@ -372,6 +462,53 @@ const messagesEndRef = ref<HTMLElement>()
 const mobileMessagesEndRef = ref<HTMLElement>()
 const mobileInput = ref<HTMLInputElement>()
 const keyboardVisible = ref(false)
+
+// ✅ ORDER FLOW STATE
+type OrderStep = 'quantity' | 'name' | 'phone' | 'address' | 'payment' | 'confirmation'
+
+interface OrderData {
+  productId?: string
+  productName: string
+  productPrice: number
+  quantity: number
+  name: string
+  phone: string
+  address: string
+  paymentMethod: string
+}
+
+const orderMode = ref(false)
+const orderStep = ref<OrderStep>('quantity')
+const orderInputValue = ref('')
+const orderData = ref<Partial<OrderData>>({})
+
+const orderPaymentMethods = ['Paiement à la livraison', 'Mobile Money', 'Virement bancaire']
+
+const ORDER_STEPS: OrderStep[] = ['quantity', 'name', 'phone', 'address', 'payment', 'confirmation']
+
+const orderStepLabel = computed(() => {
+  const labels: Record<OrderStep, string> = {
+    quantity: '🛍️ Quantité souhaitée',
+    name: '👤 Votre nom',
+    phone: '📞 Votre téléphone',
+    address: '📍 Adresse de livraison',
+    payment: '💳 Mode de paiement',
+    confirmation: '✅ Confirmer la commande'
+  }
+  return labels[orderStep.value]
+})
+
+const orderInputPlaceholder = computed(() => {
+  const placeholders: Record<OrderStep, string> = {
+    quantity: '',
+    name: 'Prénom et nom...',
+    phone: '+221 77 000 00 00',
+    address: 'Quartier, Ville...',
+    payment: '',
+    confirmation: ''
+  }
+  return placeholders[orderStep.value]
+})
 
 // ✅ RESTAURÉ : SYSTÈME DE PERSISTANCE CONVERSATION
 const conversationHistory: Map<string, any> = new Map()
@@ -1348,13 +1485,188 @@ const handleVoiceMessage = () => {
 
 const handleProductClick = (productId: string) => {
   console.log('🛍️ Clic sur produit:', productId)
-  // Analytics: Track product click
   if (typeof window !== 'undefined' && (window as any).gtag) {
     (window as any).gtag('event', 'product_click', {
       product_id: productId,
       source: 'chat_recommendation'
     })
   }
+}
+
+// ✅ DÉCLENCHÉ PAR LE BOUTON "Commander" DE PRODUCTCARD
+const handleOrderRequest = (product: { id: string; name: string; price: number; image_url?: string; url?: string }) => {
+  console.log('🛒 [ORDER] Début flow commande pour:', product.name)
+
+  orderData.value = {
+    productId: product.id,
+    productName: product.name,
+    productPrice: product.price,
+    quantity: 1
+  }
+  orderStep.value = 'quantity'
+  orderInputValue.value = ''
+  orderMode.value = true
+
+  // Message assistant qui lance le flow
+  const assistantMsg: Message = {
+    id: uuidv4(),
+    role: 'assistant',
+    content: `Super choix ! 🛍️ Combien d'exemplaires de **${product.name}** souhaitez-vous commander ?`,
+    timestamp: new Date()
+  }
+  messages.value.push(assistantMsg)
+  nextTick(() => scrollToBottom())
+}
+
+// ✅ SOUMISSION D'UNE ÉTAPE
+const submitOrderStep = async (value: string) => {
+  if (!value?.toString().trim()) return
+
+  const val = value.toString().trim()
+  orderInputValue.value = ''
+
+  // Afficher le choix de l'utilisateur comme message
+  const userMsg: Message = {
+    id: uuidv4(),
+    role: 'user',
+    content: val,
+    timestamp: new Date()
+  }
+  messages.value.push(userMsg)
+
+  // Sauvegarder la valeur selon l'étape
+  const step = orderStep.value
+  if (step === 'quantity') {
+    orderData.value.quantity = parseInt(val) || 1
+  } else if (step === 'name') {
+    orderData.value.name = val
+  } else if (step === 'phone') {
+    orderData.value.phone = val
+  } else if (step === 'address') {
+    orderData.value.address = val
+  } else if (step === 'payment') {
+    orderData.value.paymentMethod = val
+  }
+
+  // Avancer au step suivant
+  const currentIndex = ORDER_STEPS.indexOf(step)
+  const nextStep = ORDER_STEPS[currentIndex + 1] as OrderStep
+  orderStep.value = nextStep
+
+  // Message assistant pour le step suivant
+  let nextQuestion = ''
+  if (nextStep === 'name') {
+    nextQuestion = `Parfait ! Quel est votre nom complet ?`
+  } else if (nextStep === 'phone') {
+    nextQuestion = `Merci ${orderData.value.name?.split(' ')[0] || ''} ! Quel est votre numéro de téléphone ?`
+  } else if (nextStep === 'address') {
+    nextQuestion = `À quelle adresse souhaitez-vous être livré(e) ?`
+  } else if (nextStep === 'payment') {
+    nextQuestion = `Quel mode de paiement préférez-vous ?`
+  } else if (nextStep === 'confirmation') {
+    const total = (orderData.value.productPrice || 0) * (orderData.value.quantity || 1)
+    nextQuestion = `📋 **Récapitulatif de votre commande :**\n\n• **${orderData.value.productName}** × ${orderData.value.quantity} — ${total.toLocaleString('fr-FR')} FCFA\n• 👤 ${orderData.value.name}\n• 📞 ${orderData.value.phone}\n• 📍 ${orderData.value.address || 'Non renseigné'}\n• 💳 ${orderData.value.paymentMethod}\n\nTout est correct ?`
+  }
+
+  if (nextQuestion) {
+    const assistantMsg: Message = {
+      id: uuidv4(),
+      role: 'assistant',
+      content: nextQuestion,
+      timestamp: new Date()
+    }
+    messages.value.push(assistantMsg)
+  }
+
+  await nextTick()
+  scrollToBottom()
+}
+
+// ✅ CONFIRMER ET ENVOYER LA COMMANDE
+const completeOrder = async () => {
+  if (isLoading.value) return
+  isLoading.value = true
+
+  try {
+    const apiUrl = configData.value.apiUrl || 'https://chatseller-api-production.up.railway.app'
+    const response = await fetch(`${apiUrl}/api/v1/public/orders/complete`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      mode: 'cors',
+      credentials: 'omit',
+      body: JSON.stringify({
+        shopId: configData.value.shopId,
+        conversationId: conversationId.value,
+        customerName: orderData.value.name,
+        customerPhone: orderData.value.phone,
+        customerAddress: orderData.value.address,
+        paymentMethod: orderData.value.paymentMethod,
+        productId: orderData.value.productId,
+        productName: orderData.value.productName,
+        productPrice: orderData.value.productPrice,
+        quantity: orderData.value.quantity
+      })
+    })
+
+    const result = await response.json()
+
+    if (result.success) {
+      const confirmMsg: Message = {
+        id: uuidv4(),
+        role: 'assistant',
+        content: result.data.message || '🎉 **Commande confirmée !** Nous vous contacterons très bientôt.',
+        timestamp: new Date()
+      }
+      messages.value.push(confirmMsg)
+      console.log('✅ [ORDER] Commande créée:', result.data.orderId)
+
+      // Analytics
+      if (typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', 'purchase', {
+          transaction_id: result.data.orderId,
+          value: (orderData.value.productPrice || 0) * (orderData.value.quantity || 1),
+          currency: 'XOF',
+          items: [{ item_id: orderData.value.productId, item_name: orderData.value.productName, quantity: orderData.value.quantity }]
+        })
+      }
+    } else {
+      throw new Error(result.error || 'Erreur inconnue')
+    }
+  } catch (err: any) {
+    console.error('❌ [ORDER] Erreur completeOrder:', err.message)
+    const errMsg: Message = {
+      id: uuidv4(),
+      role: 'assistant',
+      content: 'Désolée, une erreur s\'est produite lors de la validation de votre commande. Veuillez réessayer ou nous contacter directement.',
+      timestamp: new Date()
+    }
+    messages.value.push(errMsg)
+  } finally {
+    isLoading.value = false
+    orderMode.value = false
+    orderStep.value = 'quantity'
+    orderData.value = {}
+    await nextTick()
+    scrollToBottom()
+  }
+}
+
+// ✅ ANNULER LA COMMANDE EN COURS
+const cancelOrder = () => {
+  orderMode.value = false
+  orderStep.value = 'quantity'
+  orderInputValue.value = ''
+  orderData.value = {}
+
+  const cancelMsg: Message = {
+    id: uuidv4(),
+    role: 'assistant',
+    content: 'Commande annulée. N\'hésitez pas si vous avez d\'autres questions ! 😊',
+    timestamp: new Date()
+  }
+  messages.value.push(cancelMsg)
+  nextTick(() => scrollToBottom())
+  console.log('🚫 [ORDER] Commande annulée par l\'utilisateur')
 }
 
 const resetChat = () => {
@@ -1946,4 +2258,143 @@ onMounted(() => {
 .cs-mobile-dot:nth-child(1) { animation-delay: 0s; }
 .cs-mobile-dot:nth-child(2) { animation-delay: 0.2s; }
 .cs-mobile-dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* ✅ ORDER FLOW STYLES */
+.cs-order-flow {
+  padding: 12px 16px 8px;
+  border-top: 1px solid #e5e7eb;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cs-order-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cs-order-step-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.cs-order-cancel-btn {
+  font-size: 12px;
+  color: #9ca3af;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: inherit;
+  transition: color 0.2s;
+}
+.cs-order-cancel-btn:hover { color: #ef4444; }
+
+.cs-order-qty-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cs-order-qty-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.cs-order-qty-btn {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.cs-order-qty-btn:hover { opacity: 0.8; }
+
+.cs-order-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.cs-order-text-input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  color: #1f2937;
+  background: white;
+  transition: border-color 0.2s;
+}
+.cs-order-text-input:focus { border-color: #8B5CF6; }
+
+.cs-order-submit {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  font-family: inherit;
+}
+.cs-order-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+.cs-order-submit:not(:disabled):hover { opacity: 0.85; }
+
+.cs-order-payment-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cs-order-payment-btn {
+  padding: 10px 14px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  background: white;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.cs-order-payment-btn:hover {
+  border-color: #8B5CF6;
+  background: #f5f3ff;
+  color: #6D28D9;
+}
+
+.cs-order-confirm-section {
+  padding: 4px 0;
+}
+
+.cs-order-confirm-btn {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  font-family: inherit;
+}
+.cs-order-confirm-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.cs-order-confirm-btn:not(:disabled):hover { opacity: 0.9; }
 </style>

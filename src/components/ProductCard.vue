@@ -33,21 +33,26 @@
           {{ formattedPrice }}
         </div>
 
-        <a
-          v-if="product.url"
-          :href="product.url"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="product-cta"
-          @click="handleClick"
-        >
-          Voir le produit
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="external-icon">
-            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-            <polyline points="15 3 21 3 21 9"></polyline>
-            <line x1="10" y1="14" x2="21" y2="3"></line>
-          </svg>
-        </a>
+        <div class="product-actions">
+          <a
+            v-if="product.url"
+            :href="product.url"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="product-cta"
+            @click="handleClick"
+          >
+            Voir
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="external-icon">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+          </a>
+          <button class="product-order-btn" @click.prevent="handleOrder">
+            Commander
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -72,6 +77,7 @@ const props = defineProps<ProductCardProps>()
 
 const emit = defineEmits<{
   click: [productId: string]
+  order: [product: ProductCardProps['product']]
 }>()
 
 // Tronquer la description si trop longue
@@ -104,10 +110,16 @@ const handleImageError = (event: Event) => {
   }
 }
 
-// Gérer le clic sur le CTA
+// Gérer le clic sur le CTA "Voir"
 const handleClick = () => {
   emit('click', props.product.id)
   console.log('🛒 Clic produit:', props.product.name)
+}
+
+// Gérer le clic sur "Commander"
+const handleOrder = () => {
+  emit('order', props.product)
+  console.log('🛒 Commander:', props.product.name)
 }
 </script>
 
@@ -204,6 +216,12 @@ const handleClick = () => {
   gap: 12px;
 }
 
+.product-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
 .product-price {
   font-size: 18px;
   font-weight: 700;
@@ -234,6 +252,33 @@ const handleClick = () => {
 }
 
 .product-cta:active {
+  transform: translateY(0);
+}
+
+.product-order-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 16px;
+  background: transparent;
+  color: #10b981;
+  border: 2px solid #10b981;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.product-order-btn:hover {
+  background: #10b981;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.product-order-btn:active {
   transform: translateY(0);
 }
 
@@ -271,7 +316,12 @@ const handleClick = () => {
   }
 
   .product-cta {
-    padding: 8px 14px;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .product-order-btn {
+    padding: 8px 12px;
     font-size: 13px;
   }
 }
