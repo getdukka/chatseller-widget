@@ -139,7 +139,7 @@
         <!-- ✅ INPUT TOUJOURS VISIBLE (change de comportement en mode checkout) -->
         <div class="cs-input-container" :style="inputContainerStyle">
           <input
-            v-model="orderMode ? orderInputValue : currentMessage"
+            v-model="activeInputValue"
             @keypress.enter="orderMode ? submitOrderStep(orderInputValue) : sendMessage()"
             :placeholder="orderMode ? orderInputPlaceholder : inputPlaceholder"
             :type="orderMode && orderStep === 'phone' ? 'tel' : 'text'"
@@ -315,7 +315,7 @@
         <div class="cs-mobile-input-container" :style="mobileInputContainerStyle">
           <input
             ref="mobileInput"
-            v-model="orderMode ? orderInputValue : currentMessage"
+            v-model="activeInputValue"
             @keypress.enter="orderMode ? submitOrderStep(orderInputValue) : sendMessage()"
             @focus="handleMobileInputFocus"
             @blur="handleMobileInputBlur"
@@ -450,6 +450,18 @@ type OrderStep = 'name' | 'phone' | 'address' | 'payment' | 'confirmation'
 const orderMode = ref(false)
 const orderStep = ref<OrderStep>('name')
 const orderInputValue = ref('')
+
+// Writable computed pour le v-model de l'input (ternary v-model ne fonctionne pas en Vue)
+const activeInputValue = computed({
+  get: () => orderMode.value ? orderInputValue.value : currentMessage.value,
+  set: (val: string) => {
+    if (orderMode.value) {
+      orderInputValue.value = val
+    } else {
+      currentMessage.value = val
+    }
+  }
+})
 
 interface CheckoutData {
   name: string
