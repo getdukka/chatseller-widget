@@ -68,17 +68,17 @@
                 <div class="cs-agent-name-in-bubble" :style="agentNameInBubbleStyle">{{ agentName }}</div>
                 <div class="cs-agent-title-in-bubble" :style="agentTitleInBubbleStyle">{{ agentTitle }}</div>
 
-                <!-- ✅ CARTE PRODUIT SI content_type === 'product_card' -->
+                <!-- ✅ MESSAGE TEXTE EN PREMIER -->
+                <div v-if="message.content" v-html="formatMessage(message.content)"></div>
+
+                <!-- ✅ CARTE PRODUIT APRÈS LE TEXTE -->
                 <ProductCard
                   v-if="message.content_type === 'product_card' && message.product_card"
                   :product="message.product_card"
                   @click="handleProductClick"
                   @order="handleOrderRequest"
-                  style="margin: 8px 0;"
+                  style="margin: 12px 0 4px 0;"
                 />
-
-                <!-- ✅ MESSAGE TEXTE (avec ou sans carte produit) -->
-                <div v-if="message.content" v-html="formatMessage(message.content)"></div>
 
                 <div class="cs-message-time" :style="messageTimeStyle">{{ formatTime(message.timestamp) }}</div>
               </div>
@@ -255,17 +255,17 @@
                 <div class="cs-agent-name-in-bubble" :style="agentNameInBubbleStyle">{{ agentName }}</div>
                 <div class="cs-agent-title-in-bubble" :style="agentTitleInBubbleStyle">{{ agentTitle }}</div>
 
-                <!-- ✅ CARTE PRODUIT SI content_type === 'product_card' -->
+                <!-- ✅ MESSAGE TEXTE EN PREMIER -->
+                <div v-if="message.content" v-html="formatMessage(message.content)"></div>
+
+                <!-- ✅ CARTE PRODUIT APRÈS LE TEXTE -->
                 <ProductCard
                   v-if="message.content_type === 'product_card' && message.product_card"
                   :product="message.product_card"
                   @click="handleProductClick"
                   @order="handleOrderRequest"
-                  style="margin: 8px 0;"
+                  style="margin: 12px 0 4px 0;"
                 />
-
-                <!-- ✅ MESSAGE TEXTE (avec ou sans carte produit) -->
-                <div v-if="message.content" v-html="formatMessage(message.content)"></div>
 
                 <div class="cs-mobile-message-time" :style="messageTimeStyle">{{ formatTime(message.timestamp) }}</div>
               </div>
