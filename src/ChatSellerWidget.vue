@@ -117,52 +117,40 @@
       <!-- ✅ INPUT SECTION -->
       <div class="cs-input-section-desktop" :style="inputSectionStyle">
 
-        <!-- ✅ CHECKOUT FLOW (collecte infos client) -->
-        <div v-if="orderMode" class="cs-order-flow">
-          <div class="cs-order-header">
-            <span class="cs-order-step-label">{{ orderStepLabel }}</span>
-            <button class="cs-order-cancel-btn" @click="cancelOrder">✕ Annuler</button>
-          </div>
-
-          <!-- Paiement : boutons radio -->
-          <div v-if="orderStep === 'payment'" class="cs-order-payment-section">
-            <button v-for="m in orderPaymentMethods" :key="m" class="cs-order-payment-btn" @click="submitOrderStep(m)">{{ m }}</button>
-          </div>
-
-          <!-- Confirmation -->
-          <div v-else-if="orderStep === 'confirmation'" class="cs-order-confirm-section">
-            <button class="cs-order-confirm-btn" :style="{ background: primaryColor }" @click="completeOrder" :disabled="isLoading">
-              <span v-if="!isLoading">✅ Confirmer ma commande</span>
-              <span v-else>⏳ Envoi en cours...</span>
-            </button>
-          </div>
-
-          <!-- Texte libre (name, phone, address) -->
-          <div v-else class="cs-order-input-row">
-            <input
-              :type="orderStep === 'phone' ? 'tel' : 'text'"
-              v-model="orderInputValue"
-              :placeholder="orderInputPlaceholder"
-              class="cs-order-text-input"
-              @keypress.enter="submitOrderStep(orderInputValue)"
-            />
-            <button class="cs-order-submit" :style="{ background: primaryColor }" @click="submitOrderStep(orderInputValue)" :disabled="!orderInputValue?.trim()">→</button>
-          </div>
+        <!-- ✅ CHECKOUT CONTEXT BAR (au-dessus de l'input pendant le checkout) -->
+        <div v-if="orderMode" class="cs-order-context-bar">
+          <span class="cs-order-step-label">{{ orderStepLabel }}</span>
+          <button class="cs-order-cancel-btn" @click="cancelOrder">✕ Annuler</button>
         </div>
 
-        <!-- ✅ INPUT CLASSIQUE -->
-        <div v-else class="cs-input-container" :style="inputContainerStyle">
+        <!-- Paiement : boutons au-dessus de l'input -->
+        <div v-if="orderMode && orderStep === 'payment'" class="cs-order-payment-section">
+          <button v-for="m in orderPaymentMethods" :key="m" class="cs-order-payment-btn" @click="submitOrderStep(m)">{{ m }}</button>
+        </div>
+
+        <!-- Confirmation : bouton au-dessus de l'input -->
+        <div v-if="orderMode && orderStep === 'confirmation'" class="cs-order-confirm-section">
+          <button class="cs-order-confirm-btn" :style="{ background: primaryColor }" @click="completeOrder" :disabled="isLoading">
+            <span v-if="!isLoading">Confirmer ma commande</span>
+            <span v-else>Envoi en cours...</span>
+          </button>
+        </div>
+
+        <!-- ✅ INPUT TOUJOURS VISIBLE (change de comportement en mode checkout) -->
+        <div class="cs-input-container" :style="inputContainerStyle">
           <input
-            v-model="currentMessage"
-            @keypress.enter="sendMessage"
-            :placeholder="inputPlaceholder"
+            v-model="orderMode ? orderInputValue : currentMessage"
+            @keypress.enter="orderMode ? submitOrderStep(orderInputValue) : sendMessage()"
+            :placeholder="orderMode ? orderInputPlaceholder : inputPlaceholder"
+            :type="orderMode && orderStep === 'phone' ? 'tel' : 'text'"
             class="cs-message-input"
             :style="messageInputStyle"
-            :disabled="isTyping || isLoading"
+            :disabled="isTyping || isLoading || (orderMode && (orderStep === 'payment' || orderStep === 'confirmation'))"
           />
 
           <!-- ✅ BOUTON MICRO EN GRIS -->
           <button
+            v-if="!orderMode"
             @click="handleVoiceMessage"
             class="cs-voice-button"
             :style="voiceButtonStyle"
@@ -175,8 +163,8 @@
 
           <!-- ✅ BOUTON SEND COULEUR DYNAMIQUE -->
           <button
-            @click="sendMessage"
-            :disabled="!currentMessage.trim() || isTyping || isLoading"
+            @click="orderMode ? submitOrderStep(orderInputValue) : sendMessage()"
+            :disabled="orderMode ? !orderInputValue?.trim() : (!currentMessage.trim() || isTyping || isLoading)"
             class="cs-send-button"
             :style="sendButtonStyle"
           >
@@ -304,52 +292,43 @@
       <!-- ✅ Input Mobile avec gestion clavier CORRIGÉE -->
       <div class="cs-mobile-input-section" :style="mobileInputSectionStyle">
 
-        <!-- ✅ CHECKOUT FLOW MOBILE -->
-        <div v-if="orderMode" class="cs-order-flow">
-          <div class="cs-order-header">
-            <span class="cs-order-step-label">{{ orderStepLabel }}</span>
-            <button class="cs-order-cancel-btn" @click="cancelOrder">✕ Annuler</button>
-          </div>
-
-          <div v-if="orderStep === 'payment'" class="cs-order-payment-section">
-            <button v-for="m in orderPaymentMethods" :key="m" class="cs-order-payment-btn" @click="submitOrderStep(m)">{{ m }}</button>
-          </div>
-
-          <div v-else-if="orderStep === 'confirmation'" class="cs-order-confirm-section">
-            <button class="cs-order-confirm-btn" :style="{ background: primaryColor }" @click="completeOrder" :disabled="isLoading">
-              <span v-if="!isLoading">✅ Confirmer ma commande</span>
-              <span v-else>⏳ Envoi en cours...</span>
-            </button>
-          </div>
-
-          <div v-else class="cs-order-input-row">
-            <input
-              :type="orderStep === 'phone' ? 'tel' : 'text'"
-              v-model="orderInputValue"
-              :placeholder="orderInputPlaceholder"
-              class="cs-order-text-input"
-              @keypress.enter="submitOrderStep(orderInputValue)"
-            />
-            <button class="cs-order-submit" :style="{ background: primaryColor }" @click="submitOrderStep(orderInputValue)" :disabled="!orderInputValue?.trim()">→</button>
-          </div>
+        <!-- ✅ CHECKOUT CONTEXT BAR MOBILE -->
+        <div v-if="orderMode" class="cs-order-context-bar">
+          <span class="cs-order-step-label">{{ orderStepLabel }}</span>
+          <button class="cs-order-cancel-btn" @click="cancelOrder">✕ Annuler</button>
         </div>
 
-        <!-- ✅ INPUT CLASSIQUE MOBILE -->
-        <div v-else class="cs-mobile-input-container" :style="mobileInputContainerStyle">
+        <!-- Paiement : boutons au-dessus de l'input -->
+        <div v-if="orderMode && orderStep === 'payment'" class="cs-order-payment-section">
+          <button v-for="m in orderPaymentMethods" :key="m" class="cs-order-payment-btn" @click="submitOrderStep(m)">{{ m }}</button>
+        </div>
+
+        <!-- Confirmation : bouton au-dessus de l'input -->
+        <div v-if="orderMode && orderStep === 'confirmation'" class="cs-order-confirm-section">
+          <button class="cs-order-confirm-btn" :style="{ background: primaryColor }" @click="completeOrder" :disabled="isLoading">
+            <span v-if="!isLoading">Confirmer ma commande</span>
+            <span v-else>Envoi en cours...</span>
+          </button>
+        </div>
+
+        <!-- ✅ INPUT TOUJOURS VISIBLE MOBILE -->
+        <div class="cs-mobile-input-container" :style="mobileInputContainerStyle">
           <input
             ref="mobileInput"
-            v-model="currentMessage"
-            @keypress.enter="sendMessage"
+            v-model="orderMode ? orderInputValue : currentMessage"
+            @keypress.enter="orderMode ? submitOrderStep(orderInputValue) : sendMessage()"
             @focus="handleMobileInputFocus"
             @blur="handleMobileInputBlur"
-            :placeholder="inputPlaceholder"
+            :placeholder="orderMode ? orderInputPlaceholder : inputPlaceholder"
+            :type="orderMode && orderStep === 'phone' ? 'tel' : 'text'"
             class="cs-mobile-message-input"
             :style="messageInputStyle"
-            :disabled="isTyping || isLoading"
+            :disabled="isTyping || isLoading || (orderMode && (orderStep === 'payment' || orderStep === 'confirmation'))"
           />
 
-          <!-- ✅ Bouton micro gris -->
+          <!-- ✅ Bouton micro gris (masqué en mode checkout) -->
           <button
+            v-if="!orderMode"
             @click="handleVoiceMessage"
             class="cs-mobile-voice"
             :style="voiceButtonStyle"
@@ -362,8 +341,8 @@
 
           <!-- ✅ Bouton send couleur dynamique -->
           <button
-            @click="sendMessage"
-            :disabled="!currentMessage.trim() || isTyping"
+            @click="orderMode ? submitOrderStep(orderInputValue) : sendMessage()"
+            :disabled="orderMode ? !orderInputValue?.trim() : (!currentMessage.trim() || isTyping)"
             class="cs-mobile-send"
             :style="sendButtonStyle"
           >
@@ -2382,19 +2361,13 @@ onMounted(() => {
 .cs-mobile-dot:nth-child(3) { animation-delay: 0.4s; }
 
 /* ✅ ORDER FLOW STYLES */
-.cs-order-flow {
-  padding: 12px 16px 8px;
-  border-top: 1px solid #e5e7eb;
-  background: #fafafa;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.cs-order-header {
+.cs-order-context-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 8px 16px;
+  background: #f0fdf4;
+  border-top: 1px solid #d1fae5;
 }
 
 .cs-order-step-label {
@@ -2480,6 +2453,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  padding: 8px 16px;
 }
 
 .cs-order-payment-btn {
@@ -2502,7 +2476,7 @@ onMounted(() => {
 }
 
 .cs-order-confirm-section {
-  padding: 4px 0;
+  padding: 4px 16px;
 }
 
 .cs-order-confirm-btn {
