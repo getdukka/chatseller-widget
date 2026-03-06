@@ -1,15 +1,16 @@
 <template>
   <div class="product-card">
-    <div class="product-image-container">
+    <div class="product-image-container" style="position:relative;width:100%;height:180px;background:linear-gradient(135deg,#f5f7fa 0%,#e9ecef 100%);overflow:hidden;max-height:180px;">
       <img
         v-if="product.image_url"
         :src="product.image_url"
         :alt="product.name"
         class="product-image"
+        style="width:100%;height:100%;object-fit:cover;max-width:100%;max-height:180px;display:block;"
         @error="handleImageError"
       />
-      <div v-else class="product-image-placeholder">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <div v-else class="product-image-placeholder" style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:#9ca3af;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="64" height="64" style="width:64px;height:64px;opacity:0.5;flex-shrink:0;">
           <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
           <circle cx="8.5" cy="8.5" r="1.5"></circle>
           <polyline points="21 15 16 10 5 21"></polyline>
@@ -43,7 +44,7 @@
             @click="handleClick"
           >
             Voir
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="external-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="external-icon" width="16" height="16" style="width:16px;height:16px;flex-shrink:0;">
               <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
               <polyline points="15 3 21 3 21 9"></polyline>
               <line x1="10" y1="14" x2="21" y2="3"></line>
