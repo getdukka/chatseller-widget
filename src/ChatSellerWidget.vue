@@ -118,19 +118,28 @@
       <div class="cs-input-section-desktop" :style="inputSectionStyle">
 
         <!-- ✅ CHECKOUT CONTEXT BAR (au-dessus de l'input pendant le checkout) -->
-        <div v-if="orderMode" class="cs-order-context-bar">
-          <span class="cs-order-step-label">{{ orderStepLabel }}</span>
-          <button class="cs-order-cancel-btn" @click="cancelOrder">✕ Annuler</button>
+        <div v-if="orderMode" style="display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:#f0fdf4;border-top:1px solid #d1fae5;">
+          <span style="font-size:13px;font-weight:600;color:#374151;font-family:inherit;">{{ orderStepLabel }}</span>
+          <button @click="cancelOrder" style="font-size:12px;color:#9ca3af;background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:4px;font-family:inherit;">✕ Annuler</button>
         </div>
 
         <!-- Paiement : boutons au-dessus de l'input -->
-        <div v-if="orderMode && orderStep === 'payment'" class="cs-order-payment-section">
-          <button v-for="m in orderPaymentMethods" :key="m" class="cs-order-payment-btn" @click="submitOrderStep(m)">{{ m }}</button>
+        <div v-if="orderMode && orderStep === 'payment'" style="display:flex;flex-direction:column;gap:6px;padding:8px 16px;">
+          <button
+            v-for="m in orderPaymentMethods"
+            :key="m"
+            @click="submitOrderStep(m)"
+            style="padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:8px;background:white;font-size:13px;font-weight:500;color:#374151;cursor:pointer;text-align:left;font-family:inherit;line-height:1.3;"
+          >{{ m }}</button>
         </div>
 
         <!-- Confirmation : bouton au-dessus de l'input -->
-        <div v-if="orderMode && orderStep === 'confirmation'" class="cs-order-confirm-section">
-          <button class="cs-order-confirm-btn" :style="{ background: primaryColor }" @click="completeOrder" :disabled="isLoading">
+        <div v-if="orderMode && orderStep === 'confirmation'" style="padding:4px 16px;">
+          <button
+            :style="{ width:'100%', padding:'13px', border:'none', borderRadius:'10px', background: primaryColor, color:'white', fontSize:'15px', fontWeight:'600', cursor:'pointer', fontFamily:'inherit', opacity: isLoading ? '0.6' : '1', lineHeight:'1' }"
+            @click="completeOrder"
+            :disabled="isLoading"
+          >
             <span v-if="!isLoading">Confirmer ma commande</span>
             <span v-else>Envoi en cours...</span>
           </button>
@@ -293,19 +302,28 @@
       <div class="cs-mobile-input-section" :style="mobileInputSectionStyle">
 
         <!-- ✅ CHECKOUT CONTEXT BAR MOBILE -->
-        <div v-if="orderMode" class="cs-order-context-bar">
-          <span class="cs-order-step-label">{{ orderStepLabel }}</span>
-          <button class="cs-order-cancel-btn" @click="cancelOrder">✕ Annuler</button>
+        <div v-if="orderMode" style="display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:#f0fdf4;border-top:1px solid #d1fae5;">
+          <span style="font-size:13px;font-weight:600;color:#374151;font-family:inherit;">{{ orderStepLabel }}</span>
+          <button @click="cancelOrder" style="font-size:12px;color:#9ca3af;background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:4px;font-family:inherit;">✕ Annuler</button>
         </div>
 
         <!-- Paiement : boutons au-dessus de l'input -->
-        <div v-if="orderMode && orderStep === 'payment'" class="cs-order-payment-section">
-          <button v-for="m in orderPaymentMethods" :key="m" class="cs-order-payment-btn" @click="submitOrderStep(m)">{{ m }}</button>
+        <div v-if="orderMode && orderStep === 'payment'" style="display:flex;flex-direction:column;gap:6px;padding:8px 16px;">
+          <button
+            v-for="m in orderPaymentMethods"
+            :key="m"
+            @click="submitOrderStep(m)"
+            style="padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:8px;background:white;font-size:13px;font-weight:500;color:#374151;cursor:pointer;text-align:left;font-family:inherit;line-height:1.3;"
+          >{{ m }}</button>
         </div>
 
         <!-- Confirmation : bouton au-dessus de l'input -->
-        <div v-if="orderMode && orderStep === 'confirmation'" class="cs-order-confirm-section">
-          <button class="cs-order-confirm-btn" :style="{ background: primaryColor }" @click="completeOrder" :disabled="isLoading">
+        <div v-if="orderMode && orderStep === 'confirmation'" style="padding:4px 16px;">
+          <button
+            :style="{ width:'100%', padding:'13px', border:'none', borderRadius:'10px', background: primaryColor, color:'white', fontSize:'15px', fontWeight:'600', cursor:'pointer', fontFamily:'inherit', opacity: isLoading ? '0.6' : '1', lineHeight:'1' }"
+            @click="completeOrder"
+            :disabled="isLoading"
+          >
             <span v-if="!isLoading">Confirmer ma commande</span>
             <span v-else>Envoi en cours...</span>
           </button>
