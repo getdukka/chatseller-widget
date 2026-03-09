@@ -44,6 +44,7 @@ export interface ChatSellerConfig {
   debug?: boolean
   disableFallback?: boolean
   forceDisplay?: boolean
+  subscriptionExpired?: boolean
 }
 
 class ChatSeller {
@@ -104,6 +105,13 @@ class ChatSeller {
       // ✅ Charger la configuration depuis l'API AVANT d'injecter le CSS
       await this.loadConfigFromAPI()
 
+      // ✅ Ne pas afficher le widget si l'abonnement est expiré
+      if (this.config.subscriptionExpired) {
+        console.warn('🔒 [INIT] Abonnement expiré — widget non affiché')
+        this.isInitialized = false
+        return
+      }
+
       // ✅ CORRECTION : Injecter le CSS APRÈS le chargement de la config API
       // pour que les couleurs dynamiques soient correctes
       this.injectCriticalCSS()
@@ -147,6 +155,13 @@ class ChatSeller {
       const configData = await response.json()
 
       if (configData.success && configData.data) {
+        // ✅ Vérifier si l'abonnement est actif — masquer le widget si expiré
+        if (configData.data.subscriptionActive === false) {
+          console.warn('🔒 [LOAD CONFIG] Abonnement expiré — widget désactivé')
+          this.config.subscriptionExpired = true
+          return
+        }
+
         console.log('✅ [LOAD CONFIG] Configuration reçue:', {
           shopName: configData.data.shop?.name,
           agentName: configData.data.agent?.name,
