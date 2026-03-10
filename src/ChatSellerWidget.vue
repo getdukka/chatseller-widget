@@ -1,6 +1,6 @@
 <!-- src/ChatSellerWidget.vue -->
 <template>
-  <div class="cs-chatseller-widget-vue">
+  <div v-if="widgetEnabled" class="cs-chatseller-widget-vue">
     <!-- ✅ INTERFACE DESKTOP -->
     <div 
       v-if="!isMobile"
@@ -386,6 +386,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick, watch } from 'vue'
 import { v4 as uuidv4 } from 'uuid'
+
+// ✅ Cache de l'essai expiré : masque définitivement le widget si l'abonnement est inactif
+const widgetEnabled = ref(true)
 import type { CSSProperties } from 'vue'
 import ProductCard from './components/ProductCard.vue'
 import CartBanner from './components/CartBanner.vue'
@@ -1206,6 +1209,15 @@ const initConversation = async () => {
     })
 
     if (!response.ok) {
+      // ✅ Abonnement inactif / essai expiré → masquer le widget silencieusement
+      if (response.status === 403 || response.status === 402) {
+        const body = await response.json().catch(() => ({}))
+        if (body?.code === 'SUBSCRIPTION_EXPIRED' || response.status === 403) {
+          console.log('🔒 [INIT] Abonnement inactif - widget désactivé')
+          widgetEnabled.value = false
+          return
+        }
+      }
       throw new Error(`Init API Error: ${response.status}`)
     }
 
