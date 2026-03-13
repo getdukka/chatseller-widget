@@ -959,13 +959,13 @@ const messageTimeStyle = computed((): CSSProperties => ({
   fontFamily: 'inherit'
 }))
 
-// ✅ HEURE MESSAGE UTILISATEUR EN BLANC
+// ✅ HEURE MESSAGE UTILISATEUR EN BLANC (semi-transparent)
 const messageTimeUserStyle = computed((): CSSProperties => ({
   fontSize: '11px',
   color: '#FFFFFF',
   margin: '4px 0 0 0',
   textAlign: 'right',
-  opacity: '1',
+  opacity: '0.6',
   fontFamily: 'inherit'
 }))
 
