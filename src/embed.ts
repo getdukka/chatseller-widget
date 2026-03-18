@@ -1968,7 +1968,7 @@ class ChatSeller {
           cursor: pointer !important;
           transition: all 0.3s ease !important;
           box-shadow: 0 8px 25px rgba(${this.hexToRgb(primaryColor)}, 0.3) !important;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+          font-family: inherit !important;
           display: flex !important;
           align-items: center !important;
           justify-content: center !important;
