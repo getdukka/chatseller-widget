@@ -2,16 +2,16 @@
   <div
     style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);max-width:100%;margin:8px 0;font-family:inherit;"
   >
-    <!-- Image -->
-    <div style="position:relative;width:100%;height:180px;background:linear-gradient(135deg,#f5f7fa 0%,#e9ecef 100%);overflow:hidden;max-height:180px;flex-shrink:0;">
+    <!-- Image carrée (aspect-ratio 1:1) -->
+    <div style="position:relative;width:100%;padding-top:100%;background:linear-gradient(135deg,#f5f7fa 0%,#e9ecef 100%);overflow:hidden;flex-shrink:0;">
       <img
         v-if="product.image_url"
         :src="product.image_url"
         :alt="product.name"
-        style="width:100%;height:100%;object-fit:cover;max-width:100%;max-height:180px;display:block;"
+        style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block;"
         @error="handleImageError"
       />
-      <div v-else style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:#9ca3af;">
+      <div v-else style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#9ca3af;">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="64" height="64" style="width:64px;height:64px;opacity:0.5;flex-shrink:0;">
           <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
           <circle cx="8.5" cy="8.5" r="1.5"></circle>

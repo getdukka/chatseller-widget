@@ -127,10 +127,16 @@
         <div v-if="orderMode && orderStep === 'payment'" style="display:flex;flex-direction:column;gap:6px;padding:8px 16px;">
           <button
             v-for="m in orderPaymentMethods"
-            :key="m"
-            @click="submitOrderStep(m)"
-            style="padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:8px;background:white;font-size:13px;font-weight:500;color:#374151;cursor:pointer;text-align:left;font-family:inherit;line-height:1.3;"
-          >{{ m }}</button>
+            :key="m.label"
+            @click="m.enabled ? submitOrderStep(m.label) : null"
+            :disabled="!m.enabled"
+            :style="m.enabled
+              ? 'padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:8px;background:white;font-size:13px;font-weight:500;color:#374151;cursor:pointer;text-align:left;font-family:inherit;line-height:1.3;display:flex;align-items:center;justify-content:space-between;'
+              : 'padding:10px 14px;border:1.5px solid #f3f4f6;border-radius:8px;background:#f9fafb;font-size:13px;font-weight:500;color:#9ca3af;cursor:not-allowed;text-align:left;font-family:inherit;line-height:1.3;display:flex;align-items:center;justify-content:space-between;opacity:0.7;'"
+          >
+            <span>{{ m.label }}</span>
+            <span v-if="m.comingSoon" style="font-size:10px;font-weight:600;color:#6b7280;background:#e5e7eb;padding:2px 7px;border-radius:20px;white-space:nowrap;margin-left:8px;">Bientôt</span>
+          </button>
         </div>
 
         <!-- Confirmation : bouton au-dessus de l'input -->
@@ -311,10 +317,16 @@
         <div v-if="orderMode && orderStep === 'payment'" style="display:flex;flex-direction:column;gap:6px;padding:8px 16px;">
           <button
             v-for="m in orderPaymentMethods"
-            :key="m"
-            @click="submitOrderStep(m)"
-            style="padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:8px;background:white;font-size:13px;font-weight:500;color:#374151;cursor:pointer;text-align:left;font-family:inherit;line-height:1.3;"
-          >{{ m }}</button>
+            :key="m.label"
+            @click="m.enabled ? submitOrderStep(m.label) : null"
+            :disabled="!m.enabled"
+            :style="m.enabled
+              ? 'padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:8px;background:white;font-size:13px;font-weight:500;color:#374151;cursor:pointer;text-align:left;font-family:inherit;line-height:1.3;display:flex;align-items:center;justify-content:space-between;'
+              : 'padding:10px 14px;border:1.5px solid #f3f4f6;border-radius:8px;background:#f9fafb;font-size:13px;font-weight:500;color:#9ca3af;cursor:not-allowed;text-align:left;font-family:inherit;line-height:1.3;display:flex;align-items:center;justify-content:space-between;opacity:0.7;'"
+          >
+            <span>{{ m.label }}</span>
+            <span v-if="m.comingSoon" style="font-size:10px;font-weight:600;color:#6b7280;background:#e5e7eb;padding:2px 7px;border-radius:20px;white-space:nowrap;margin-left:8px;">Bientôt</span>
+          </button>
         </div>
 
         <!-- Confirmation : bouton au-dessus de l'input -->
@@ -493,7 +505,11 @@ interface CheckoutData {
 
 const checkoutData = ref<Partial<CheckoutData>>({})
 
-const orderPaymentMethods = ['Paiement à la livraison', 'Mobile Money', 'Virement bancaire']
+const orderPaymentMethods = [
+  { label: 'Payer à la livraison', enabled: true },
+  { label: 'Payer avec mon téléphone', enabled: false, comingSoon: true },
+  { label: 'Payer avec ma carte bancaire', enabled: false, comingSoon: true },
+]
 
 const ORDER_STEPS: OrderStep[] = ['name', 'phone', 'address', 'payment', 'confirmation']
 
@@ -1617,29 +1633,63 @@ const removeFromCart = (index: number) => {
   }
 }
 
+// ✅ CLÉS LOCALSTORAGE
+const CS_CUSTOMER_KEY = 'cs_customer_data'
+
+const saveCustomerToStorage = (data: Partial<CheckoutData>) => {
+  try {
+    const toSave = { name: data.name, phone: data.phone, address: data.address }
+    localStorage.setItem(CS_CUSTOMER_KEY, JSON.stringify(toSave))
+  } catch { /* localStorage peut être bloqué */ }
+}
+
+const loadCustomerFromStorage = (): Partial<CheckoutData> => {
+  try {
+    const raw = localStorage.getItem(CS_CUSTOMER_KEY)
+    return raw ? JSON.parse(raw) : {}
+  } catch { return {} }
+}
+
 // ✅ LANCER LE CHECKOUT (collecte infos client)
 const startCheckout = () => {
   if (cartItems.value.length === 0) return
 
   console.log('🛒 [CHECKOUT] Début checkout avec', cartItems.value.length, 'articles')
 
+  // Pré-remplir depuis localStorage si données connues
+  const saved = loadCustomerFromStorage()
+  const hasAllInfo = !!(saved.name && saved.phone && saved.address)
+
   orderMode.value = true
-  orderStep.value = 'name'
   orderInputValue.value = ''
-  checkoutData.value = {}
+  checkoutData.value = { ...saved }
 
   // Récapitulatif panier dans le chat
   const itemsList = cartItems.value.map(item =>
     `• **${item.name}** × ${item.quantity} — ${(item.price * item.quantity).toLocaleString('fr-FR')} FCFA`
   ).join('\n')
 
-  const assistantMsg: Message = {
-    id: uuidv4(),
-    role: 'assistant',
-    content: `Parfait ! Voici votre panier :\n\n${itemsList}\n\n**Total : ${cartTotal.value.toLocaleString('fr-FR')} FCFA**\n\nPour finaliser votre commande, j'ai besoin de quelques informations. Quel est votre nom complet ?`,
-    timestamp: new Date()
+  if (hasAllInfo) {
+    // Infos déjà connues → aller directement au paiement
+    orderStep.value = 'payment'
+    const assistantMsg: Message = {
+      id: uuidv4(),
+      role: 'assistant',
+      content: `Parfait ! Voici votre panier :\n\n${itemsList}\n\n**Total : ${cartTotal.value.toLocaleString('fr-FR')} FCFA**\n\nJe retrouve vos informations :\n• 👤 ${saved.name}\n• 📞 ${saved.phone}\n• 📍 ${saved.address}\n\nQuel mode de paiement préférez-vous ?`,
+      timestamp: new Date()
+    }
+    messages.value.push(assistantMsg)
+  } else {
+    // Première commande → collecter les infos
+    orderStep.value = 'name'
+    const assistantMsg: Message = {
+      id: uuidv4(),
+      role: 'assistant',
+      content: `Parfait ! Voici votre panier :\n\n${itemsList}\n\n**Total : ${cartTotal.value.toLocaleString('fr-FR')} FCFA**\n\nPour finaliser votre commande, j'ai besoin de quelques informations. Quel est votre nom complet ?`,
+      timestamp: new Date()
+    }
+    messages.value.push(assistantMsg)
   }
-  messages.value.push(assistantMsg)
   nextTick(() => scrollToBottom())
 }
 
@@ -1766,6 +1816,9 @@ const completeOrder = async () => {
           }))
         })
       }
+
+      // Sauvegarder les infos client pour les prochaines commandes
+      saveCustomerToStorage(checkoutData.value)
 
       // Vider le panier après commande réussie
       cartItems.value = []

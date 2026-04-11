@@ -92,9 +92,11 @@ class ChatSeller {
       return
     }
 
-    // ✅ Autoriser l'initialisation sur toutes les pages (mode flottant sur pages non-produit)
-    if (!this.isProductPage() && !this.config.forceDisplay && !this.config.floatingPosition) {
-      console.log('🚫 [INIT] Page non-produit sans forceDisplay/floatingPosition, initialisation annulée')
+    // ✅ Sur desktop (>768px), toujours initialiser : flottant sur pages non-produit
+    // Sur mobile, uniquement sur les pages produit (le flottant est caché via CSS)
+    const isDesktop = window.innerWidth > 768
+    if (!this.isProductPage() && !this.config.forceDisplay && !this.config.floatingPosition && !isDesktop) {
+      console.log('🚫 [INIT] Mobile + page non-produit : widget non affiché')
       this.isInitialized = false
       return
     }
@@ -1817,10 +1819,10 @@ class ChatSeller {
       ${position.includes('right') ? 'right: 20px !important;' : 'left: 20px !important;'}
       bottom: 90px !important;
       z-index: 2147483647 !important;
-      width: 60px !important;
-      height: 60px !important;
-      min-width: 60px !important;
-      min-height: 60px !important;
+      width: 64px !important;
+      height: 64px !important;
+      min-width: 64px !important;
+      min-height: 64px !important;
       display: block !important;
       visibility: visible !important;
       opacity: 1 !important;
@@ -1923,6 +1925,7 @@ class ChatSeller {
       styleEl.textContent = `
         .cs-floating-btn:hover { transform: scale(1.1) !important; }
         .cs-floating-btn:hover .cs-tip { opacity: 1 !important; }
+        @media (max-width: 768px) { .cs-floating-widget { display: none !important; } }
       `
       document.head.appendChild(styleEl)
     }
@@ -1930,7 +1933,7 @@ class ChatSeller {
     // ✅ CRÉER LE BOUTON DIRECTEMENT VIA DOM (pas innerHTML)
     const btn = document.createElement('div')
     btn.className = 'cs-floating-btn'
-    btn.style.cssText = `width:60px;height:60px;background:linear-gradient(135deg,${primaryColor} 0%,${darkerColor} 100%);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 25px rgba(${rgbColor},0.4);transition:all 0.3s ease;position:relative;`
+    btn.style.cssText = `width:64px;height:64px;background:linear-gradient(135deg,${primaryColor} 0%,${darkerColor} 100%);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 30px rgba(${rgbColor},0.5),0 2px 8px rgba(0,0,0,0.15);transition:all 0.3s ease;position:relative;`
     btn.onclick = () => {
       if ((window as any).ChatSeller?.show) (window as any).ChatSeller.show()
       else if ((window as any).ChatSeller?.open) (window as any).ChatSeller.open()
