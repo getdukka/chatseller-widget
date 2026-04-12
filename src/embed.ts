@@ -147,7 +147,22 @@ class ChatSeller {
 
       console.log('🔄 [LOAD CONFIG] Chargement configuration depuis:', configUrl)
 
-      const response = await fetch(configUrl)
+      // ✅ Timeout 4s — évite de bloquer l'affichage du widget sur cold start Railway
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => {
+        controller.abort()
+        console.warn('⏱️ [LOAD CONFIG] Timeout 4s dépassé — affichage avec config locale')
+      }, 4000)
+
+      let response: Response
+      try {
+        response = await fetch(configUrl, { signal: controller.signal })
+      } catch (err: any) {
+        clearTimeout(timeoutId)
+        if (err.name === 'AbortError') return // timeout → affichage avec config locale
+        throw err
+      }
+      clearTimeout(timeoutId)
 
       if (!response.ok) {
         console.warn('⚠️ [LOAD CONFIG] Erreur API:', response.status, '- utilisation config locale')
@@ -1534,67 +1549,15 @@ class ChatSeller {
     this.renderWidget()
   }
 
-  // ✅ NOUVELLE MÉTHODE : Détection type de page améliorée
+  // Détection type de page : produit → widget inline, tout le reste → bouton flottant
   private detectPageType(): 'product' | 'category' | 'home' | 'other' {
     try {
-      // ✅ PRIORITÉ 1 : Si floatingPosition est configuré ET pas de CTA produit réel, mode flottant
-      if (this.config.floatingPosition) {
-        // Vérifie s'il y a un VRAI CTA de produit (pas juste un bouton quelconque)
-        const realProductCTA = document.querySelector(
-          'form[action*="/cart/add"] button, ' +
-          '.product-form button[type="submit"], ' +
-          'button[name="add"], ' +
-          '.add-to-cart, ' +
-          '.shopify-payment-button'
-        )
-        if (!realProductCTA) {
-          console.log('💬 [DETECT] floatingPosition configuré + pas de CTA produit = mode flottant')
-          return 'other'
-        }
+      if (!this.isProductPage()) {
+        console.log('📄 [DETECT] Page non-produit → flottant')
+        return 'other'
       }
-
-      // ✅ PRIORITÉ 2 : DÉTECTION PAGE PRODUIT
-      if (this.isProductPage()) {
-        console.log('🛍️ [DETECT] Page produit détectée')
-        return 'product'
-      }
-
-      // ✅ MODE FORCE : Traiter comme page produit si forceDisplay activé ET CTA présent
-      if (this.config.forceDisplay && document.querySelector('.cta-button, button[class*="add"], button[class*="buy"]')) {
-        console.log('🚧 [FORCE] Mode forceDisplay: traitement comme page produit')
-        return 'product'
-      }
-      
-      // ✅ DÉTECTION PAGE CATÉGORIE/COLLECTION
-      const categoryIndicators = [
-        () => window.location.pathname.includes('/collections/'),
-        () => window.location.pathname.includes('/category/'),
-        () => window.location.pathname.includes('/catalog/'),
-        () => document.querySelector('.collection-header, .category-header, .products-grid'),
-        () => document.querySelector('[class*="collection"], [class*="category"]')
-      ]
-      
-      if (categoryIndicators.some(indicator => {
-        try { return indicator() } catch { return false }
-      })) {
-        return 'category'
-      }
-      
-      // ✅ DÉTECTION PAGE D'ACCUEIL
-      const homeIndicators = [
-        () => window.location.pathname === '/' || window.location.pathname === '/index.html',
-        () => document.querySelector('.homepage, .home-banner, .hero-section'),
-        () => document.querySelector('[class*="home"], [class*="hero"]')
-      ]
-      
-      if (homeIndicators.some(indicator => {
-        try { return indicator() } catch { return false }
-      })) {
-        return 'home'
-      }
-      
-      return 'other'
-      
+      console.log('🛍️ [DETECT] Page produit détectée')
+      return 'product'
     } catch (error) {
       console.warn('⚠️ Erreur détection type page:', error)
       return 'other'
@@ -1808,9 +1771,15 @@ class ChatSeller {
 
   // ✅ MÉTHODE AMÉLIORÉE : Widget flottant
   private insertFloatingWidget(container: HTMLElement, isVisible: boolean = false): void {
-    console.log('💬 [FLOATING] Insertion widget flottant')
+    // ✅ Desktop uniquement — masquer sur mobile via JS (plus fiable que media query avec inline styles)
+    const isMobile = window.innerWidth <= 768
+    if (isMobile) {
+      console.log('📱 [FLOATING] Mobile détecté — bouton flottant non affiché')
+      return
+    }
 
-    // ✅ STYLES FLOTTANT - FORCER VISIBILITÉ MAXIMALE
+    console.log('💬 [FLOATING] Insertion widget flottant desktop')
+
     const position = this.config.floatingPosition || 'bottom-right'
 
     container.className = 'cs-chatseller-widget cs-floating-widget'
@@ -1834,7 +1803,7 @@ class ChatSeller {
 
     // ✅ INSÉRER À LA FIN DU BODY
     document.body.appendChild(container)
-    console.log('✅ Widget flottant beauté inséré avec styles forcés')
+    console.log('✅ Widget flottant inséré en bas-droite (desktop)')
   }
 
   // ✅ NOUVELLE MÉTHODE : Container beauté spécialisé

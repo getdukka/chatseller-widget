@@ -1086,9 +1086,9 @@ const messageInputStyle = computed((): CSSProperties => ({
   margin: '0'
 }))
 
-// ✅ BOUTON MICRO EN GRIS
+// ✅ BOUTON MICRO — pulse rouge quand écoute active
 const voiceButtonStyle = computed((): CSSProperties => ({
-  background: '#6B7280',
+  background: isListening.value ? '#ef4444' : '#6B7280',
   border: 'none',
   color: '#ffffff',
   cursor: 'pointer',
@@ -1101,7 +1101,8 @@ const voiceButtonStyle = computed((): CSSProperties => ({
   justifyContent: 'center',
   transition: 'all 0.2s ease',
   margin: '0',
-  outline: 'none'
+  outline: 'none',
+  animation: isListening.value ? 'cs-pulse 1s infinite' : 'none'
 }))
 
 // ✅ BOUTON SEND AVEC COULEUR DYNAMIQUE
@@ -1527,9 +1528,67 @@ const sendMessage = async () => {
   }
 }
 
+// ✅ VOICE — Web Speech API (SpeechRecognition)
+const isListening = ref(false)
+
 const handleVoiceMessage = () => {
-  console.log('🎤 Message vocal demandé')
-  alert('Fonctionnalité vocale bientôt disponible !')
+  const SpeechRecognition =
+    (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+
+  if (!SpeechRecognition) {
+    // Navigateur non compatible (très rare en 2026, surtout Safari desktop)
+    const msg: Message = {
+      id: uuidv4(),
+      role: 'assistant',
+      content: 'Votre navigateur ne prend pas en charge la reconnaissance vocale. Essayez Chrome ou Edge.',
+      timestamp: new Date()
+    }
+    messages.value.push(msg)
+    nextTick(() => scrollToBottom())
+    return
+  }
+
+  if (isListening.value) return // évite double déclenchement
+
+  const recognition = new SpeechRecognition()
+  recognition.lang = 'fr-FR'
+  recognition.interimResults = false
+  recognition.maxAlternatives = 1
+
+  isListening.value = true
+
+  recognition.onresult = (event: any) => {
+    const transcript = event.results[0][0].transcript
+    console.log('🎤 [VOICE] Transcription:', transcript)
+    isListening.value = false
+    if (transcript.trim()) {
+      // Injecter le texte dans l'input et envoyer
+      currentMessage.value = transcript.trim()
+      sendMessage()
+    }
+  }
+
+  recognition.onerror = (event: any) => {
+    console.warn('🎤 [VOICE] Erreur:', event.error)
+    isListening.value = false
+    if (event.error === 'not-allowed') {
+      const msg: Message = {
+        id: uuidv4(),
+        role: 'assistant',
+        content: 'Accès au microphone refusé. Autorisez l\'accès dans les paramètres de votre navigateur.',
+        timestamp: new Date()
+      }
+      messages.value.push(msg)
+      nextTick(() => scrollToBottom())
+    }
+  }
+
+  recognition.onend = () => {
+    isListening.value = false
+  }
+
+  recognition.start()
+  console.log('🎤 [VOICE] Écoute démarrée...')
 }
 
 const handleProductClick = (productId: string) => {
@@ -2420,6 +2479,11 @@ onMounted(() => {
 
 <style scoped>
 /* ✅ ANIMATIONS CSS DANS LE COMPONENT */
+@keyframes cs-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+  50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+}
+
 @keyframes cs-pulse-status {
   0%, 100% { 
     opacity: 1; 
